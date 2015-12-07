@@ -20,7 +20,7 @@ if (Meteor.isClient) {
           SlidesCollection.insert({ _id: slideLibrary.title(), page: slideLibrary.getPage('first') });  
         } else if(slideDocument.page) {
           Session.set('slide.page', slideDocument.page);   
-        }  
+        } 
         slideLibrary.render(slideLibrary.getPage(Session.get('slide.page')));      
       }); 
     });
@@ -69,11 +69,16 @@ if (Meteor.isClient) {
     $('#slide-nav-gallery').slick({
       dots: true,
       arrows: true,
-      infinite: true,
+      infinite: false,
       slidesToShow: 5,
-      slidesToScroll: 2,
-      focusOnSelect: true
+      slidesToScroll: 2
     });
+  });
+
+  Template.slideNavPanel.events({
+    'click .slide-nav-option': function (event) {
+      slideLibrary.setPage(event);
+    }
   });
 
   // Tool Panel
@@ -82,21 +87,6 @@ if (Meteor.isClient) {
       Meteor.call('clear', slideLibrary.title() , Session.get('slide.page'), function() {
         overlayLibrary.clear();
       });
-    },
-    'click #slide-next-btn': function (event) {
-      slideLibrary.setPage( 
-        slideLibrary.getPage('next') 
-      );
-    },
-    'click #slide-prev-btn': function (event) {
-      slideLibrary.setPage( 
-        slideLibrary.getPage('prev') 
-      );
-    },
-    'click #slide-first-btn': function (event) {
-      slideLibrary.setPage( 
-        slideLibrary.getPage('first') 
-      );
     },
     'click .overlay-btn-tool': function (event) {
       var tool = $(event.currentTarget).attr('data-tool');

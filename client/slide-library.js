@@ -3,11 +3,20 @@ SlideLibrary = function (_title) {
   PDFJS.workerSrc = '/packages/pascoual_pdfjs/build/pdf.worker.js';
   var self = this;
   var slides;
+  create();
+  
 
-  var create = function() {
+  function create() {
     $('#slide').append('<canvas id="slide-canvas"> </canvas>');
   };
-  create();
+  
+
+  function updatePage(number){
+    Session.set('slide.page', number);
+    SlidesCollection.update({_id: self.title()}, {
+      $set: {page: number}
+    });
+  }
 
   self.clear = function() {
     $('#slide-canvas').remove();
@@ -26,24 +35,20 @@ SlideLibrary = function (_title) {
   };
   self.getPage = function(request){
     var number = Session.get('slide.page');
-    number = ('next'  === request) ? (number += 1) : number;
-    number = ('prev'  === request) ? (number -= 1) : number;
-    number = ('first' === request) ?            1  : number;
-    number = (_.isNumber(request)) ?      request  : number;
-    return number;
+    return Number(number);
   }
-  self.setPage = function(number){
-    Session.set('slide.page', number);
-    SlidesCollection.update({_id: self.title()}, {
-      $set: {page: number}
-    });
+
+  self.setPage = function(event){
+    var number = $(event.currentTarget).attr('data-slide');
+    updatePage(number);
   }
+  
   self.render = function(request){
     if(slides){
       self.clear(); 
-      var number = self.getPage(request);
+      var number = self.getPage();
       slides.getPage(number).then(function (page) {
-        self.setPage(number);
+        updatePage(number);
         var scale = 3;
         var viewport = page.getViewport(scale);
         // Prepare canvas using slide page dimensions
