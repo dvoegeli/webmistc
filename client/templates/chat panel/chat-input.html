@@ -1,0 +1,10 @@
+<template name="chatInput">
+  {{#if currentUser}}
+  <div class="input-group">
+    <span class="input-group-addon">
+      <i class="glyphicon glyphicon-console"></i>
+    </span>
+    <textarea class="form-control" id="chat-input-message" rows="3" placeholder="Enter message here." style="resize: none;"></textarea>
+  </div>
+  {{/if}}
+</template>

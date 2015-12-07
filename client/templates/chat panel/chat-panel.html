@@ -1,0 +1,9 @@
+<template name="chatPanel">
+  <div style="text-align: right;">
+    {{> loginButtons align="right"}}
+  </div>
+  {{#each messages}}
+    <strong>{{name}}</strong><br>
+    {{message}}<hr>
+  {{/each}}
+</template>

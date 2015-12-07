@@ -1,0 +1,38 @@
+<!-- 
+<template name="slides">
+  <a href="/" class="dropdown-toggle" data-toggle="dropdown" role="button">Slides<span class="caret"></span></a>
+  <ul class="dropdown-menu">
+    <li><a id="slide-next-btn" href="#">Next</a></li>
+    <li><a id="slide-prev-btn" href="#">Previous</a></li>
+    <li><a id="slide-first-btn" href="#">First</a></li>
+  </ul>
+</template>
+-->
+
+<template name="slides">
+
+    <div class="btn-group padded">
+
+      <button type="button" id="slide-prev-btn" class="btn btn-sm btn-default overlay-btn-tool" title="Previous Slide">
+        <i class="fa fa-step-backward fa-fw"></i>
+      </button>
+
+      <button type="button" id="slide-next-btn" class="btn btn-sm btn-default overlay-btn-tool" title="Next Slide">
+        <i class="fa fa-step-forward fa-fw"></i>
+      </button>
+
+    </div>
+
+    <div class="btn-group padded">
+
+      <button type="button" id="slide-first-btn" class="btn btn-sm btn-default overlay-btn-tool" title="First Slide">
+        <i class="fa fa-fast-backward fa-fw"></i>
+      </button>
+
+      <button type="button" id="slide-last-btn" class="btn btn-sm btn-default overlay-btn-tool" title="Last Slide">
+        <i class="fa fa-fast-forward fa-fw"></i>
+      </button>
+
+    </div>
+    
+</template>

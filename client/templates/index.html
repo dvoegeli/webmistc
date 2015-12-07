@@ -1,0 +1,54 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <meta name="description" content="MIST/C Web is the successor of MIST/C, which is an open-source, Java-based Internet teaching and conferencing environment.">
+  <meta name="author" content="Dorian Voegeli, C4I, GMU">
+
+  <title>MISTCweb</title>
+</head>
+
+
+<body>
+
+  <main>
+
+    <aside>
+      <section id="tool-panel">
+        {{> toolPanel}}
+      </section>
+      <section id="tool-fluid"></section>
+    </aside>
+
+    <figure id="whiteboard">
+       {{> overlay}}
+       {{> slide}} 
+    </figure>
+    <nav id="slide-nav-panel">
+      {{> slideNavPanel}}
+    </nav>
+
+    <footer>
+      <section id="control-panel">
+        {{> controlPanel}}
+      </section>
+      <section id="control-fluid"></section>
+    </footer>
+      
+  </main>
+
+  <aside>
+
+    <section class="container" id="question-panel">
+      <p>question panel</p>
+    </section>
+    <section class="container" id="chat-panel">
+      {{> chatPanel }}
+    </section>
+    <section class="container" id="chat-input">
+      {{> chatInput }}
+    </section>
+    
+  </aside>
+  
+</body>

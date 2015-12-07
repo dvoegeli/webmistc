@@ -1,0 +1,23 @@
+<template name="toolPanel">
+    
+    {{> stickyReplace}}  
+
+    {{> tools}}
+
+    <div class="btn-group padded">
+      {{#if isTextToolActive}}
+        {{> points}}
+      {{else}}
+        {{> weights}}
+      {{/if}}  
+
+      {{> colors}} 
+    </div>
+
+    {{> erasers}}
+
+    {{> slides}} 
+
+    {{> create}} 
+
+</template>
