@@ -1,7 +1,7 @@
 if (Meteor.isServer) {
 
   Meteor.startup(function () {
-
+    _ = lodash;
   });
 
   // Slides
@@ -19,7 +19,35 @@ if (Meteor.isServer) {
     return Messages.find({});
   });
 
+  // Questions
+  Meteor.publish('questions', function () {
+    return Questions.find({});
+  });
+
   Meteor.methods({
+    'moveToQuestionPanel': function (name, message, timestamp) {
+      // remove from messages
+      Messages.remove({
+        time: timestamp
+      });
+      // add to questions
+      Questions.insert({
+        name: name,
+        message: message,
+        time: timestamp
+      });
+    },
+    'moveToChatPanel': function (name, message, timestamp) {
+      // remove from messages
+      Questions.remove({
+        time: timestamp
+      });
+      Messages.insert({
+        name: name,
+        message: message,
+        time: timestamp
+      });
+    },
     'clear': function (title, number) {
       Presentations.update({_id: title + number}, {
         $set: {overlay: []}
@@ -28,8 +56,7 @@ if (Meteor.isServer) {
     'markEraser': function (title, number, id) {
       Presentations.update({_id: title + number }, {
         $pull : {
-          overlay: {
-            _id : id}
+          overlay: { _id : id }
           }
         }
       );
@@ -133,27 +160,45 @@ if (Meteor.isServer) {
         }
       );
     },
-    'markText': function (title, number, x, y, width, height, text, color, size) {
-      var hasOverlayOnSlide = (Presentations.find({_id: title + number}).count() > 0);
+    'storeTextbox': function (textbox) {
+      var hasOverlayOnSlide = (Presentations.find({_id: textbox.title + textbox.number}).count() > 0);
       if (!hasOverlayOnSlide){
-        Presentations.insert({_id: title + number, overlay: [] }); 
+        Presentations.insert({_id: textbox.title + textbox.number, overlay: [] }); 
       }
-      Presentations.update({_id: title + number}, {
-        $push: {
-          overlay: {
-            _id: new Mongo.ObjectID()._str,
-            type: 'text',
-            x: x,
-            y: y,
-            width: width,
-            height: height,
-            text: text,
-            color: color,
-            size: size}
-          } 
+      var overlay = Presentations.findOne({_id: textbox.title + textbox.number }).overlay;
+      console.log('the data:')
+      console.log(textbox)
+      console.log('what already in the database')
+      console.log(overlay)
+      if(textbox._id){
+        var noteIndex = _.findIndex(overlay, { '_id': textbox._id });
+        _.merge(overlay[noteIndex], {
+          width: textbox.width,
+          height: textbox.height,
+          x: textbox.x,
+          y: textbox.y,
+          text: textbox.text
+        })
+      } else {
+        overlay.push({
+          _id: new Mongo.ObjectID()._str,
+          type: 'text',
+          x: textbox.x,
+          y: textbox.y,
+          width: textbox.width,
+          height: textbox.height,
+          color: textbox.color,
+          size: textbox.size,
+          text: textbox.text,
+        })
+      }
+      Presentations.update({_id: textbox.title + textbox.number }, {
+        $set : {
+          overlay: overlay
         }
-      );
-    },
+      });
+      console.log('--------------------------------------------------------------')
+    }
   });
 
   Router.route('/slides/:filename', function (){

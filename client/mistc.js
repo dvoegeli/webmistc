@@ -6,6 +6,7 @@ if (Meteor.isClient) {
 
   // Startup
   Meteor.startup( function() {
+    _ = lodash;
     slideLibrary = new SlideLibrary('WelcomeToMISTCweb');
     overlayLibrary = new OverlayLibrary();
 
@@ -34,6 +35,9 @@ if (Meteor.isClient) {
     // messages
     Meteor.subscribe('messages');
 
+    // questions
+    Meteor.subscribe('questions');
+
     Tracker.autorun( function() {
       // slides
       var slideDocument = SlidesCollection.find({ _id: slideLibrary.title() }).fetch()[0];
@@ -54,10 +58,6 @@ if (Meteor.isClient) {
       }
     });
 
-    // chat
-    var $messages = $('#chat-panel');
-    $messages.scrollTop($messages[0].scrollHeight);
-
   });
 
   // Accounts
@@ -65,6 +65,7 @@ if (Meteor.isClient) {
     passwordSignupFields: 'USERNAME_ONLY'
   });
 
+  // Slide Navigation
   Template.slideNavPanel.onRendered(function(){
     $('#slide-nav-gallery').slick({
       dots: true,
@@ -90,9 +91,7 @@ if (Meteor.isClient) {
     },
     'click .overlay-btn-tool': function (event) {
       var tool = $(event.currentTarget).attr('data-tool');
-      var cursor = $(event.currentTarget).attr('data-cursor');
-      Session.set('overlay.tool', tool);
-      Session.set('overlay.cursor', cursor);
+      changeTool(tool);
     },
     'click .overlay-btn-color': function (event) {
       var color = $(event.currentTarget).attr('data-color');
@@ -100,11 +99,11 @@ if (Meteor.isClient) {
     },
     'click .overlay-btn-size': function (event) {
       var size = $(event.currentTarget).attr('data-size');
-      Session.set('overlay.size', size);
+      Session.set('overlay.size.outline', size);
     },
     'click .overlay-btn-text': function (event) {
-      var text = $(event.currentTarget).attr('data-text');
-      Session.set('overlay.text', text);
+      var text = $(event.currentTarget).attr('data-size');
+      Session.set('overlay.size.font', text);
     },
     'click .overlay-btn-sticky-replace > .toggle': function (event) {
       var stickyMode = $(event.currentTarget).hasClass('off');
@@ -114,7 +113,7 @@ if (Meteor.isClient) {
   });
 
   Template.toolPanel.helpers({
-    isTextToolActive: function() {
+    hasSelectedTextTool: function() {
       return _.isEqual( Session.get('overlay.tool'), 'text' );
     }
   });
@@ -128,223 +127,366 @@ if (Meteor.isClient) {
     });
   });
 
+  // Questions
+
+  Template.questionPanel.helpers({
+    questions: function() {
+      return Questions.find({}, { sort: { time: 1} } );
+    }
+  });
+
   // Chat
+
   Template.chatPanel.helpers({
     messages: function() {
       return Messages.find({}, { sort: { time: 1}});
     }
   });
 
-  Template.chatInput.events = {
+  Template.chatInput.events({
     'keydown textarea#chat-input-message' : function (event) {
       if(! Meteor.userId()){
         throw new Meteor.Error('not-authorized');
       }
       var $input = $(event.target);
-      var enterKeyPress = 13; // 13 is the enter key event
-      if (event.which == enterKeyPress) { 
+      var enterKey = 13; // 13 is the enter key event
+      if (event.which === enterKey) { 
         if (Meteor.user()){
           var name = Meteor.user().username;
         } else { 
           var name = 'Anonymous';
         }
         if ($input.val() != '') {
+          var timestamp = Date.now().toString();
           Messages.insert({
             name: name,
             message: $input.val(),
-            time: Date.now(),
+            time: timestamp
           });
           $input.val('');
         }
+        var $messages = $('#chat-panel');
+        $messages.scrollTop($messages[0].scrollHeight);
       }
-      var $messages = $('#chat-panel');
-      $messages.scrollTop($messages[0].scrollHeight);
+    }
+  });
+
+  Template.chatPanel.events({
+    // very ugly parent nesting, needs some TLC
+    'click .glyphicon-star' : function (event) {
+      var $target = $(event.currentTarget);
+      var name = $target.parent().parent().attr('data-name');
+      var message = $target.parent().text().trim();
+      var timestamp = $target.parent().parent().attr('data-time');
+      Meteor.call('moveToQuestionPanel', name, message, timestamp);
+    }
+  });
+
+  Template.questionPanel.events({
+    // very ugly parent nesting, needs some TLC
+    'click .glyphicon-remove' : function (event) {
+      var $target = $(event.currentTarget);
+      var timestamp = $target.parent().parent().attr('data-time');
+      var question = Questions.find({time: timestamp}).fetch()[0];
+      Meteor.call('moveToChatPanel', question.name, question.message, question.time);
+    }
+  });
+
+  // Overlay
+  function changeTool(_tool) {
+    var tool = _tool;
+    var cursor = $('[data-tool="' + tool + '"]').attr('data-cursor');
+    Session.set('overlay.tool', tool);
+    Session.set('overlay.cursor', cursor);
+    changeCursor();
+  }
+
+  function changeCursor() {
+    var cursor = Session.get('overlay.cursor');
+    var tool = Session.get('overlay.tool');
+    var color = _.isEqual( tool, 'erase' ) ? 'LightCoral' : Session.get('overlay.color');
+    var rotation = ( _.isEqual( tool, 'line' ) || _.isEqual( tool, 'arrow' ) ) ? -45 : 0;
+    $('#overlay').awesomeCursor(cursor, {
+      color: color,
+      rotate: rotation
+    });
+  }
+
+  Template.overlay.onCreated( function () {
+    // press CONTROL+Z to remove latest annotation from current slide
+    key('control+z', 'keyboard-shortcuts', function() {
+      overlayLibrary.undo(slideLibrary.title(), slideLibrary.getPage());
+    });
+
+    // press 1-7 to change tools
+    key('1', 'keyboard-shortcuts', function() {
+      changeTool('text');
+    });
+    key('2', 'keyboard-shortcuts', function() {
+      changeTool('pencil');
+    });
+    key('3', 'keyboard-shortcuts', function() {
+      changeTool('line');
+    });
+    key('4', 'keyboard-shortcuts', function() {
+      changeTool('arrow');
+    });
+    key('5', 'keyboard-shortcuts', function() {
+      changeTool('ellipse');
+    });
+    key('6', 'keyboard-shortcuts', function() {
+      changeTool('rect');
+    });
+    key('7', 'keyboard-shortcuts', function() {
+      changeTool('erase');
+    });
+
+    // press - and = to cycle through colors
+    key('-', 'keyboard-shortcuts', function() {
+      var color = overlayLibrary.cycleLeftToolColor();
+      Session.set('overlay.color', color);
+      changeCursor();
+    });
+    key('=', 'keyboard-shortcuts', function() {
+      var color = overlayLibrary.cycleRightToolColor();
+      Session.set('overlay.color', color);
+      changeCursor();
+    });
+
+    // press _ and + to cycle through sizes
+    key('shift+-', 'keyboard-shortcuts', function() {
+      var hasSelectedTextTool = _.isEqual( Session.get('overlay.tool'), 'text' );
+      if(hasSelectedTextTool){
+        var fontSize = overlayLibrary.cycleLeftTextSize();
+        Session.set('overlay.size.font', fontSize);
+      } else {
+        var outlineSize = overlayLibrary.cycleLeftToolSize();
+        Session.set('overlay.size.outline', outlineSize);
+      }
+    });
+    key('shift+=', 'keyboard-shortcuts', function() {
+      var hasSelectedTextTool = _.isEqual( Session.get('overlay.tool'), 'text' );
+      if(hasSelectedTextTool){
+        var fontSize = overlayLibrary.cycleRightTextSize();
+        Session.set('overlay.size.font', fontSize);
+      } else {
+        var outlineSize = overlayLibrary.cycleRightToolSize();
+        Session.set('overlay.size.outline', outlineSize);
+      }
+    });
+
+    // press ENTER to store new textbox
+    key('enter', 'text-entry', function(){
+      var jqTextInput = $('.annotation-text-input.annotation-text-active').first();
+      // console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+      // console.log('text input is: ')
+      // console.log(jqTextInput)
+      var isReplaceOn = Session.get('overlay.tool.replace');
+      overlayLibrary.removeActiveText();
+      key.filter = key.filters['all'];
+      key.setScope('keyboard-shortcuts');
+      // console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+      // console.log('pressed enter!')
+      // console.log('text entry is off. scope is: ' + key.getScope())
+      overlayLibrary.storeTextbox(slideLibrary.title(), slideLibrary.getPage(), jqTextInput.get(0));
+      if( isReplaceOn ){
+        overlayLibrary.replaceNote('previous', slideLibrary.title(), slideLibrary.getPage());
+      }
+    });
+    // press ESCAPE to cancel text entry
+    key('escape', 'text-entry', function() {
+      key.filter = key.filters['all'];
+      key.setScope('keyboard-shortcuts');
+      overlayLibrary.cancelText();
+    });
+
+    key.setScope('keyboard-shortcuts');
+  });  
+
+  key.filters = {
+    'all': function filter(event){
+      var tagName = (event.target || event.srcElement).tagName;
+      // ignore keypressed in any elements that support keyboard data input
+      return !(tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA');
+    },
+    'keyboard-shortcuts': function filter(event){
+      var tagName = (event.target || event.srcElement).tagName;
+      // ignore keypressed in any elements that support keyboard data input
+      return !(tagName == 'INPUT' || tagName == 'SELECT' || tagName == 'TEXTAREA');
+    },
+    'text-entry': function filter(event){
+      var tagName = (event.target || event.srcElement).tagName;
+      return (tagName === 'SPAN');
     }
   }
 
-  // Document 
-  // wish this was a global template :-(
-  // TODO: make a "global" template that has everything placed inside
-  // then test to "global" events from the "global" template
-  // Template.document.events({
-  $(document).on('keydown', function (event){
-    var shiftKey  = 16;  // 16 is the shift key event 
-    var ctrlKey   = 17;  // 17 is the control key event
-    var keyPressed = event.which;
-    // set the SHIFT modifier
-    if( _.isEqual( keyPressed, shiftKey ) ){ 
-      Session.set('overlay.keydown.shift', true); 
-    };
-    // set the CTRL modifier
-    if( _.isEqual( keyPressed, ctrlKey ) ){ 
-      Session.set('overlay.keydown.ctrl', true); 
-    }; 
+  Template.overlay.onRendered(function(){
 
-    // undo the last note by pressing CTRL+Z
-    var zKey = 90;  // 90 is the 'z' key event
-    var ctrlKeyDown = Session.get('overlay.keydown.ctrl');
-    var zKeyDown = keyPressed == zKey;
-    if ( ctrlKeyDown && zKeyDown )  { 
-      // how to delete from database?
-      overlayLibrary.undo(slideLibrary.title(), slideLibrary.getPage());
-    } 
-  });
+  })
 
-  $(document).on('keyup', function (event){
-    var shiftKey  = 16;  // 16 is the shift key event 
-    var ctrlKey   = 17;  // 17 is the control key event
-    var keyReleased = event.which;
-    // unset the SHIFT modifier
-    if( _.isEqual( keyReleased, shiftKey ) ){
-      Session.set('overlay.keydown.shift', false);
-    }
-    // unset the CONTROL modifier
-    if( _.isEqual( keyReleased, ctrlKey ) ){
-      Session.set('overlay.keydown.ctrl', false);
-    } 
-  });
-
-  
   Template.overlay.events({
-    'keydown textarea#overlay-place-textarea': function(event){
-      // ESC will cancel the text
-      // ENTER will attach the text
-      // SHIFT + ENTER will add a new line
-      var enterKey  = 13;  // 13 is the enter key event
-      var escapeKey = 27;  // 27 is the escape key event
-      var shiftKey  = 16;  // 16 is the shift key event 
-      var ctrlKey   = 17;  // 17 is the control key event
-      var keyPressed = event.which;
-      // attach the text
-      var shiftKeyDown = Session.get('overlay.keydown.shift');
-      var enterKeyPressed = (keyPressed == enterKey);
-      if ( enterKeyPressed && !shiftKeyDown ) { 
-        overlayLibrary.attachText(slideLibrary.title(), slideLibrary.getPage());
-      } 
-      //cancel the text
-      var escapeKeyPressed = (keyPressed == escapeKey);
-      if ( escapeKeyPressed ){
-        overlayLibrary.cancelText();
-      }  
-      // trigger replace if in replace mode
-      if( _.isEqual( keyPressed, enterKey ) && _.isEqual(Session.get('overlay.tool.replace'), true) ){
-        overlayLibrary.replace(slideLibrary.title(), slideLibrary.getPage());
-      }    
-    },
-    'keyup textarea': function(event){
-      overlayLibrary.autoresizeTextInput(event);
-    },
-    'keydown': function(event){
-      var shiftKey  = 16;  // 16 is the shift key event 
-      var ctrlKey   = 17;  // 17 is the control key event
-      var keyPressed = event.which;
-      // set the SHIFT modifier
-      if( _.isEqual( keyPressed, shiftKey ) ){ 
-        Session.set('overlay.keydown.shift', true); 
-      };
-      // set the CTRL modifier
-      if( _.isEqual( keyPressed, ctrlKey ) ){ 
-        Session.set('overlay.keydown.ctrl', true); 
-      }; 
-
-      // undo the last note by pressing CTRL+Z
-      var zKey = 90;  // 90 is the 'z' key event
-      var ctrlKeyDown = Session.get('overlay.keydown.ctrl');
-      var zKeyDown = keyPressed == zKey;
-      if ( ctrlKeyDown && zKeyDown )  { 
-        overlayLibrary.undo(slideLibrary.title(), slideLibrary.getPage());
-      }     
-    },
-    'keyup': function(event){
-      var shiftKey = 16;  // 16 is the shift key event 
-      var ctrlKey  = 17;  // 17 is the control key event
-      var keyReleased = event.which;
-      // unset the SHIFT modifier
-      if( _.isEqual( keyReleased, shiftKey ) ){
-        Session.set('overlay.keydown.shift', false);
+    'click': function (event) {
+      var hasClickedLeftMouseButton = _.isEqual(event.which, 1);
+      if ( !hasClickedLeftMouseButton ) { return true; }
+      //-------------------------------------------------------
+      var d3Target = d3.select(event.currentTarget);
+      var hasSelectedTextTool = _.isEqual( Session.get('overlay.tool'), 'text' );
+      var isReplaceOn = Session.get('overlay.tool.replace');
+      var isTargetTextInput =  d3Target.classed('annotation-text-input');
+      var isTargetTextHandle =  d3Target.classed('annotation-text-handle');
+      // console.log('target:')
+      // console.log(d3Target.node())
+      // console.log('replace on: ' + isReplaceOn)
+      // console.log('is the target .annotation-text-input: ' + isTargetTextInput)
+      // console.log('text tool active: ' + hasSelectedTextTool)
+      // console.log('is the target .annotation-text-handle: ' + isTargetTextHandle)
+      if ( isReplaceOn ) {
+        if ( isTargetTextInput ) {
+          overlayLibrary.setActiveText(d3Target.node());
+          key.setScope('text-entry'); 
+          key.filter = key.filters['text-entry'];
+          // console.log('text entry is on. scope is: ' + key.getScope())
+        } else { // nothing, shape, or handle is here
+          if ( !isTargetTextHandle ) {  
+            if( hasSelectedTextTool ) {
+              overlayLibrary.placeText(slideLibrary.title(), slideLibrary.getPage());
+              key.setScope('text-entry'); 
+              key.filter = key.filters['text-entry'];
+              // console.log('text entry is on: ' + key.getScope())
+            } else {
+              overlayLibrary.replaceNote('latest', slideLibrary.title(), slideLibrary.getPage());
+            }
+          } else if( isTargetTextHandle ){
+            var domTextBox = d3Target.node().parentNode;
+            overlayLibrary.startDragTextbox(domTextBox);
+          }
+        } // start drawing a shape
+      } else { // replace is turned off
+        if ( isTargetTextInput ) {
+          overlayLibrary.setActiveText(d3Target.node());
+          key.setScope('text-entry'); 
+          key.filter = key.filters['text-entry'];
+          // console.log('text entry is on. scope is:' + key.getScope())
+        } else { // nothing, shape, or handle is here
+          if ( hasSelectedTextTool ) {  
+            if( !isTargetTextHandle ){
+              overlayLibrary.removeActiveText();
+              overlayLibrary.placeText(slideLibrary.title(), slideLibrary.getPage());
+              key.setScope('text-entry'); 
+              key.filter = key.filters['text-entry'];
+              // console.log('text entry is on. scope is:' + key.getScope())
+            } else if( isTargetTextHandle ){
+              var domTextBox = d3Target.node().parentNode;
+              overlayLibrary.startDragTextbox(domTextBox); 
+            }
+          } // start drawing a shape
+        }
       }
-      // unset the CONTROL modifier
-      if( _.isEqual( keyReleased, ctrlKey ) ){
-        Session.set('overlay.keydown.ctrl', false);
+    },
+    'mouseup': function (event) {
+      var hasClickedLeftMouseButton = _.isEqual(event.which, 1);
+      if ( !hasClickedLeftMouseButton ) { return true; }
+      //-------------------------------------------------------
+      var d3Target = d3.select(event.target);
+      var hasSelectedTextTool = _.isEqual( Session.get('overlay.tool'), 'text' );
+      var isTargetTextInput =  d3Target.classed('annotation-text-input');
+      var isTargetTextHandle =  d3Target.classed('annotation-text-handle');
+      if( (!hasSelectedTextTool && !isTargetTextInput && !isTargetTextHandle) ) {
+        Session.set('draw', false);
+        switch( Session.get('overlay.tool') ) {
+          case 'line':
+            overlayLibrary.markLineEnd(event);
+            overlayLibrary.markLine(slideLibrary.title(), slideLibrary.getPage(), event);
+            break;
+          case 'arrow':
+            overlayLibrary.markArrowEnd(event);
+            overlayLibrary.markArrow(slideLibrary.title(), slideLibrary.getPage(), event);
+            break;
+          case 'rect':
+            overlayLibrary.markBoxCorner(event);
+            overlayLibrary.recoordinateBox(event);
+            overlayLibrary.markBox(slideLibrary.title(), slideLibrary.getPage(), event);
+            break;
+          case 'ellipse':
+            overlayLibrary.markEllipseCorner(event);
+            overlayLibrary.recoordinateEllipse(event);
+            overlayLibrary.markEllipse(slideLibrary.title(), slideLibrary.getPage(), event);
+            break;
+          case 'pencil':
+            overlayLibrary.markSquiggle(slideLibrary.title(), slideLibrary.getPage(), event);
+            break;
+          case 'erase':
+            overlayLibrary.deactivateEraser();
+            break;
+        }       
       }
+      // console.log('--------------------------------------------------------------------')
+    },
+    'mouseover .annotation-text-handle': function(event){
+      var jqTextbox = $(event.target).parent().get(0);
+      overlayLibrary.startDragTextbox(jqTextbox);
+    },
+    'mouseout .annotation-text-handle': function(event){
+      var jqTextbox = $(event.target).parent().get(0);
+      overlayLibrary.stopDragTextbox(jqTextbox);
+    },
+    'mouseup .annotation-text-handle': function(event){
+      var jqTextHandle = $(event.target);
+      var jqTextBox = jqTextHandle.parent();
+      var jqTextInput = jqTextBox.find('.annotation-text-input').first();
+      overlayLibrary.storeTextbox(slideLibrary.title(), slideLibrary.getPage(), jqTextInput.get(0));
+    },
+    'keyup .annotation-text-input, mouseup .annotation-text-input': function(event){
+      var domTextInput = event.target;
+      overlayLibrary.autosizeTextbox(domTextInput);
     },
     'mouseover': function(event){
-      var cursor = Session.get('overlay.cursor');
-      var tool = Session.get('overlay.tool');
-      var color = _.isEqual( tool, 'erase' ) ? 'LightCoral' : Session.get('overlay.color');
-      var rotation = ( _.isEqual( tool, 'line' ) || _.isEqual( tool, 'arrow' ) ) ? -45 : 0;
-      $('#overlay').awesomeCursor(cursor, {
-        color: color,
-        rotate: rotation
-      });
+      changeCursor();
     },
-    'mouseout': function(event){
+    'mouseexit': function(event){
       $('#overlay').css('cursor', '');
     },
-    'click': function(event){
-      var target = $(event.target);
-      if (_.isEqual( Session.get('overlay.tool'), 'text' ) && !_.isEqual(target.attr('id'), 'overlay-place-textarea') && !target.hasClass('annotation-text') ){
-        // CLICK outside the textarea will cancel the text
-        // CLICK inside the textarea will move the input cursor
-        overlayLibrary.placeText(slideLibrary.title(), slideLibrary.getPage(), event);       
-      }
-    },
-
     'click .annotation': function(event){
       if (_.isEqual( Session.get('overlay.tool'), 'erase' ) ){
         overlayLibrary.useEraserOnce(event, slideLibrary.title(), slideLibrary.getPage());
       }
     },
     'mousedown': function (event) {
-      Session.set('draw', true);
-      if (_.isEqual( Session.get('overlay.tool'), 'line' ) ){
-        overlayLibrary.markLineStart(event);
+      var hasClickedLeftMouseButton = _.isEqual(event.which, 1);
+      if ( !hasClickedLeftMouseButton ) { return true; }
+      //-------------------------------------------------------
+      var d3Target = d3.select(event.target);
+      var isReplaceOn = Session.get('overlay.tool.replace');
+      var hasSelectedTextTool = _.isEqual( Session.get('overlay.tool'), 'text' );
+      var isTargetTextInput =  d3Target.classed('annotation-text-input');
+      var isTargetTextHandle =  d3Target.classed('annotation-text-handle');
+      overlayLibrary.storeActiveTextInputs(slideLibrary.title(), slideLibrary.getPage());
+      key.filter = key.filters['all'];
+      key.setScope('keyboard-shortcuts');
+      if(isReplaceOn){
+        overlayLibrary.replaceNote('previous', slideLibrary.title(), slideLibrary.getPage());
       }
-      if (_.isEqual( Session.get('overlay.tool'), 'arrow' ) ){
-        overlayLibrary.markArrowStart(event);
+      if( (!isTargetTextInput && !isTargetTextHandle && !hasSelectedTextTool) ) {
+        Session.set('draw', true);
+        if (_.isEqual( Session.get('overlay.tool'), 'line' ) ){
+          overlayLibrary.markLineStart(event);
+        }
+        if (_.isEqual( Session.get('overlay.tool'), 'arrow' ) ){
+          overlayLibrary.markArrowStart(event);
+        }
+        if (_.isEqual( Session.get('overlay.tool'), 'rect' ) ){
+          overlayLibrary.markBoxOrigin(event);
+        }    
+        if (_.isEqual( Session.get('overlay.tool'), 'ellipse' ) ){
+          overlayLibrary.markEllipseOrigin(event);
+        }  
+        if (_.isEqual( Session.get('overlay.tool'), 'pencil' ) ){
+          overlayLibrary.markSquiggleStart(event);
+        } 
+        if (_.isEqual( Session.get('overlay.tool'), 'erase' ) ){
+          overlayLibrary.activateEraser(slideLibrary.title(), slideLibrary.getPage());
+        } 
       }
-      if (_.isEqual( Session.get('overlay.tool'), 'rect' ) ){
-        overlayLibrary.markBoxOrigin(event);
-      }    
-      if (_.isEqual( Session.get('overlay.tool'), 'ellipse' ) ){
-        overlayLibrary.markEllipseOrigin(event);
-      }  
-      if (_.isEqual( Session.get('overlay.tool'), 'pencil' ) ){
-        overlayLibrary.markSquiggleStart(event);
-      } 
-      if (_.isEqual( Session.get('overlay.tool'), 'erase' ) ){
-        overlayLibrary.activateEraser(slideLibrary.title(), slideLibrary.getPage());
-      }    
-    },
-    'mouseup': function (event) {
-      Session.set('draw', false);
-      if (Session.get('overlay.tool.replace') && !_.isEqual(Session.get('overlay.tool'), 'text') ){
-        overlayLibrary.replace(slideLibrary.title(), slideLibrary.getPage());
-      }
-      if (_.isEqual( Session.get('overlay.tool'), 'line' ) ){
-        overlayLibrary.markLineEnd(event);
-        overlayLibrary.markLine(slideLibrary.title(), slideLibrary.getPage(), event);
-      }
-      if (_.isEqual( Session.get('overlay.tool'), 'arrow' ) ){
-        overlayLibrary.markArrowEnd(event);
-        overlayLibrary.markArrow(slideLibrary.title(), slideLibrary.getPage(), event);
-      }
-      if (_.isEqual( Session.get('overlay.tool'), 'rect' ) ){
-        overlayLibrary.markBoxCorner(event);
-        overlayLibrary.recoordinateBox(event);
-        overlayLibrary.markBox(slideLibrary.title(), slideLibrary.getPage(), event);
-      }
-      if (_.isEqual( Session.get('overlay.tool'), 'ellipse' ) ){
-        overlayLibrary.markEllipseCorner(event);
-        overlayLibrary.recoordinateEllipse(event);
-        overlayLibrary.markEllipse(slideLibrary.title(), slideLibrary.getPage(), event);
-      }  
-      if (_.isEqual( Session.get('overlay.tool'), 'pencil' ) ){
-        overlayLibrary.markSquiggle(slideLibrary.title(), slideLibrary.getPage(), event);
-      } 
-      if (_.isEqual( Session.get('overlay.tool'), 'erase' ) ){
-        overlayLibrary.deactivateEraser();
-      }          
     },
     'mousemove': function (event) {
       overlayLibrary.createLocalSpace(event);

@@ -12,8 +12,8 @@ OverlayLibrary = function () {
     Session.setDefault('overlay.tool', 'pencil');
     Session.setDefault('overlay.cursor', 'pencil');
     Session.setDefault('overlay.color', '#CC2529');
-    Session.setDefault('overlay.size', '5px');
-    Session.setDefault('overlay.text', '16pt');
+    Session.setDefault('overlay.size.outline', '5');
+    Session.setDefault('overlay.size.font', '16');
     Session.setDefault('overlay.tool.replace', true);
     create();
   };
@@ -81,9 +81,82 @@ OverlayLibrary = function () {
     create();
   };
 
+  // TOOL COLOR -----------------------------------------------------------------------------------------
+  var toolColor = {
+    current: Session.get('overlay.color'),
+    codes: ['#396AB1', '#DA7C30', '#3E9651', '#CC2529', '#535154', '#6B4C9A', '#922428','#948B3D']
+  }
+
+  self.cycleLeftToolColor = function(){
+    toolColor.current = leftOfElementInArray(toolColor.current, toolColor.codes);
+    return toolColor.current;
+  }
+
+  self.cycleRightToolColor = function(){
+    toolColor.current = rightOfElementInArray(toolColor.current, toolColor.codes);
+    return toolColor.current;
+  }
+
+  // TOOL SIZE -----------------------------------------------------------------------------------------
+  var toolSize = {
+    current: Session.get('overlay.size.outline'),
+    codes: ['3', '5', '8', '13', '21']
+  }
+
+  self.cycleLeftToolSize = function(){
+    toolSize.current = leftOfElementInArray(toolSize.current, toolSize.codes);
+    return toolSize.current;
+  }
+
+  self.cycleRightToolSize = function(){
+    toolSize.current = rightOfElementInArray(toolSize.current, toolSize.codes);
+    return toolSize.current;
+  }  
+
+  // TEXT SIZE -----------------------------------------------------------------------------------------
+  var textSize = {
+    current: Session.get('overlay.size.font'),
+    codes: [14, 18, 24, 32, 42]
+  }
+
+  self.cycleLeftTextSize = function(){
+    textSize.current = leftOfElementInArray(parseInt(textSize.current), textSize.codes)
+    return textSize.current;
+  }
+
+  self.cycleRightTextSize = function(){
+    textSize.current = rightOfElementInArray(parseInt(textSize.current), textSize.codes);
+    return textSize.current;
+  }  
+
+  // UTILITIES ----------------------------------------------------------------------------------------
+ function leftOfElementInArray (element, array){
+    var leftOfElement = element;
+    var index = _.indexOf(array, element);
+    var isElementInArray = !_.isEqual(index, -1);
+    if( isElementInArray ){
+      index = (index - 1 >= 0) ? (index - 1) : (array.length - 1);
+      leftOfElement = array[index];
+    }
+    return leftOfElement;
+  }
+
+  function rightOfElementInArray (element, array){
+    var rightOfElement = element;
+    var index = _.indexOf(array, element);
+    var isElementInArray = !_.isEqual(index, -1);
+    if( isElementInArray ){
+      index = (index + 1 < array.length) ? (index + 1) : 0;
+      rightOfElement = array[index];
+    }
+    return rightOfElement;
+  }
+
   // ERASE ---------------------------------------------------------------------------------------------
 
   self.useEraserOnce = function(event, title, number) {
+    // TODO rewrite to use d3 instead of jquery
+    // also, all targets should be an html node, not the raw event object
     var target = $(event.target);
     var element = target.hasClass('annotation') ? target : target.parent();
     if( element.hasClass('annotation') ){
@@ -109,31 +182,36 @@ OverlayLibrary = function () {
   // UNDO ---------------------------------------------------------------------------------------------
 
   self.undo = function(title, number) {
-    var mostRecentNote = $('svg .annotation:last-child');
-    var id = mostRecentNote.attr('id');
-    mostRecentNote.remove();
+    var latestNote = $('svg .annotation').last();
+    var id = latestNote.attr('id');
+    latestNote.remove();
     Meteor.call('markEraser', title, number, id);
   };
 
   // REPLACE ---------------------------------------------------------------------------------------------
 
-  self.replace = function(title, number) {
-    var annotations = $('svg .annotation');
-    var noteIndex = (annotations.length - 1);
-    var noteToReplace = annotations[noteIndex];
-    var id = $(noteToReplace).attr('id');
+  self.replaceNote = function( whichNote, title, number) {
+    var jqNote;
+    switch(whichNote){
+      case 'latest':
+        jqNote = $('svg .annotation').last();
+        break;
+      case 'previous':
+        jqNote = $('svg .annotation:nth-last-child(2)').first();
+        break;
+    }
+    var id = jqNote.attr('id');
+    jqNote.remove();
     if(id){
-      noteToReplace.remove();
       Meteor.call('markEraser', title, number, id);
     }
   };
-
 
   // DRAW -----------------------------------------------------------------------------------------------
   self.markSquiggle = function(title, number) {
     var points = Session.get('overlay.tool.pencil.points'); 
     var color = Session.get('overlay.color');
-    var size = Session.get('overlay.size');
+    var size = Session.get('overlay.size.outline');
     points = pathSimplifier.simplify(points, 3.0, true);
     Meteor.call('markSquiggle', title, number, points, color, size);
   };
@@ -148,7 +226,7 @@ OverlayLibrary = function () {
     var x2 = Session.get('overlay.tool.line.x2');
     var y2 = Session.get('overlay.tool.line.y2');
     var color = Session.get('overlay.color');
-    var size = Session.get('overlay.size');
+    var size = Session.get('overlay.size.outline');
     var isTooSmallToSee = _.isEqual(x1, x2) && _.isEqual(y1, y2)
     if(!isTooSmallToSee){
       Meteor.call('markLine', title, number, x1, y1, x2, y2, color, size);
@@ -170,7 +248,7 @@ OverlayLibrary = function () {
     var x2 = Session.get('overlay.tool.arrow.x2');
     var y2 = Session.get('overlay.tool.arrow.y2');
     var color = Session.get('overlay.color');
-    var size = Session.get('overlay.size');
+    var size = Session.get('overlay.size.outline');
     var isTooSmallToSee = _.isEqual(x1, x2) && _.isEqual(y1, y2)
     if(!isTooSmallToSee){
       Meteor.call('markArrow', title, number, x1, y1, x2, y2, color, size);
@@ -193,7 +271,7 @@ OverlayLibrary = function () {
     var width = Session.get('overlay.tool.box.width');
     var height = Session.get('overlay.tool.box.height');
     var color = Session.get('overlay.color');
-    var size = Session.get('overlay.size');
+    var size = Session.get('overlay.size.outline');
     var isTooSmallToSee = _.isEqual(width, 0) || _.isEqual(height, 0)
     if(!isTooSmallToSee){
       Meteor.call('markBox', title, number, x, y, width, height, 'none', color, size);
@@ -240,7 +318,7 @@ OverlayLibrary = function () {
     var rx = Session.get('overlay.tool.ellipse.rx');
     var ry = Session.get('overlay.tool.ellipse.ry');
     var color = Session.get('overlay.color');
-    var size = Session.get('overlay.size');
+    var size = Session.get('overlay.size.outline');
     var isTooSmallToSee = _.isEqual(rx, 0) || _.isEqual(ry, 0)
     if(!isTooSmallToSee){
       Meteor.call('markEllipse', title, number, cx, cy, rx, ry, 'none', color, size);
@@ -286,16 +364,6 @@ OverlayLibrary = function () {
     Session.set('overlay.tool.ellipse.corner.y', localSpace.y);
   };
 
-  self.markText = function(title, number) {
-    var x = Session.get('overlay.tool.text.x');
-    var y = Session.get('overlay.tool.text.y');
-    var width = Session.get('overlay.tool.text.width');
-    var height = Session.get('overlay.tool.text.height');
-    var text = Session.get('overlay.tool.text.text');
-    var color = Session.get('overlay.color');
-    var size = Session.get('overlay.text');
-    Meteor.call('markText', title, number, x, y, width, height, text, color, size);
-  };
   // PLACE  -----------------------------------------------------------------------------------------------
   self.placeLine = function() {
     d3.select('#overlay_place_line').remove();
@@ -305,7 +373,7 @@ OverlayLibrary = function () {
       .attr('y1', Session.get('overlay.tool.line.y1') )
       .attr('x2', Session.get('overlay.tool.line.x2') )
       .attr('y2', Session.get('overlay.tool.line.y2') )
-      .attr('stroke-width', Session.get('overlay.size') )
+      .attr('stroke-width', Session.get('overlay.size.outline') )
       .attr('stroke', Session.get('overlay.color') );
   };
 
@@ -324,7 +392,7 @@ OverlayLibrary = function () {
         .attr('y1', Session.get('overlay.tool.arrow.y1') )
         .attr('x2', Session.get('overlay.tool.arrow.x2') )
         .attr('y2', Session.get('overlay.tool.arrow.y2') )
-        .attr('stroke-width', Session.get('overlay.size') )
+        .attr('stroke-width', Session.get('overlay.size.outline') )
         .attr('stroke', Session.get('overlay.color') );
     }
   };
@@ -338,7 +406,7 @@ OverlayLibrary = function () {
       .attr('width', Session.get('overlay.tool.box.width') )
       .attr('height', Session.get('overlay.tool.box.height') )
       .attr('fill', 'none')
-      .attr('stroke-width', Session.get('overlay.size') )
+      .attr('stroke-width', Session.get('overlay.size.outline') )
       .style('stroke', Session.get('overlay.color') );
   };
 
@@ -351,7 +419,7 @@ OverlayLibrary = function () {
       .attr('rx', Session.get('overlay.tool.ellipse.rx') )
       .attr('ry', Session.get('overlay.tool.ellipse.ry') )
       .attr('fill', 'none')
-      .attr('stroke-width', Session.get('overlay.size') )
+      .attr('stroke-width', Session.get('overlay.size.outline') )
       .style('stroke', Session.get('overlay.color') );
   };
 
@@ -380,104 +448,11 @@ OverlayLibrary = function () {
       .attr('id','overlay_place_pencil')
       .attr('d', squigglePointGenerator(points))
       .attr('fill', 'none')
-      .attr('stroke-width', Session.get('overlay.size'))
+      .attr('stroke-width', Session.get('overlay.size.outline'))
       .attr('stroke', Session.get('overlay.color'));
   };
 
-  self.attachText = function(title, number){
-    var textArea = $('#overlay-place-textarea');
-    var width = textArea.width();
-    var height = textArea.height();
-    var text = textArea.val();
-    if(text){
-      text = text.replace(/\n/g, '<br>');  // repalce javascript newlines with html breaks
-      
-      Session.set('overlay.tool.text.width', width);
-      Session.set('overlay.tool.text.height', height);
-      Session.set('overlay.tool.text.text', text);
-
-      d3.select('#overlay-place-text').remove();
-      self.markText(title, number);
-    }    
-  };
-
-  self.cancelText = function(){
-    d3.select('#overlay-place-text').remove();  
-  }
-
-  self.placeText = function(title, number, event) {
-    var size = Session.get('overlay.text');
-    var color = Session.get('overlay.color');
-    
-    var x = localSpace.x;
-    var y = localSpace.y;
-
-    Session.set('overlay.tool.text.x', x);
-    Session.set('overlay.tool.text.y', y);
-
-    d3.select('#overlay-place-text').remove();
-    var wrapper = overlay.append('foreignObject')
-      .attr('id','overlay-place-text') // refactor out name somehow, pass in through parameter
-      .attr('x', x)
-      .attr('y', y)
-      .attr('width', '600px')
-      .attr('height', '3000px')
-    var textArea = wrapper.append('xhtml:textarea')
-      .attr('id','overlay-place-textarea') // refactor out name somehow, pass in through parameter
-      .attr('class', 'text-tool-input')
-      .attr('wrap','hard')
-      .attr('resize', 'none')      
-      .attr('placeholder', 'Press enter when done.\nPress shift+enter for new line.')
-      .style('font-size', size)
-      .style('color', color)
-      .style('width', '300px') // place these into a stylesheet
-      .style('min-width', '100px')
-      .style('padding', '0px 5px');
-    var holder = wrapper.append('xhtml:div') // refactor out name somehow, pass in through parameter
-      .attr('id','overlay-place-holder')
-      .attr('class', 'text-tool-input')
-      .attr('wrap','hard')
-      .style('font-size', size)
-      .style('max-width', '600px') // place these into a stylesheet
-      .style('min-width', '100px') // place these into a stylesheet
-      .style('display', 'none')
-      .style('padding', '0px 5px');
-
-    $('#overlay-place-textarea').focus();
-    $('#overlay-place-textarea').autosize();
-  };
-
-  self.autoresizeTextInput = function(event) {
-    var $text = $(event.target);
-    var $holder = $('#overlay-place-holder'); //refactor these names out
-    var $wrapper = $('#overlay-place-text');  // refactor out, pass in through parameters
-
-    $holder.text( $text.val() );
-    var width = Number( $holder.css("width").slice(0,-2) ) + 20 + 'px';
-    $text.css( "width", width);
-  }
-
   // DRAW -----------------------------------------------------------------------------------------------
-  function drawText(note) {
-    overlay.append('foreignObject')
-      .attr('id', note._id)
-      .attr('class', 'annotation')
-      .attr('x', note.x)
-      .attr('y', note.y)
-      .attr('width', note.width)
-      .attr('height', note.height)
-      .append('xhtml:textarea')
-        .attr('class', 'annotation-text')
-        .attr('wrap','hard')
-        .style('font-size', note.size)
-        .style('width', note.width)
-        .style('height', note.height)
-        .style('color', note.color)
-        .html(note.text);
-        // this is very vulernable to injection attacks due to using html instead of text
-        // the reason html is used is to preserve whitespace and line breaks
-  };
-
   function drawSquiggle(note) { 
     overlay.append('path')
       .attr('id', note._id)
@@ -537,5 +512,256 @@ OverlayLibrary = function () {
       .attr('stroke-width', note.weight)
       .attr('fill', note.fill)
       .style('stroke', note.color);
+  };
+
+  // spin out into a utility library, this is useful everywhere
+  function updateSessionObject (id, attributes) {
+    var object = Session.get(id);
+    _.each(attributes, function(value, key) {
+      object[key] = value;
+    })
+    Session.set(id, object);
+  }
+
+  // TEXT --------------------------------------------------------------------------
+  Session.setDefault('overlay.tool.textbox', {});
+
+  self.storeTextbox = function(title, number, domTextInput) { 
+    // console.log('storing textbox, before updates')
+    // console.log(domTextInput)  
+    var jqTextInput = $(domTextInput);
+    var jqTextBox = jqTextInput.parent().parent();
+    var text = jqTextInput.text();
+    if(text){
+      updateSessionObject('overlay.tool.textbox', {
+        title: title,
+        number: number,
+        text: text,
+        height: jqTextInput.css('height'),
+        width: jqTextInput.css('width'),
+        x: jqTextBox.attr('data-x'),
+        y: jqTextBox.attr('data-y'),
+      });
+      if (jqTextBox.attr('id')){
+        updateSessionObject('overlay.tool.textbox', {
+          _id: jqTextBox.attr('id')
+        });
+      }
+      // console.log('##########################################')
+      // console.log('storing textbox, after updates')
+      // console.log(Session.get('overlay.tool.textbox'))
+      // console.log('##########################################')
+      Meteor.call('storeTextbox', Session.get('overlay.tool.textbox'));
+    }    
+  }; 
+
+  self.placeText = function(title, number) {
+    var x = localSpace.x;
+    var y = localSpace.y;
+    var size = parseInt( Session.get('overlay.size.font') );
+    var color = Session.get('overlay.color');
+
+    Session.set('overlay.tool.textbox', {});
+    updateSessionObject('overlay.tool.textbox', {
+      x: x,
+      y: y,
+      size: size,
+      color: color
+    });   
+
+    var textbox = overlay.append('g')
+      .attr({
+        class: 'annotation annotation-text-box',
+        'data-x': x,
+        'data-y': y,
+        'data-x-origin': x,
+        'data-y-origin': y,
+      });
+    var handle = textbox.append('rect')
+      .attr({
+        class: 'annotation-text-handle',
+        'min-height': size + 'px',
+        x: x - 20 + 'px',
+        y: y,
+        width: '20px',
+      });
+    var background = textbox.append('rect')
+      .attr({
+        class: 'annotation-text-background',
+        'min-width': (size * 5) + 'px',
+        'min-height': size + 'px',
+        x: x,
+        y: y,
+      });
+    var text = textbox.append('foreignObject')
+      .attr({
+        class: 'annotation-text-container',
+        height: '600px',
+        width: '600px',
+        x: x,
+        y: y,
+      });
+      var input = text.append('xhtml:span')
+        .attr({
+          class: 'annotation-text annotation-text-active annotation-text-input',
+          'data-placeholder': 'Press enter when done\nShift+enter for new line.',
+          contenteditable: '',
+          wrap: 'hard',
+        })        
+        .style({
+          color: color,
+          'font-size': size + 'px',
+          'max-width': '600px',
+          'min-width': (size * 5) + 'px',
+          'min-height': size + 'px',
+        });
+    input.node().focus();
+    // change background and handle to match text
+    var bounding = {
+      height: parseInt( $( input.node() ).css( 'height' ) ), 
+      width: parseInt( $( input.node() ).css( 'width' ) ), 
+    }
+    handle.attr( 'height', bounding.height );    
+    background.attr( 'width', bounding.width);
+    background.attr( 'height', bounding.height );
+    input.attr('data-placeholder-width', bounding.width);
+    input.attr('data-placeholder-height', bounding.height);
+  };
+
+  self.autosizeTextbox = function(domTextInput) {
+    var jqTextInput = $(domTextInput);
+    var jqTextContainer = jqTextInput.parent();
+    var jqTextBox = jqTextContainer.parent(); 
+    var jqTextBackground = jqTextBox.find('.annotation-text-background').first();
+    var jqTextHandle = jqTextBox.find('.annotation-text-handle').first();
+    var size = parseInt(Session.get('overlay.size.font'));
+    var width = parseInt(jqTextInput.css('width'));
+    var height = parseInt(jqTextInput.css('height')); 
+    if( jqTextInput.text() ){
+      jqTextHandle.attr('height', height);
+      jqTextBackground.attr('width', width);
+      jqTextBackground.attr('height', height);
+      jqTextContainer.attr('width', width + (2 * size) );
+      jqTextContainer.attr('height', height);
+    } else {
+      jqTextHandle.attr('height', jqTextInput.attr('data-placeholder-height') );
+      jqTextBackground.attr('width', jqTextInput.attr('data-placeholder-width') );
+      jqTextBackground.attr('height', jqTextInput.attr('data-placeholder-height') );
+      jqTextContainer.attr('width', jqTextInput.attr('data-placeholder-width') + (2 * size) );
+      jqTextContainer.attr('height', jqTextInput.attr('data-placeholder-height') );
+    }
+  }
+
+  self.cancelText = function(){
+    // the textbox group
+    $('.annotation-text.annotation-text-active').first().parent().parent().remove(); 
+  }
+  self.removeActiveText = function(){
+    overlay.selectAll('.annotation-text-active')
+        .classed('annotation-text-active', false);
+  }
+  self.setActiveText = function(domTextbox){
+    self.removeActiveText();
+    d3.select(domTextbox).classed('annotation-text-active', true);
+  }
+
+  var dragGroup = d3.behavior.drag()
+    .origin(function() { 
+      var d3Textbox = d3.select(this);
+      return {
+        x: d3Textbox.attr('x') + d3.transform(d3Textbox.attr('transform')).translate[0],
+        y: d3Textbox.attr('y') + d3.transform(d3Textbox.attr('transform')).translate[1],
+      };
+    })
+    .on('drag', function() {
+      var d3Textbox = d3.select(this);
+      var x = d3.event.x;
+      var y = d3.event.y;
+      d3Textbox.attr({
+        'transform': function(){
+            return 'translate(' + [ x, y ] + ')'
+        },
+        'data-x': _.round(parseInt(d3Textbox.attr('data-x-origin')) 
+                          + parseFloat(d3.transform(d3Textbox.attr('transform')).translate[0])),
+        'data-y': _.round(parseInt(d3Textbox.attr('data-y-origin')) 
+                          + parseFloat(d3.transform(d3Textbox.attr('transform')).translate[1])),
+      })
+    });
+
+  self.startDragTextbox = function(domTextBox){
+    d3.select(domTextBox).call(dragGroup);
+  }
+
+  self.stopDragTextbox = function(textbox){
+    d3.select(textbox).on('drag', null);
+    d3.select(textbox).on('.drag', null);
+  }
+
+  self.storeActiveTextInputs = function( title, page ){
+    var activeTextInput = $('.annotation-text-active');
+    if ( activeTextInput.length ){
+      // console.log('active text inputs:')
+      // console.log(activeTextInput);
+      // console.log('deactivating and storing all active texts:')
+      self.removeActiveText();
+      activeTextInput.each( function(){
+        var domTextInput = this;
+        self.storeTextbox( title, page, domTextInput);
+      });
+    }
+  }
+
+  function drawText(note) {
+    var textbox = overlay.append('g')
+      .attr({
+        id: note._id,
+        class: 'annotation annotation-text-box',
+        'data-x': note.x,
+        'data-y': note.y,
+        'data-x-origin': note.x,
+        'data-y-origin': note.y,
+      });
+    var handle = textbox.append('rect')
+      .attr({
+        class: 'annotation-text-handle',
+        height: note.height,
+        width: '20px',
+        x: parseInt(note.x) - 20 + 'px',
+        y: note.y,
+      });
+    var background = textbox.append('rect')
+      .attr({
+        class: 'annotation-text-background',
+        height: note.height,
+        width: note.width,
+        x: note.x,
+        y: note.y,
+      });
+    var text = textbox.append('foreignObject')
+      .attr({
+        class: 'annotation-text-container',
+        height: '600px',
+        width: '600px',
+        x: note.x,
+        y: note.y,
+      });
+      var input = text.append('xhtml:span')
+        .attr({
+          class: 'annotation-text annotation-text-input',
+          'data-placeholder': 'Press enter when done\nShift+enter for new line.',
+          contenteditable: '',
+          wrap: 'hard',
+        })        
+        .style({
+          color: note.color,
+          'font-size': note.size + 'px',
+          height: parseInt(note.height),
+          width: parseInt(note.width) + note.size,
+          'max-width': '600px',
+          'min-width': (note.size * 5) + 'px',
+          'min-height': note.size + 'px', 
+        })   
+        .text(note.text);
+    self.autosizeTextbox(input.node());
   };
 }

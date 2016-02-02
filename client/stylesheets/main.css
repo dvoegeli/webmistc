@@ -33,10 +33,26 @@
   font-family: sans-serif;
   padding: 0px 5px;
   word-break: keep-all;
-  display : block;
-  background: rgba(255, 255, 255, 0.9);
+  display:inline-block;
   resize: none;
   outline: none;
+  shape-rendering: crispEdges;
+  stroke: none;
+}
+.annotation-text:empty::before {
+    content: attr(data-placeholder);
+    display: inline-block;
+    color: lightslategray;
+    shape-rendering: crispEdges;
+    stroke: none;
+}
+.annotation-text-background {
+  fill: white;
+  fill-opacity: .85;
+}
+.annotation-text-handle {
+  fill: cadetblue;
+  fill-opacity: .45;
 }
 
 .text-tool-input {

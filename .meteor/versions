@@ -18,6 +18,7 @@ check@1.1.0
 coffeescript@1.0.11
 copleykj:jquery-autosize@1.17.8
 d3js:d3@3.5.5
+dbernhard:jquery-ui-draggable@0.1.2
 ddp@1.2.2
 ddp-client@1.2.1
 ddp-common@1.2.2
@@ -49,6 +50,7 @@ iron:router@1.0.12
 iron:url@1.0.11
 jiku:bootstrap-toggle@0.0.1
 jquery@1.11.4
+keymaster:keymaster@1.6.2_1
 kidovate:bootstrap-slider@0.0.5
 launch-screen@1.0.4
 less@2.5.1
@@ -68,6 +70,7 @@ npm-mongo@1.4.39_1
 observe-sequence@1.0.7
 ordered-dict@1.0.4
 pascoual:pdfjs@1.1.114
+pba:jquery-svg-class@0.0.0
 promise@0.5.1
 random@1.0.5
 rate-limit@1.0.0
@@ -83,6 +86,7 @@ spacebars@1.0.7
 spacebars-compiler@1.0.7
 srp@1.0.4
 standard-minifiers@1.0.2
+stevezhu:lodash@4.0.0
 templating@1.1.5
 templating-tools@1.0.0
 tracker@1.0.9

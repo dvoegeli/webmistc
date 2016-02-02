@@ -5,10 +5,10 @@
     {{> tools}}
 
     <div class="btn-group padded">
-      {{#if isTextToolActive}}
-        {{> points}}
+      {{#if hasSelectedTextTool}}
+        {{> font}}
       {{else}}
-        {{> weights}}
+        {{> outline}}
       {{/if}}  
 
       {{> colors}} 

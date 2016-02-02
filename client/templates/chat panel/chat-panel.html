@@ -1,9 +1,22 @@
 <template name="chatPanel">
+
   <div style="text-align: right;">
     {{> loginButtons align="right"}}
   </div>
+
   {{#each messages}}
-    <strong>{{name}}</strong><br>
-    {{message}}<hr>
+
+  <div class="chat-message" data-name="{{name}}" data-time="{{time}}">
+    <span>
+      <strong>{{name}}</strong>
+    </span> 
+
+    <div>
+      <span class="glyphicon glyphicon-star" style="color: gold; cursor:pointer"></span>
+      {{message}}<hr>
+    </div>
+  </div>
+
   {{/each}}
+  
 </template>
