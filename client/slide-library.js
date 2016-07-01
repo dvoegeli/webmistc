@@ -12,9 +12,20 @@ SlideLibrary = function (_title) {
   
 
   function updatePage(number){
+    //console.error('update page: ' + number);
     Session.set('slide.page', number);
-    SlidesCollection.update({_id: self.title()}, {
-      $set: {page: number}
+    Meteor.call('slides.change', self.title(), number);
+    Meteor.call('recordings.insert', {
+      state: 'session',
+      action: 'slide.page',
+      params: [number],
+      time: Date.now(),
+    });
+    Meteor.call('recordings.insert', {
+      state: 'database',
+      action: 'slides.change',
+      params: [self.title(), number],
+      time: Date.now(),
     });
   }
 
@@ -38,8 +49,7 @@ SlideLibrary = function (_title) {
     return Number(number);
   }
 
-  self.setPage = function(event){
-    var number = $(event.currentTarget).attr('data-slide');
+  self.setPage = function(number){
     updatePage(number);
   }
   
@@ -48,7 +58,7 @@ SlideLibrary = function (_title) {
       self.clear(); 
       var number = self.getPage();
       slides.getPage(number).then(function (page) {
-        updatePage(number);
+        //updatePage(number);
         var scale = 3;
         var viewport = page.getViewport(scale);
         // Prepare canvas using slide page dimensions

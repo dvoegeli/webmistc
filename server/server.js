@@ -1,7 +1,12 @@
+// Recordings
+import '../imports/recording-library.js'; 
+import _ from 'lodash';
+
+
 if (Meteor.isServer) {
 
   Meteor.startup(function () {
-    _ = lodash;
+    //_ = lodash;
   });
 
   // Slides
@@ -25,6 +30,18 @@ if (Meteor.isServer) {
   });
 
   Meteor.methods({
+    'slides.change': function(title, number){
+      SlidesCollection.update({_id: title}, {
+        $set: {page: number}
+      });
+    },
+    'messages.new': function(name, message, timestamp){
+      Messages.insert({
+        name: name,
+        message: message,
+        time: timestamp
+      });
+    },
     'moveToQuestionPanel': function (name, message, timestamp) {
       // remove from messages
       Messages.remove({
@@ -61,7 +78,7 @@ if (Meteor.isServer) {
         }
       );
     },
-    'markSquiggle': function (title, number, points, color, width) {
+    'markSquiggle': function (title, number, id, points, color, width) {
       var hasOverlayOnSlide = (Presentations.find({_id: title + number}).count() > 0);
       if (!hasOverlayOnSlide){
         Presentations.insert({_id: title + number, overlay: [] }); 
@@ -69,7 +86,7 @@ if (Meteor.isServer) {
       Presentations.update({_id: title + number}, {
         $push: {
           overlay: {
-            _id: new Mongo.ObjectID()._str,
+            _id: id,
             type: 'squiggle',
             points: points,
             color: color,
@@ -78,7 +95,7 @@ if (Meteor.isServer) {
         }
       );
     },
-    'markLine': function (title, number, x1, y1, x2, y2, color, width) {
+    'markLine': function (title, number, id, x1, y1, x2, y2, color, width) {
       var hasOverlayOnSlide = (Presentations.find({_id: title + number}).count() > 0);
       if (!hasOverlayOnSlide){
         Presentations.insert({_id: title + number, overlay: [] }); 
@@ -86,7 +103,7 @@ if (Meteor.isServer) {
       Presentations.update({_id: title + number}, {
         $push: {
           overlay: {
-            _id: new Mongo.ObjectID()._str,
+            _id: id,
             type: 'line',
             x1: x1,
             y1: y1,
@@ -98,7 +115,7 @@ if (Meteor.isServer) {
         }
       );
     },
-    'markArrow': function (title, number, x1, y1, x2, y2, color, width) {
+    'markArrow': function (title, number, id, x1, y1, x2, y2, color, width) {
       var hasOverlayOnSlide = (Presentations.find({_id: title + number}).count() > 0);
       if (!hasOverlayOnSlide){
         Presentations.insert({_id: title + number, overlay: [] }); 
@@ -106,7 +123,7 @@ if (Meteor.isServer) {
       Presentations.update({_id: title + number}, {
         $push: {
           overlay: {
-            _id: new Mongo.ObjectID()._str,
+            _id: id,
             type: 'arrow',
             x1: x1,
             y1: y1,
@@ -118,7 +135,7 @@ if (Meteor.isServer) {
         }
       );
     },
-    'markBox': function (title, number, x, y, width, height, fill, color, weight) {
+    'markBox': function (title, number, id, x, y, width, height, fill, color, weight) {
       var hasOverlayOnSlide = (Presentations.find({_id: title + number}).count() > 0);
       if (!hasOverlayOnSlide){
         Presentations.insert({_id: title + number, overlay: [] }); 
@@ -126,7 +143,7 @@ if (Meteor.isServer) {
       Presentations.update({_id: title + number}, {
         $push: {
           overlay: {
-            _id: new Mongo.ObjectID()._str,
+            _id: id,
             type: 'box',
             x: x,
             y: y,
@@ -139,7 +156,7 @@ if (Meteor.isServer) {
         }
       );
     },
-    'markEllipse': function (title, number, cx, cy, rx, ry, fill, color, weight) {
+    'markEllipse': function (title, number, id, cx, cy, rx, ry, fill, color, weight) {
       var hasOverlayOnSlide = (Presentations.find({_id: title + number}).count() > 0);
       if (!hasOverlayOnSlide){
         Presentations.insert({_id: title + number, overlay: [] }); 
@@ -147,7 +164,7 @@ if (Meteor.isServer) {
       Presentations.update({_id: title + number}, {
         $push: {
           overlay: {
-            _id: new Mongo.ObjectID()._str,
+            _id: id,
             type: 'circle',
             cx: cx,
             cy: cy,
@@ -166,12 +183,8 @@ if (Meteor.isServer) {
         Presentations.insert({_id: textbox.title + textbox.number, overlay: [] }); 
       }
       var overlay = Presentations.findOne({_id: textbox.title + textbox.number }).overlay;
-      console.log('the data:')
-      console.log(textbox)
-      console.log('what already in the database')
-      console.log(overlay)
-      if(textbox._id){
-        var noteIndex = _.findIndex(overlay, { '_id': textbox._id });
+      var noteIndex = _.findIndex(overlay, { '_id': textbox._id });
+      if(~noteIndex){
         _.merge(overlay[noteIndex], {
           width: textbox.width,
           height: textbox.height,
@@ -181,7 +194,7 @@ if (Meteor.isServer) {
         })
       } else {
         overlay.push({
-          _id: new Mongo.ObjectID()._str,
+          _id: textbox._id,
           type: 'text',
           x: textbox.x,
           y: textbox.y,
@@ -197,7 +210,6 @@ if (Meteor.isServer) {
           overlay: overlay
         }
       });
-      console.log('--------------------------------------------------------------')
     }
   });
 

@@ -1,5 +1,14 @@
 if (Meteor.isClient) {
 
+  import FileSaver from 'filesaverjs';
+  // wrong syntax
+  // with brackets means exported variable of module
+  // without brackets means entire module 
+  import { Playback } from '../imports/playback-library.js';
+  import { Recording } from '../imports/recording-library.js';
+
+  import { Recordings } from '../imports/recording-library.js';
+
   // libraries
   var overlayLibrary;
   var slideLibrary;
@@ -27,11 +36,14 @@ if (Meteor.isClient) {
     });
     // presentations
     Meteor.subscribe('presentations', function(){
-      var hasPresentations = Presentations.find({}).count() > 0
+      var hasPresentations = Presentations.find({}).count() > 0;
       if (!hasPresentations){
         Presentations.insert({_id: slideLibrary.title() + ( Session.get('slide.page') || slideLibrary.getPage('first') ), overlay: [] });
       }
     });
+    // messages
+    Meteor.subscribe('recordings');
+
     // messages
     Meteor.subscribe('messages');
 
@@ -78,7 +90,8 @@ if (Meteor.isClient) {
 
   Template.slideNavPanel.events({
     'click .slide-nav-option': function (event) {
-      slideLibrary.setPage(event);
+      var number = $(event.currentTarget).attr('data-slide');
+      slideLibrary.setPage(number);
     }
   });
 
@@ -109,6 +122,64 @@ if (Meteor.isClient) {
       var stickyMode = $(event.currentTarget).hasClass('off');
       var replaceMode = !stickyMode;
       Session.set('overlay.tool.replace', replaceMode);
+      if(Session.get('recording.happening')){
+        Meteor.call('recordings.insert', {
+          state: 'session',
+          action: 'overlay.tool.replace',
+          params: [replaceMode],
+          time: Date.now(),
+        }); 
+      } 
+    },
+    'click .overlay-btn-recording[title="Recording"]': function (event) {
+      $(event.currentTarget).toggleClass('on');
+      var recordingMode = $(event.currentTarget).hasClass('on');
+      var color = recordingMode ? 'crimson' : ''; 
+      $(event.currentTarget).css("color", color);
+      Session.set('overlay.tool.recording', recordingMode);
+      Session.set('recording.happening', recordingMode);
+      if(Session.get('recording.happening')){
+        const time = Date.now();
+        Meteor.call('recordings.start'); 
+        Meteor.call('recordings.insert', {
+          state: 'time',
+          action: 'start',
+          params: [time],
+          time: time,
+        });
+        Meteor.call('recordings.insert', {
+          state: 'session',
+          action: 'overlay.tool.replace',
+          params: [Session.get('overlay.tool.replace')],
+          time: time + 1,
+        }); 
+        Meteor.call('recordings.insert', {
+          state: 'session',
+          action: 'slide.page',
+          params: [Session.get('slide.page')],
+          time: Date.now(),
+        });
+        Meteor.call('recordings.insert', {
+          state: 'database',
+          action: 'slides.change',
+          params: [slideLibrary.title(), Session.get('slide.page')],
+          time: Date.now(),
+        });
+      } else {
+        const time = Date.now();
+        Meteor.call('recordings.insert', {
+          state: 'time',
+          action: 'stop',
+          params: [time],
+          time: time,
+        });
+        Meteor.call('recordings.stop');
+      }
+    },
+    'click .overlay-btn-recording[title="Download"]': function (event) {
+      const recording = Recordings.find({}).fetch();
+      const blob = new Blob([JSON.stringify(recording, null, 2)], {type: "text/plain;charset=utf-8"});
+      FileSaver.saveAs(blob, "recording.json");
     }
   });
 
@@ -125,6 +196,25 @@ if (Meteor.isClient) {
         return 'Current value: ' + value;
       }
     });
+  });
+
+  Template.controlPanel.events({
+    'click .control-btn-slide-picker-button': function (event) {
+      const jqSlidePicker = $('.control-btn-slide-picker');
+      jqSlidePicker.click();
+      event.preventDefault();
+    },
+    'change .control-btn-slide-picker': function (event) {
+      const jqSlidePicker = $(event.currentTarget);
+      var jqRecording = jqSlidePicker.get(0).files[0];
+      var fileReader = new FileReader();
+      fileReader.onload = function(event) {
+        // parse JSON then send to playback
+        const uploadedRecording = JSON.parse(event.target.result);
+        Playback.with(uploadedRecording);
+      };
+      fileReader.readAsText(jqRecording);
+    },
   });
 
   // Questions
@@ -158,11 +248,14 @@ if (Meteor.isClient) {
         }
         if ($input.val() != '') {
           var timestamp = Date.now().toString();
-          Messages.insert({
-            name: name,
-            message: $input.val(),
-            time: timestamp
-          });
+          var message = $input.val();
+          Meteor.call('messages.new', name, message, timestamp);
+          Meteor.call('recordings.insert', {
+            state: 'database',
+            action: 'messages.new',
+            params: [name, message, timestamp],
+            time: Date.now(),
+          }); 
           $input.val('');
         }
         var $messages = $('#chat-panel');
@@ -179,6 +272,12 @@ if (Meteor.isClient) {
       var message = $target.parent().text().trim();
       var timestamp = $target.parent().parent().attr('data-time');
       Meteor.call('moveToQuestionPanel', name, message, timestamp);
+      Meteor.call('recordings.insert', {
+        state: 'database',
+        action: 'moveToQuestionPanel',
+        params: [name, message, timestamp],
+        time: Date.now(),
+      });
     }
   });
 
@@ -189,6 +288,12 @@ if (Meteor.isClient) {
       var timestamp = $target.parent().parent().attr('data-time');
       var question = Questions.find({time: timestamp}).fetch()[0];
       Meteor.call('moveToChatPanel', question.name, question.message, question.time);
+      Meteor.call('recordings.insert', {
+        state: 'database',
+        action: 'moveToChatPanel',
+        params: [question.name, question.message, question.time],
+        time: Date.now(),
+      });
     }
   });
 
@@ -278,18 +383,13 @@ if (Meteor.isClient) {
     // press ENTER to store new textbox
     key('enter', 'text-entry', function(){
       var jqTextInput = $('.annotation-text-input.annotation-text-active').first();
-      // console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-      // console.log('text input is: ')
-      // console.log(jqTextInput)
       var isReplaceOn = Session.get('overlay.tool.replace');
+      var isUsingEraser = _.isEqual( Session.get('overlay.tool'), 'erase' );
       overlayLibrary.removeActiveText();
       key.filter = key.filters['all'];
       key.setScope('keyboard-shortcuts');
-      // console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
-      // console.log('pressed enter!')
-      // console.log('text entry is off. scope is: ' + key.getScope())
       overlayLibrary.storeTextbox(slideLibrary.title(), slideLibrary.getPage(), jqTextInput.get(0));
-      if( isReplaceOn ){
+      if( isReplaceOn && !isUsingEraser ){
         overlayLibrary.replaceNote('previous', slideLibrary.title(), slideLibrary.getPage());
       }
     });
@@ -332,28 +432,21 @@ if (Meteor.isClient) {
       var d3Target = d3.select(event.currentTarget);
       var hasSelectedTextTool = _.isEqual( Session.get('overlay.tool'), 'text' );
       var isReplaceOn = Session.get('overlay.tool.replace');
+      var isUsingEraser = _.isEqual( Session.get('overlay.tool'), 'erase' );
       var isTargetTextInput =  d3Target.classed('annotation-text-input');
       var isTargetTextHandle =  d3Target.classed('annotation-text-handle');
-      // console.log('target:')
-      // console.log(d3Target.node())
-      // console.log('replace on: ' + isReplaceOn)
-      // console.log('is the target .annotation-text-input: ' + isTargetTextInput)
-      // console.log('text tool active: ' + hasSelectedTextTool)
-      // console.log('is the target .annotation-text-handle: ' + isTargetTextHandle)
       if ( isReplaceOn ) {
         if ( isTargetTextInput ) {
           overlayLibrary.setActiveText(d3Target.node());
           key.setScope('text-entry'); 
           key.filter = key.filters['text-entry'];
-          // console.log('text entry is on. scope is: ' + key.getScope())
         } else { // nothing, shape, or handle is here
           if ( !isTargetTextHandle ) {  
             if( hasSelectedTextTool ) {
               overlayLibrary.placeText(slideLibrary.title(), slideLibrary.getPage());
               key.setScope('text-entry'); 
               key.filter = key.filters['text-entry'];
-              // console.log('text entry is on: ' + key.getScope())
-            } else {
+            } else if(!isUsingEraser) {      
               overlayLibrary.replaceNote('latest', slideLibrary.title(), slideLibrary.getPage());
             }
           } else if( isTargetTextHandle ){
@@ -366,7 +459,6 @@ if (Meteor.isClient) {
           overlayLibrary.setActiveText(d3Target.node());
           key.setScope('text-entry'); 
           key.filter = key.filters['text-entry'];
-          // console.log('text entry is on. scope is:' + key.getScope())
         } else { // nothing, shape, or handle is here
           if ( hasSelectedTextTool ) {  
             if( !isTargetTextHandle ){
@@ -374,7 +466,6 @@ if (Meteor.isClient) {
               overlayLibrary.placeText(slideLibrary.title(), slideLibrary.getPage());
               key.setScope('text-entry'); 
               key.filter = key.filters['text-entry'];
-              // console.log('text entry is on. scope is:' + key.getScope())
             } else if( isTargetTextHandle ){
               var domTextBox = d3Target.node().parentNode;
               overlayLibrary.startDragTextbox(domTextBox); 
@@ -420,7 +511,6 @@ if (Meteor.isClient) {
             break;
         }       
       }
-      // console.log('--------------------------------------------------------------------')
     },
     'mouseover .annotation-text-handle': function(event){
       var jqTextbox = $(event.target).parent().get(0);
@@ -446,24 +536,27 @@ if (Meteor.isClient) {
     'mouseexit': function(event){
       $('#overlay').css('cursor', '');
     },
-    'click .annotation': function(event){
+    /*'click .annotation': function(event){
+      // TODO - this event isn't working; logical error somewhere
+      // use mousedown then mouseover to erase
       if (_.isEqual( Session.get('overlay.tool'), 'erase' ) ){
-        overlayLibrary.useEraserOnce(event, slideLibrary.title(), slideLibrary.getPage());
+        overlayLibrary.activateEraser(event, slideLibrary.title(), slideLibrary.getPage());
       }
-    },
+    },*/
     'mousedown': function (event) {
       var hasClickedLeftMouseButton = _.isEqual(event.which, 1);
       if ( !hasClickedLeftMouseButton ) { return true; }
       //-------------------------------------------------------
       var d3Target = d3.select(event.target);
       var isReplaceOn = Session.get('overlay.tool.replace');
+      var isUsingEraser = _.isEqual( Session.get('overlay.tool'), 'erase' );
       var hasSelectedTextTool = _.isEqual( Session.get('overlay.tool'), 'text' );
       var isTargetTextInput =  d3Target.classed('annotation-text-input');
       var isTargetTextHandle =  d3Target.classed('annotation-text-handle');
       overlayLibrary.storeActiveTextInputs(slideLibrary.title(), slideLibrary.getPage());
       key.filter = key.filters['all'];
       key.setScope('keyboard-shortcuts');
-      if(isReplaceOn){
+      if(isReplaceOn && !isUsingEraser){
         overlayLibrary.replaceNote('previous', slideLibrary.title(), slideLibrary.getPage());
       }
       if( (!isTargetTextInput && !isTargetTextHandle && !hasSelectedTextTool) ) {

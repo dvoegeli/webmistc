@@ -1,3 +1,7 @@
+import { Meteor } from 'meteor/meteor';
+import { Playback } from '../imports/playback-library.js';
+import { Recording } from '../imports/recording-library.js';
+
 OverlayLibrary = function () {
   var self = this;
   var overlay;
@@ -163,15 +167,27 @@ OverlayLibrary = function () {
       var id = element.attr('id');
       element.remove();
       Meteor.call('markEraser', title, number, id);
+      Meteor.call('recordings.insert', {
+        state: 'database',
+        action: 'markEraser',
+        params: [title, number, id],
+        time: Date.now(),
+      });
     }    
   }; 
   // move these next two methods' events out to the template
   self.activateEraser = function(title, number) {
     // change this to the Template.overlay
     $('#overlay-canvas').on('mouseover.annotation', '.annotation', function(){
-        var id = this.id;
-        $(this).remove();
-        Meteor.call('markEraser', title, number, id);    
+      var id = this.id;
+      $(this).remove();
+      Meteor.call('markEraser', title, number, id);
+      Meteor.call('recordings.insert', {
+        state: 'database',
+        action: 'markEraser',
+        params: [title, number, id],
+        time: Date.now(),
+      });    
     });
   };
  
@@ -186,6 +202,12 @@ OverlayLibrary = function () {
     var id = latestNote.attr('id');
     latestNote.remove();
     Meteor.call('markEraser', title, number, id);
+    Meteor.call('recordings.insert', {
+      state: 'database',
+      action: 'markEraser',
+      params: [title, number, id],
+      time: Date.now(),
+    });
   };
 
   // REPLACE ---------------------------------------------------------------------------------------------
@@ -204,16 +226,29 @@ OverlayLibrary = function () {
     jqNote.remove();
     if(id){
       Meteor.call('markEraser', title, number, id);
+      Meteor.call('recordings.insert', {
+        state: 'database',
+        action: 'markEraser',
+        params: [title, number, id],
+        time: Date.now(),
+      });
     }
   };
 
   // DRAW -----------------------------------------------------------------------------------------------
   self.markSquiggle = function(title, number) {
-    var points = Session.get('overlay.tool.pencil.points'); 
-    var color = Session.get('overlay.color');
-    var size = Session.get('overlay.size.outline');
+    const id = new Mongo.ObjectID()._str;
+    let points = Session.get('overlay.tool.pencil.points'); 
+    const color = Session.get('overlay.color');
+    const size = Session.get('overlay.size.outline');
     points = pathSimplifier.simplify(points, 3.0, true);
-    Meteor.call('markSquiggle', title, number, points, color, size);
+    Meteor.call('markSquiggle', title, number, id, points, color, size);
+    Meteor.call('recordings.insert', {
+      state: 'database',
+      action: 'markSquiggle',
+      params: [title, number, id, points, color, size],
+      time: Date.now(),
+    });
   };
 
   self.markSquiggleStart = function(event) {
@@ -221,15 +256,22 @@ OverlayLibrary = function () {
   };
 
   self.markLine = function(title, number) {
-    var x1 = Session.get('overlay.tool.line.x1');
-    var y1 = Session.get('overlay.tool.line.y1');
-    var x2 = Session.get('overlay.tool.line.x2');
-    var y2 = Session.get('overlay.tool.line.y2');
-    var color = Session.get('overlay.color');
-    var size = Session.get('overlay.size.outline');
-    var isTooSmallToSee = _.isEqual(x1, x2) && _.isEqual(y1, y2)
+    const id = new Mongo.ObjectID()._str;
+    const x1 = Session.get('overlay.tool.line.x1');
+    const y1 = Session.get('overlay.tool.line.y1');
+    const x2 = Session.get('overlay.tool.line.x2');
+    const y2 = Session.get('overlay.tool.line.y2');
+    const color = Session.get('overlay.color');
+    const size = Session.get('overlay.size.outline');
+    const isTooSmallToSee = _.isEqual(x1, x2) && _.isEqual(y1, y2)
     if(!isTooSmallToSee){
-      Meteor.call('markLine', title, number, x1, y1, x2, y2, color, size);
+      Meteor.call('markLine', title, number, id, x1, y1, x2, y2, color, size);
+      Meteor.call('recordings.insert', {
+        state: 'database',
+        action: 'markLine',
+        params: [title, number, id, x1, y1, x2, y2, color, size],
+        time: Date.now(),
+      });
     }
   };
   self.markLineStart = function(event) {
@@ -243,15 +285,22 @@ OverlayLibrary = function () {
   };
 
   self.markArrow = function(title, number) {
-    var x1 = Session.get('overlay.tool.arrow.x1');
-    var y1 = Session.get('overlay.tool.arrow.y1');
-    var x2 = Session.get('overlay.tool.arrow.x2');
-    var y2 = Session.get('overlay.tool.arrow.y2');
-    var color = Session.get('overlay.color');
-    var size = Session.get('overlay.size.outline');
-    var isTooSmallToSee = _.isEqual(x1, x2) && _.isEqual(y1, y2)
+    const id = new Mongo.ObjectID()._str;
+    const x1 = Session.get('overlay.tool.arrow.x1');
+    const y1 = Session.get('overlay.tool.arrow.y1');
+    const x2 = Session.get('overlay.tool.arrow.x2');
+    const y2 = Session.get('overlay.tool.arrow.y2');
+    const color = Session.get('overlay.color');
+    const size = Session.get('overlay.size.outline');
+    const isTooSmallToSee = _.isEqual(x1, x2) && _.isEqual(y1, y2)
     if(!isTooSmallToSee){
-      Meteor.call('markArrow', title, number, x1, y1, x2, y2, color, size);
+      Meteor.call('markArrow', title, number, id, x1, y1, x2, y2, color, size);
+      Meteor.call('recordings.insert', {
+        state: 'database',
+        action: 'markArrow',
+        params: [title, number, id, x1, y1, x2, y2, color, size],
+        time: Date.now(),
+      });
     }  
   };
 
@@ -266,15 +315,22 @@ OverlayLibrary = function () {
   };
 
   self.markBox = function(title, number) {
-    var x = Session.get('overlay.tool.box.x');
-    var y = Session.get('overlay.tool.box.y');
-    var width = Session.get('overlay.tool.box.width');
-    var height = Session.get('overlay.tool.box.height');
-    var color = Session.get('overlay.color');
-    var size = Session.get('overlay.size.outline');
-    var isTooSmallToSee = _.isEqual(width, 0) || _.isEqual(height, 0)
+    const id = new Mongo.ObjectID()._str;
+    const x = Session.get('overlay.tool.box.x');
+    const y = Session.get('overlay.tool.box.y');
+    const width = Session.get('overlay.tool.box.width');
+    const height = Session.get('overlay.tool.box.height');
+    const color = Session.get('overlay.color');
+    const size = Session.get('overlay.size.outline');
+    const isTooSmallToSee = _.isEqual(width, 0) || _.isEqual(height, 0)
     if(!isTooSmallToSee){
-      Meteor.call('markBox', title, number, x, y, width, height, 'none', color, size);
+      Meteor.call('markBox', title, number, id, x, y, width, height, 'none', color, size);
+      Meteor.call('recordings.insert', {
+        state: 'database',
+        action: 'markBox',
+        params: [title, number, id, x, y, width, height, 'none', color, size],
+        time: Date.now(),
+      });
     }
   };
 
@@ -313,15 +369,22 @@ OverlayLibrary = function () {
   };
 
   self.markEllipse = function(title, number) {
-    var cx = Session.get('overlay.tool.ellipse.cx');
-    var cy = Session.get('overlay.tool.ellipse.cy');
-    var rx = Session.get('overlay.tool.ellipse.rx');
-    var ry = Session.get('overlay.tool.ellipse.ry');
-    var color = Session.get('overlay.color');
-    var size = Session.get('overlay.size.outline');
-    var isTooSmallToSee = _.isEqual(rx, 0) || _.isEqual(ry, 0)
+    const id = new Mongo.ObjectID()._str;
+    const cx = Session.get('overlay.tool.ellipse.cx');
+    const cy = Session.get('overlay.tool.ellipse.cy');
+    const rx = Session.get('overlay.tool.ellipse.rx');
+    const ry = Session.get('overlay.tool.ellipse.ry');
+    const color = Session.get('overlay.color');
+    const size = Session.get('overlay.size.outline');
+    const isTooSmallToSee = _.isEqual(rx, 0) || _.isEqual(ry, 0)
     if(!isTooSmallToSee){
-      Meteor.call('markEllipse', title, number, cx, cy, rx, ry, 'none', color, size);
+      Meteor.call('markEllipse', title, number, id, cx, cy, rx, ry, 'none', color, size);
+      Meteor.call('recordings.insert', {
+        state: 'database',
+        action: 'markEllipse',
+        params: [title, number, id, cx, cy, rx, ry, 'none', color, size],
+        time: Date.now(),
+      });
     }
   };
 
@@ -527,8 +590,6 @@ OverlayLibrary = function () {
   Session.setDefault('overlay.tool.textbox', {});
 
   self.storeTextbox = function(title, number, domTextInput) { 
-    // console.log('storing textbox, before updates')
-    // console.log(domTextInput)  
     var jqTextInput = $(domTextInput);
     var jqTextBox = jqTextInput.parent().parent();
     var text = jqTextInput.text();
@@ -547,22 +608,26 @@ OverlayLibrary = function () {
           _id: jqTextBox.attr('id')
         });
       }
-      // console.log('##########################################')
-      // console.log('storing textbox, after updates')
-      // console.log(Session.get('overlay.tool.textbox'))
-      // console.log('##########################################')
       Meteor.call('storeTextbox', Session.get('overlay.tool.textbox'));
+      Meteor.call('recordings.insert', {
+        state: 'database',
+        action: 'storeTextbox',
+        params: [Session.get('overlay.tool.textbox')],
+        time: Date.now(),
+      });
     }    
   }; 
 
   self.placeText = function(title, number) {
-    var x = localSpace.x;
-    var y = localSpace.y;
-    var size = parseInt( Session.get('overlay.size.font') );
-    var color = Session.get('overlay.color');
+    const id = new Mongo.ObjectID()._str;
+    const x = localSpace.x;
+    const y = localSpace.y;
+    const size = parseInt( Session.get('overlay.size.font') );
+    const color = Session.get('overlay.color');
 
     Session.set('overlay.tool.textbox', {});
     updateSessionObject('overlay.tool.textbox', {
+      _id: id,
       x: x,
       y: y,
       size: size,
@@ -682,9 +747,9 @@ OverlayLibrary = function () {
             return 'translate(' + [ x, y ] + ')'
         },
         'data-x': _.round(parseInt(d3Textbox.attr('data-x-origin')) 
-                          + parseFloat(d3.transform(d3Textbox.attr('transform')).translate[0])),
+                  + parseFloat(d3.transform(d3Textbox.attr('transform')).translate[0])),
         'data-y': _.round(parseInt(d3Textbox.attr('data-y-origin')) 
-                          + parseFloat(d3.transform(d3Textbox.attr('transform')).translate[1])),
+                  + parseFloat(d3.transform(d3Textbox.attr('transform')).translate[1])),
       })
     });
 
@@ -700,9 +765,6 @@ OverlayLibrary = function () {
   self.storeActiveTextInputs = function( title, page ){
     var activeTextInput = $('.annotation-text-active');
     if ( activeTextInput.length ){
-      // console.log('active text inputs:')
-      // console.log(activeTextInput);
-      // console.log('deactivating and storing all active texts:')
       self.removeActiveText();
       activeTextInput.each( function(){
         var domTextInput = this;
