@@ -26,6 +26,3 @@ johanbrook:publication-collector  # Test a Meteor publication by collecting its 
 react-meteor-data
 accounts-ui
 accounts-password
-fourseven:scss
-materialize:materialize@=0.97.7
-useraccounts:materialize

@@ -16,10 +16,3 @@ export const renderRoutes = () => (
     <Route path='*' component={NotFound} />
   </Router>
 );
-  {/*<Router history={browserHistory}>
-    <Route path='/' component={Home}>
-      <Route path='app' component={App} />
-      <Route path='setup' component={Setup} />
-      <Route path='*' component={NotFound} />
-    </Route>
-  </Router>*/}
