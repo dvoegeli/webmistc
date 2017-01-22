@@ -77,12 +77,20 @@ export default class App extends Component {
           slide5: false,
           slide6: false,
         }
+      },
+      whiteboard: {
+        fullscreen: false,
       }
     };
   }
 
   toggleMute(){
     _.merge(this.state.mic, { muted: !this.state.mic.muted });
+    this.setState(this.state);
+  }
+
+  toggleFullscreen(){
+    _.merge(this.state.whiteboard, { fullscreen: !this.state.whiteboard.fullscreen });
     this.setState(this.state);
   }
 
@@ -241,7 +249,7 @@ export default class App extends Component {
   }
   render() {
     const muteButton = classNames(
-      'mute-btn w3-btn w3-btn-floating-large ripple w3-card-4 w3-hide-large', {
+      'mute-btn w3-btn w3-btn-floating-large ripple w3-card-4', {
       'w3-light-green w3-text-white': !this.state.mic.muted,
       'w3-pink w3-text-white': this.state.mic.muted,
     });
@@ -252,15 +260,13 @@ export default class App extends Component {
     });
     
     const noteMenu = classNames(
-      'w3-sidenav w3-card-8 w3-white w3-animate-left w3-container',{
-      'w3-hide': !this.state.notes.menuOpened,
+      'menu w3-sidenav w3-card-8 w3-white w3-animate-left w3-container',{
       'w3-show': this.state.notes.menuOpened,
     });
     const noteMenuButton = 'notes-menu-btn w3-opennav w3-btn w3-btn-floating-large ripple w3-teal w3-card-4 w3-hide-large w3-text-white';
     
     const panelMenu = classNames(
-      'w3-sidenav w3-card-8 w3-white w3-animate-right', {
-      'w3-hide': !this.state.panels.menuOpened,
+      'menu w3-sidenav w3-card-8 w3-white w3-animate-right', {
       'w3-show': this.state.panels.menuOpened,
     });
     const panelMenuButton = 'panels-menu-btn w3-btn w3-btn-floating-large ripple w3-teal w3-card-4 w3-hide-large w3-text-white';
@@ -402,7 +408,7 @@ export default class App extends Component {
     }
     const messages = {
       list: classNames(
-        'messages__recipient-list w3-text-teal w3-dropdown-content w3-card-4', {
+        '.messages__recipient-list w3-text-teal w3-dropdown-content w3-card-4', {
         'w3-show': this.state.messages.listOpened,
       }),
     }
@@ -440,66 +446,79 @@ export default class App extends Component {
       tab: {
         attendee: classNames(
           'w3-btn w3-deep-orange', {
-          'w3-disabled': !this.state.roles.sortBy.attendee,
+          'w3-opacity-max': !this.state.roles.sortBy.attendee,
         }),
         contributor: classNames(
           'w3-btn w3-green', {
-          'w3-disabled': !this.state.roles.sortBy.contributor,
+          'w3-opacity-max': !this.state.roles.sortBy.contributor,
         }),
         presenter: classNames(
           'w3-btn w3-blue', {
-          'w3-disabled': !this.state.roles.sortBy.presenter,
+          'w3-opacity-max': !this.state.roles.sortBy.presenter,
         }),
         admin: classNames(
           'w3-btn w3-pink', {
-          'w3-disabled': !this.state.roles.sortBy.admin,
+          'w3-opacity-max': !this.state.roles.sortBy.admin,
         }),
       }
     }
 
     const slideNav = classNames(
-      'slide-nav w3-sidenav w3-container w3-white w3-animate-bottom', {
+      'menu slide-nav w3-sidenav w3-container w3-white w3-animate-bottom', {
       'w3-show': this.state.slides.menuOpened,
-      'w3-hide': !this.state.slides.menuOpened,
     });
 
     const slideThumbnail = {
       slide1: classNames(
         'slide-nav__slide w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide1,
-        'slide-nav__active w3-teal w3-card-8 w3-padding': this.state.slides.active.slide1,
+        'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide1,
       }),
       slide2: classNames(
         'slide-nav__slide w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide2,
-        'slide-nav__active w3-teal w3-card-8 w3-padding': this.state.slides.active.slide2,
+        'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide2,
       }),
       slide3: classNames(
         'slide-nav__slide w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide3,
-        'slide-nav__active w3-teal w3-card-8 w3-padding': this.state.slides.active.slide3,
+        'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide3,
       }),
       slide4: classNames(
         'slide-nav__slide w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide4,
-        'slide-nav__active w3-teal w3-card-8 w3-padding': this.state.slides.active.slide4,
+        'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide4,
       }),
       slide5: classNames(
         'slide-nav__slide w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide5,
-        'slide-nav__active w3-teal w3-card-8 w3-padding': this.state.slides.active.slide5,
+        'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide5,
       }),
       slide6: classNames(
         'slide-nav__slide w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide6,
-        'slide-nav__active w3-teal w3-card-8 w3-padding': this.state.slides.active.slide6,
+        'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide6,
       }),
     }
 
-    console.log("rendering")
+    const fullscreenButton = classNames(
+      'fullscreen-btn w3-btn w3-btn-floating-large ripple w3-card-4 w3-text-white w3-teal', {
+      'fullscreen-btn--fullscreen': this.state.whiteboard.fullscreen,
+    });
+    const fullscreenButtonIcon = classNames(
+      'fa fa-fw', {
+      'fa-expand': !this.state.whiteboard.fullscreen,
+      'fa-compress': this.state.whiteboard.fullscreen,
+    });
+
+    const whiteboard = classNames(
+      'whiteboard w3-card-4 w3-light-grey', {
+      'whiteboard--fullscreen': this.state.whiteboard.fullscreen,
+    });
     return (
       <div>
         <button className={muteButton} onClick={this.toggleMute.bind(this)}><i className={muteButtonIcon}/></button>
+        <button className={fullscreenButton} onClick={this.toggleFullscreen.bind(this)}><i className={fullscreenButtonIcon}/></button>
         {/*<!-- NoteMenu -->*/}
         <button className={noteMenuButton} onClick={this.toggleNoteMenu.bind(this)}><i className="fa-pencil fa fa-fw"/></button>
         <nav className={noteMenu} style={{zIndex: 4}}>
@@ -550,7 +569,7 @@ export default class App extends Component {
 
         {/*<!-- PanelMenu -->*/}
         <button className={panelMenuButton} onClick={this.togglePanelMenu.bind(this)}><i className="fa-th-list fa fa-fw"/></button>
-        <nav className={panelMenu} style={{zIndex: 4, right:0, width: 275 + 'px'}}>
+        <nav className={panelMenu} style={{zIndex: 4, right:0, width: 225 + 'px'}}>
           <div className="panels-menu w3-white">
             <button onClick={this.togglePanel.bind(this, 'questions')} className={questionsButton}>
               <i className="fa-sticky-note-o fa fa-lg fa-fw w3-margin-right"/>Questions
@@ -569,7 +588,7 @@ export default class App extends Component {
               </main>
             </div>
             <button onClick={this.togglePanel.bind(this, 'chat')} className={chatButton}>
-              <i className="fa-bullhorn fa fa-lg fa-fw w3-margin-right"/>Group Chat
+              <i className="fa-bullhorn fa fa-lg fa-fw w3-margin-right"/>Chat
             </button>
             <div className={chat}>
               <header className="panel__header w3-container w3-teal">
@@ -599,26 +618,27 @@ export default class App extends Component {
               </footer>
             </div>
             <button onClick={this.togglePanel.bind(this, 'message')} className={messageButton}>
-              <i className="fa-paper-plane-o fa fa-lg fa-fw w3-margin-right"/>Private Message
+              <i className="fa-paper-plane-o fa fa-lg fa-fw w3-margin-right"/>Message
             </button>
             <div className={message}>
               <header className="panel__header w3-container w3-teal">
-                <div className="w3-btn-group">
-                  <a className="w3-btn w3-teal" onClick={this.togglePanel.bind(this, 'message')}>
+                <div className="flex-row flex-row--center">
+                  <a className="w3-teal" onClick={this.togglePanel.bind(this, 'message')}>
                     <i className="fa-chevron-left fa fa-lg fa-fw w3-margin-right"/>
                   </a>
-                  <button className="w3-btn w3-cyan w3-text-white" style={{width: 80 + '%'}} onClick={this.toggleMessageRecipients.bind(this)} >
-                    {this.state.messages.recipient || 'Recipients'}
-                    <i className="fa-caret-down fa fa-lg fa-fw"/>
-                  </button>
+                  <div className="w3-dropdown-click">
+                    <button className="w3-btn w3-btn-block w3-cyan w3-text-white" onClick={this.toggleMessageRecipients.bind(this)} >
+                      {this.state.messages.recipient || 'Recipients'}
+                      <i className="fa-caret-down fa fa-lg fa-fw"/>
+                    </button>
+                    <div className={messages.list}>
+                      <a className="w3-padding-medium" onClick={this.changeRecipient.bind(this, 'dorian')} href="#">Dorian</a>
+                      <a className="w3-padding-medium" onClick={this.changeRecipient.bind(this, 'professor')} href="#">Professor</a>
+                      <a className="w3-padding-medium" onClick={this.changeRecipient.bind(this, 'student')} href="#">Student</a>
+                    </div>
+                  </div>
                 </div>
-              {/*this should be in a <div class="w3-dropdown-click">??*/}
-              {/* confirmed, doing this will remove the % hack*/}
-                <div className={messages.list}>
-                  <a className="w3-padding-medium" onClick={this.changeRecipient.bind(this, 'dorian')} href="#">Dorian</a>
-                  <a className="w3-padding-medium" onClick={this.changeRecipient.bind(this, 'professor')} href="#">Professor</a>
-                  <a className="w3-padding-medium" onClick={this.changeRecipient.bind(this, 'student')} href="#">Student</a>
-                </div>
+                
               </header>
               <main className="panel__content w3-container">
                 {this.state.messages.recipient === 'dorian' ? 
@@ -654,7 +674,7 @@ export default class App extends Component {
               </footer>
             </div>
             <button onClick={this.togglePanel.bind(this, 'roles')} className={rolesButton}>
-              <i className="fa-users fa fa-lg fa-fw w3-margin-right"/>Audience Roles
+              <i className="fa-users fa fa-lg fa-fw w3-margin-right"/>Roles
             </button>
             <div className={roles}>
               <header className="panel__header w3-container w3-teal">
@@ -727,7 +747,7 @@ export default class App extends Component {
               </main>
             </div>
             <button onClick={this.togglePanel.bind(this, 'sound')} className={soundButton}>
-              <i className="fa-microphone fa fa-lg fa-fw w3-margin-right"/>Sound Settings
+              <i className="fa-microphone fa fa-lg fa-fw w3-margin-right"/>Sound
             </button>
             <div className={sound}>
               <header className="panel__header w3-container w3-teal">
@@ -773,7 +793,7 @@ export default class App extends Component {
               </main>
             </div>
             <button onClick={this.togglePanel.bind(this, 'presentationControl')} className={presentationControlButton}>
-              <i className="fa-tv fa fa-lg fa-fw w3-margin-right"/>Presentation Controls
+              <i className="fa-tv fa fa-lg fa-fw w3-margin-right"/>Presentation
             </button>
             <div className={presentationControl}>
               <header className="panel__header w3-container w3-teal">
@@ -794,13 +814,13 @@ export default class App extends Component {
                     </a>
                     <div className="w3-section flex-row flex-row--center">
                       <button className='w3-btn w3-text-white w3-cyan w3-margin-right'>
-                        <i className='fa-backward fa fa-fw fa-lg'/>
+                        <i className='fa-backward fa fa-lg'/>
                       </button>
                       <button className={playback.playPauseButton} onClick={this.togglePlayback.bind(this)}>
                         <i className={playback.playPauseButtonIcon}/>
                       </button>
                       <button className='w3-btn w3-text-white w3-cyan'>
-                        <i className='fa-forward fa fa-fw fa-lg'/>
+                        <i className='fa-forward fa fa-lg'/>
                       </button>
                     </div>
                     <div className="w3-margin-bottom">
@@ -811,7 +831,7 @@ export default class App extends Component {
                   <li>
                     <h4>Record</h4>
                     <a className="flex-row w3-text-teal" href="#!">
-                      <i className="fa-save fa fa-lg fa-fw w3-margin-right"/>
+                      <i className="fa-save fa fa-lg w3-margin-right"/>
                       Save Presentation
                     </a>
                     <div className="w3-section flex-row flex-row--center" style={{width: 100 + '%'}}>
@@ -828,7 +848,7 @@ export default class App extends Component {
               </main>
             </div>
             <button onClick={this.togglePanel.bind(this, 'importExport')} className={importExportButton}>
-              <i className="fa-files-o fa fa-lg fa-fw w3-margin-right"/>Import/Export Slides
+              <i className="fa-files-o fa fa-lg fa-fw w3-margin-right"/>Slides
             </button>
             <div className={importExport}>
               <header className="panel__header w3-container w3-teal">
@@ -876,18 +896,18 @@ export default class App extends Component {
                 <ul className="w3-ul w3-text-teal">
                   <li>
                     <h4>Polls</h4>
-                    <div className="w3-dropdown-click w3-margin-bottom">
+                    <div className="w3-dropdown-click w3-slim w3-margin-bottom">
                       <button onClick={this.togglePollList.bind(this)} className="w3-btn w3-btn-block w3-teal">
                         {this.state.voting.poll || 'Choose a poll'}
                         <i className="fa-caret-down fa fa-fw w3-margin-left"></i>
                       </button>
                       <div className={voting.polls}>
-                        <a className="voting-polls__tag" onClick={this.changePoll.bind(this, 'Do you like WebMISTC?')} href="#">Do you like WebMISTC?</a>
-                        <a className="voting-polls__tag" onClick={this.changePoll.bind(this, 'Do you like waffles?')} href="#">Do you like waffles?</a>
+                        <a className="voting-polls__tag" onClick={this.changePoll.bind(this, 'Like WebMISTC?')} href="#">Like WebMISTC?</a>
+                        <a className="voting-polls__tag" onClick={this.changePoll.bind(this, 'Like waffles?')} href="#">Like waffles?</a>
                       </div>
                     </div>
-                    {this.state.voting.poll === 'Do you like WebMISTC?' ? 
-                      <div>
+                    {this.state.voting.poll === 'Like WebMISTC?' ? 
+                      <div className="w3-slim">
                         <div className="w3-progress-container w3-grey">
                           <div className="w3-progressbar w3-orange" style={{width: 75 + '%'}}/>
                           <div className="w3-center w3-text-white w3-margin-left" style={{position: 'absolute'}}>Yes | 15 votes | 75%</div>
@@ -898,7 +918,7 @@ export default class App extends Component {
                         </div>
                       </div>
                     :''}
-                    {this.state.voting.poll === 'Do you like waffles?' ? 
+                    {this.state.voting.poll === 'Like waffles?' ? 
                       <div>
                         <div className="w3-progress-container w3-grey">
                           <div className="w3-progressbar w3-green" style={{width: 100 + '%'}}/>
@@ -975,7 +995,7 @@ export default class App extends Component {
         </div>
         <nav className={slideNav}>
           <section className="slide-nav__controls flex-row flex-row--ends flex-row--middle w3-section ">
-            <a className="w3-text-teal w3-hide-small" onClick={this.moveSlide.bind(this, 'left')}>
+            <a className="w3-text-teal" onClick={this.moveSlide.bind(this, 'left')}>
               <i className="fa-chevron-left fa fa-5x"/>
             </a>
             <div className="slide-nav__slides-bounds w3-border-left w3-border-right">
@@ -992,7 +1012,7 @@ export default class App extends Component {
                 </div>
               </Draggable>
             </div>
-            <a className="w3-text-teal w3-hide-small" onClick={this.moveSlide.bind(this, 'right')}>
+            <a className="w3-text-teal" onClick={this.moveSlide.bind(this, 'right')}>
               <i className="fa-chevron-right fa fa-5x"/>
             </a>
           </section>
@@ -1002,7 +1022,7 @@ export default class App extends Component {
         <div className={overlay} onClick={this.closeMenus.bind(this)} style={{cursor:"pointer"}}></div>
 
         {/*<!-- Page content -->*/}
-        <main className='whiteboard w3-light-grey'/>
+        <main className={whiteboard}/>
       </div>
     );
   }
