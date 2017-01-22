@@ -402,7 +402,7 @@ export default class App extends Component {
     }
     const messages = {
       list: classNames(
-        'messages__recipient-list w3-container w3-dropdown-content w3-card-4', {
+        'messages__recipient-list w3-text-teal w3-dropdown-content w3-card-4', {
         'w3-show': this.state.messages.listOpened,
       }),
     }
@@ -539,10 +539,10 @@ export default class App extends Component {
                 {this.getRole()}
               </a>
               <div className={roleMenuOptions}>
-                <a className="w3-pale-orange w3-text-dark-grey" onClick={this.changeRole.bind(this, 'attendee')} href="#">Attendee</a>
-                <a className="w3-pale-green w3-text-dark-grey" onClick={this.changeRole.bind(this, 'contributor')} href="#">Contributor</a>
-                <a className="w3-pale-blue w3-text-dark-grey " onClick={this.changeRole.bind(this, 'presenter')} href="#">Presenter</a>
-                <a className="w3-pale-red w3-text-dark-grey" onClick={this.changeRole.bind(this, 'admin')} href="#">Admin</a>
+                <a className="w3-pale-orange w3-padding-medium w3-text-dark-grey" onClick={this.changeRole.bind(this, 'attendee')} href="#">Attendee</a>
+                <a className="w3-pale-green w3-padding-medium w3-text-dark-grey" onClick={this.changeRole.bind(this, 'contributor')} href="#">Contributor</a>
+                <a className="w3-pale-blue w3-padding-medium w3-text-dark-grey " onClick={this.changeRole.bind(this, 'presenter')} href="#">Presenter</a>
+                <a className="w3-pale-red w3-padding-medium w3-text-dark-grey" onClick={this.changeRole.bind(this, 'admin')} href="#">Admin</a>
               </div>
             </div>
           </div>
@@ -615,9 +615,9 @@ export default class App extends Component {
               {/*this should be in a <div class="w3-dropdown-click">??*/}
               {/* confirmed, doing this will remove the % hack*/}
                 <div className={messages.list}>
-                  <a onClick={this.changeRecipient.bind(this, 'dorian')} href="#">Dorian</a>
-                  <a onClick={this.changeRecipient.bind(this, 'professor')} href="#">Professor</a>
-                  <a onClick={this.changeRecipient.bind(this, 'student')} href="#">Student</a>
+                  <a className="w3-padding-medium" onClick={this.changeRecipient.bind(this, 'dorian')} href="#">Dorian</a>
+                  <a className="w3-padding-medium" onClick={this.changeRecipient.bind(this, 'professor')} href="#">Professor</a>
+                  <a className="w3-padding-medium" onClick={this.changeRecipient.bind(this, 'student')} href="#">Student</a>
                 </div>
               </header>
               <main className="panel__content w3-container">
