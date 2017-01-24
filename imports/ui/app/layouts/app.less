@@ -205,7 +205,7 @@
   bottom:0; 
   width: 100%; 
   height: @slideNavHeight;
-  @media @tablet, @desktop {
+  @media @desktop {
     width: ~"calc(100% - 200px - 225px)";
     left: 200px;
     z-index: 2;
@@ -225,7 +225,10 @@
 }
 .slide-nav__slide {
   height: 75%;
-  width: calc(100% / 3);
+  width: calc(100vw / 4);
+  @media @desktop {
+    width: ~"calc((100vw - 200px - 225px)/ 6)";
+  }
 }
 
 .slide-nav__active {
@@ -244,7 +247,7 @@
 
 .menu {
   display: none;
-
+  overflow: hidden;
   @media @desktop {
     display: block;
   }
