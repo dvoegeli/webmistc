@@ -5,6 +5,8 @@
 @tablet: ~"only screen and (min-width: 600px)";
 @desktop: ~"only screen and (min-width: 768px)";
 
+/* move all 'magic numbers' up here as variables */
+
 
 .whiteboard {
   width: 100vw;
@@ -12,7 +14,7 @@
   @media @desktop {
     position: absolute;
     width: ~"calc(100vw - 200px - 225px - 40px)";
-    height: ~"calc(100vh - 200px - 40px)";
+    height: ~"calc(100vh - 130px - 60px)";
     left: 220px;
     top: 20px;
   }
@@ -32,7 +34,7 @@
   top: 2%;
   right: 2%;
   @media @desktop {
-    top: ~"calc(100vh - 200px - 40px - 20px)";
+    top: ~"calc(100vh - 210px)";
     right: ~"calc(225px + 32px)";
     width: 28px;
     height: 28px;
@@ -53,7 +55,7 @@
   display: none;
   @media @desktop {
     display: block;
-    top: ~"calc(100vh - 200px - 40px - 20px)";
+    top: ~"calc(100vh - 210px)";
     left: ~"calc(200px + 32px)";
     width: 28px;
     height: 28px;
@@ -193,7 +195,7 @@
   @media @desktop {
     width: ~"calc(100vw - 200px - 225px)";
     left: 200px;
-    bottom: 180px;
+    bottom: 130px;
     z-index: 4;
   }
 }
@@ -207,6 +209,7 @@
   height: @slideNavHeight;
   @media @desktop {
     width: ~"calc(100% - 200px - 225px)";
+    height: calc(@slideNavHeight * .65);
     left: 200px;
     z-index: 2;
   }
@@ -214,14 +217,20 @@
 .slide-nav__controls {
   position: relative;
   height: calc(@slideNavHeight - 32px);
+  @media @desktop {
+    height: calc((@slideNavHeight - 32px ) * .65);
+  }
 }
 .slide-nav__slides-bounds {
   overflow: hidden;
   width: 80%;
 }
 .slide-nav__slides {
-  width: 2000px;
+  width: 2000px; /*this is a hack for flexbox; how to fix???*/
   height: @slideNavControlsHeight;
+  @media @desktop {
+    height: calc(@slideNavControlsHeight* .65);
+  }
 }
 .slide-nav__slide {
   height: 75%;
@@ -250,5 +259,6 @@
   overflow: hidden;
   @media @desktop {
     display: block;
+    box-shadow: none !important;
   }
 }
