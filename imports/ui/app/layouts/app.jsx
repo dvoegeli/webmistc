@@ -276,13 +276,12 @@ export default class App extends Component {
       'w3-show': this.state.notes.menuOpened || this.state.panels.menuOpened || this.state.slides.menuOpened,
     });
     const stickyNotesButton = classNames(
-      'fa fa-lg fa-fw w3-margin-right', {
+      'fa fa-lg fa-fw', {
       'fa-toggle-on w3-text-green': this.state.notes.sticky,
       'fa-toggle-off w3-text-pink': !this.state.notes.sticky,
     });  
     const roleMenuButton = classNames(
-      'notes-menu__item w3-dropdown-click', {
-      'w3-light-grey': this.state.roles.menuOpened,
+      'notes-menu__item clickable', {
       'w3-text-deep-orange': this.state.roles.attendee,
       'w3-text-green': this.state.roles.contributor,
       'w3-text-blue': this.state.roles.presenter,
@@ -522,22 +521,64 @@ export default class App extends Component {
         {/*<!-- NoteMenu -->*/}
         <button className={noteMenuButton} onClick={this.toggleNoteMenu.bind(this)}><i className="fa-pencil fa fa-fw"/></button>
         <nav className={noteMenu} style={{zIndex: 4}}>
-          <div className="notes-menu">
-            <a className="notes-menu__item w3-text-teal" href="#!" onClick={this.toggleStickyNotes.bind(this)}><i className={stickyNotesButton}/>Sticky Notes</a>
-            <a className="notes-menu__item w3-text-teal" href="#!"><i className="fa-pencil fa fa-lg fa-fw w3-margin-right"/>Draw</a>
-            <a className="notes-menu__item w3-text-teal" href="#!"><i className="fa-comment-o fa fa-lg fa-fw w3-margin-right"/>Text</a>
-            <a className="notes-menu__item w3-text-teal" href="#!"><i className="fa-minus fa fa-lg fa-fw fa-rotate-315 w3-margin-right"/>Line</a>
-            <a className="notes-menu__item w3-text-teal" href="#!"><i className="fa-long-arrow-right fa fa-lg fa-fw fa-rotate-315 w3-margin-right"/>Arrow</a>
-            <a className="notes-menu__item w3-text-teal" href="#!"><i className="fa-circle-thin fa fa-lg fa-fw w3-margin-right"/>Circle</a>
-            <a className="notes-menu__item w3-text-teal" href="#!"><i className="fa-square-o fa fa-lg fa-fw w3-margin-right"/>Box</a>
-            <a className="notes-menu__item w3-text-teal" href="#!"><i className="fa-eraser fa fa-fw fa-lg w3-margin-right"/>Eraser</a>
-            <a className="notes-menu__item w3-text-teal" href="#!">
-              <span className="notes-menu__clear-slide fa-stack fa-fw w3-margin-right">
+          <div className="notes-menu w3-text-teal">
+            <span className="notes-menu__item clickable" onClick={this.toggleStickyNotes.bind(this)}>
+              <i className={stickyNotesButton}/>
+              <span className="clickable__tooltip">
+                Sticky Notes
+              </span>
+            </span>
+            <span className="notes-menu__item clickable">
+              <i className="fa-pencil fa fa-lg fa-fw"/>
+              <span className="clickable__tooltip">
+                Draw
+              </span>
+            </span>
+            <span className="notes-menu__item clickable">
+              <i className="fa-comment-o fa fa-lg fa-fw"/>
+              <span className="clickable__tooltip">
+                Text
+              </span>
+            </span>
+            <span className="notes-menu__item clickable">
+              <i className="fa-minus fa fa-lg fa-fw fa-rotate-315"/>
+              <span className="clickable__tooltip">
+                Line
+              </span>
+            </span>
+            <span className="notes-menu__item clickable">
+              <i className="fa-long-arrow-right fa fa-lg fa-fw fa-rotate-315"/>
+              <span className="clickable__tooltip">
+                Arrow
+              </span>
+            </span>
+            <span className="notes-menu__item clickable">
+              <i className="fa-circle-thin fa fa-lg fa-fw"/>
+              <span className="clickable__tooltip">
+                Circle
+              </span>
+            </span>
+            <span className="notes-menu__item clickable">
+              <i className="fa-square-o fa fa-lg fa-fw"/>
+              <span className="clickable__tooltip">
+                Box
+              </span>
+            </span>
+            <span className="notes-menu__item clickable">
+              <i className="fa-eraser fa fa-fw fa-lg"/>
+              <span className="clickable__tooltip">
+                Eraser
+              </span>
+            </span>
+            <span className="notes-menu__item clickable">
+              <span className="notes-menu__clear-slide fa-stack fa-fw">
                 <i className="fa fa-sticky-note-o fa-stack-2x"></i>
                 <i className="fa fa-eraser fa-stack-1x"></i>
               </span>
-              Clear Slide
-            </a>
+              <span className="clickable__tooltip">
+                Clear Slide
+              </span>
+            </span>
             <span className="notes-menu__styles">
               <i className="fa-circle fa w3-large w3-text-amber"/>
               <i className="fa-circle fa w3-large w3-text-light-blue"/>
@@ -553,10 +594,18 @@ export default class App extends Component {
               <i className="fa-circle fa w3-xxlarge w3-text-grey"/>
             </span>
             <div className='roles-menu w3-dropdown-click'>
-              <a className={roleMenuButton} onClick={this.toggleRoleDropdown.bind(this)} href="#!">
+              {/**/}
+              <span className={roleMenuButton} onClick={this.toggleRoleDropdown.bind(this)}>
+                <i className="fa-user fa fa-lg fa-fw"/>
+                <span className="clickable__tooltip">
+                  {this.getRole()}
+                </span>
+              </span>
+              {/**/}
+              {/*<a className={roleMenuButton} onClick={this.toggleRoleDropdown.bind(this)} href="#!">
                 <i className="fa-user fa fa-lg fa-fw w3-margin-right"/>
                 {this.getRole()}
-              </a>
+              </a>*/}
               <div className={roleMenuOptions}>
                 <a className="w3-pale-orange w3-padding-medium w3-text-dark-grey" onClick={this.changeRole.bind(this, 'attendee')} href="#">Attendee</a>
                 <a className="w3-pale-green w3-padding-medium w3-text-dark-grey" onClick={this.changeRole.bind(this, 'contributor')} href="#">Contributor</a>
