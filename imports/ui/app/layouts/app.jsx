@@ -4,6 +4,8 @@ import _ from 'lodash';
 import classNames from 'classnames';
 import { DummyText } from '../../../api/dummyText.js';
 import Draggable from 'react-draggable';
+import ReactTooltip from 'react-tooltip';
+
 
 export default class App extends Component {
   constructor(props) {
@@ -48,6 +50,26 @@ export default class App extends Component {
           admin: false,
         }
       },
+      colors: {
+        menuOpened: false,
+        options: {
+          yellow: false,
+          blue: true,
+          orange: false,
+          green: false,
+          red: false
+        }
+      },
+      sizes: {
+        menuOpened: false,
+        options: {
+          tiny: false,
+          small: false,
+          medium: true,
+          large: false,
+          huge: false,
+        }
+      },
       soundTest: {
         testing: false,
       },
@@ -80,8 +102,27 @@ export default class App extends Component {
       },
       whiteboard: {
         fullscreen: false,
+      },
+      window: {
+        width: undefined,
+        height: undefined,
       }
     };
+  }
+
+  updateWindowDimensions() {
+    if (Meteor.isClient) {
+      _.merge(this.state.window, { width: $(window).width(), height: $(window).height() });
+      this.setState(this.state);
+    }
+  }
+
+  componentWillMount() {
+    this.updateWindowDimensions();
+  }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.updateWindowDimensions.bind(this));
   }
 
   toggleMute(){
@@ -105,6 +146,40 @@ export default class App extends Component {
   }
   toggleRoleDropdown(){
     _.merge(this.state.roles, { menuOpened: !this.state.roles.menuOpened });
+    this.setState(this.state);
+  }
+  toggleColorsDropdown(){
+    _.merge(this.state.colors, { menuOpened: !this.state.colors.menuOpened });
+    this.setState(this.state);
+  }
+  changeColor(color){
+    _.merge(this.state.colors.options,
+      { 
+        yellow: false,
+        blue: false,
+        orange: false,
+        green: false,
+        red: false,
+      },
+      { [color]: true }
+    );
+    this.toggleColorsDropdown();
+  }
+  changeSize(size){
+    _.merge(this.state.sizes.options,
+      { 
+        tiny: false,
+        small: false,
+        medium: false,
+        large: false,
+        huge: false,
+      },
+      { [size]: true }
+    );
+    this.toggleSizesDropdown();
+  }
+  toggleSizesDropdown(){
+    _.merge(this.state.sizes, { menuOpened: !this.state.sizes.menuOpened });
     this.setState(this.state);
   }
   toggleMessageRecipients(){
@@ -211,8 +286,10 @@ export default class App extends Component {
     this.setState(this.state);
   }
   toggleSlideNav(){
-    _.merge(this.state.slides, { menuOpened: !this.state.slides.menuOpened });
-    this.setState(this.state);
+    if(this.state.window.width < 900 ) {
+      _.merge(this.state.slides, { menuOpened: !this.state.slides.menuOpened });
+      this.setState(this.state);
+    }
   }
   changeSlide(slide){
     _.merge(this.state.slides.active,
@@ -249,7 +326,7 @@ export default class App extends Component {
   }
   render() {
     const muteButton = classNames(
-      'mute-btn w3-btn w3-btn-floating-large ripple w3-card-4', {
+      'mute-btn w3-btn w3-btn-floating-large ripple w3-card-2', {
       'w3-light-green w3-text-white': !this.state.mic.muted,
       'w3-pink w3-text-white': this.state.mic.muted,
     });
@@ -260,16 +337,16 @@ export default class App extends Component {
     });
     
     const noteMenu = classNames(
-      'menu w3-sidenav w3-card-8 w3-white w3-animate-left w3-container',{
+      'menu menu--notes w3-card-8 w3-animate-left',{
       'w3-show': this.state.notes.menuOpened,
     });
-    const noteMenuButton = 'notes-menu-btn w3-opennav w3-btn w3-btn-floating-large ripple w3-teal w3-card-4 w3-hide-large w3-text-white';
+    const noteMenuButton = 'notes-menu-btn w3-opennav w3-btn w3-btn-floating-large ripple w3-teal w3-card-2 w3-hide-large w3-text-white';
     
     const panelMenu = classNames(
       'menu w3-sidenav w3-card-8 w3-white w3-animate-right', {
       'w3-show': this.state.panels.menuOpened,
     });
-    const panelMenuButton = 'panels-menu-btn w3-btn w3-btn-floating-large ripple w3-teal w3-card-4 w3-hide-large w3-text-white';
+    const panelMenuButton = 'panels-menu-btn w3-btn w3-btn-floating-large ripple w3-teal w3-card-2 w3-hide-large w3-text-white';
     const overlay = classNames(
       'w3-overlay w3-animate-opacity', {
       'w3-hide': !this.state.notes.menuOpened && !this.state.panels.menuOpened && !this.state.slides.menuOpened,
@@ -281,82 +358,85 @@ export default class App extends Component {
       'fa-toggle-off w3-text-pink': !this.state.notes.sticky,
     });  
     const roleMenuButton = classNames(
-      'notes-menu__item clickable', {
+      'menu__item flex-row', {
       'w3-text-deep-orange': this.state.roles.attendee,
       'w3-text-green': this.state.roles.contributor,
       'w3-text-blue': this.state.roles.presenter,
       'w3-text-pink': this.state.roles.admin,
     });  
+    const colorMenuButton = classNames(
+      'fa-circle fa fa-fw w3-large', {
+      'w3-text-yellow': this.state.colors.options.yellow,
+      'w3-text-light-blue': this.state.colors.options.blue,
+      'w3-text-orange': this.state.colors.options.orange,
+      'w3-text-green': this.state.colors.options.green,
+      'w3-text-red': this.state.colors.options.red,
+    });
+    const sizeMenuButton = classNames(
+      'fa-circle fa fa-fw w3-text-grey', {
+      'note-size--tiny': this.state.sizes.options.tiny,
+      'note-size--small': this.state.sizes.options.small,
+      'note-size--medium': this.state.sizes.options.medium,
+      'note-size--large': this.state.sizes.options.large,
+      'note-size--huge': this.state.sizes.options.huge,
+    });
+
+    const colorMenuOptions = classNames(
+      'menu__item-dropdown--colors w3-dropdown-content w3-white w3-card-4', {
+      'w3-show': this.state.colors.menuOpened,
+    });
+
+    const sizeMenuOptions = classNames(
+      'menu__item-dropdown--sizes w3-dropdown-content w3-white w3-card-4', {
+      'w3-show': this.state.sizes.menuOpened,
+    });
+
     const roleMenuOptions = classNames(
-      'roles-menu__options w3-dropdown-content w3-white w3-card-4', {
+      'menu__item-dropdown--roles w3-dropdown-content w3-white w3-card-4', {
       'w3-show': this.state.roles.menuOpened,
     });
     ////////////////////
     const questions = classNames(
-      'panel w3-card-4', {
+      'panel w3-card-4 w3-animate-right', {
       'w3-hide': !this.state.panels.showing.questions,
     });
     const chat = classNames(
-      'panel w3-card-4', {
+      'panel w3-card-4 w3-animate-right', {
       'w3-hide': !this.state.panels.showing.chat,
     });
     const message = classNames(
-      'panel w3-card-4', {
+      'panel w3-card-4 w3-animate-right', {
       'w3-hide': !this.state.panels.showing.message,
     });
     const roles = classNames(
-      'panel w3-card-4', {
+      'panel w3-card-4 w3-animate-right', {
       'w3-hide': !this.state.panels.showing.roles,
     });
     const sound = classNames(
-      'panel w3-card-4', {
+      'panel w3-card-4 w3-animate-right', {
       'w3-hide': !this.state.panels.showing.sound,
     });
     const presentationControl = classNames(
-      'panel w3-card-4', {
+      'panel w3-card-4 w3-animate-right', {
       'w3-hide': !this.state.panels.showing.presentationControl,
     });
     const importExport = classNames(
-      'panel w3-card-4', {
+      'panel w3-card-4 w3-animate-right', {
       'w3-hide': !this.state.panels.showing.importExport,
     });
     const vote = classNames(
-      'panel w3-card-4', {
+      'panel w3-card-4 w3-animate-right', {
       'w3-hide': !this.state.panels.showing.vote,
     });
     ////////////
-    const questionsButton = classNames(
-      'w3-btn-block w3-left-align w3-white w3-text-teal', {
-      'w3-light-grey': this.state.panels.showing.questions,
-    });
-    const chatButton = classNames(
-      'w3-btn-block w3-left-align w3-white w3-text-teal', {
-      'w3-light-grey': this.state.panels.showing.chat,
-    });
-    const messageButton = classNames(
-      'w3-btn-block w3-left-align w3-white w3-text-teal', {
-      'w3-light-grey': this.state.panels.showing.message,
-    });
-    const rolesButton = classNames(
-      'w3-btn-block w3-left-align w3-white w3-text-teal', {
-      'w3-light-grey': this.state.panels.showing.roles,
-    });
-    const soundButton = classNames(
-      'w3-btn-block w3-left-align w3-white w3-text-teal', {
-      'w3-light-grey': this.state.panels.showing.sound,
-    });
-    const presentationControlButton = classNames(
-      'w3-btn-block w3-left-align w3-white w3-text-teal', {
-      'w3-light-grey': this.state.panels.showing.presentationControl,
-    });
-    const importExportButton = classNames(
-      'w3-btn-block w3-left-align w3-white w3-text-teal', {
-      'w3-light-grey': this.state.panels.showing.importExport,
-    });
-    const voteButton = classNames(
-      'w3-btn-block w3-left-align w3-white w3-text-teal', {
-      'w3-light-grey': this.state.panels.showing.vote,
-    });
+    const questionsButton = 'menu__item w3-margin-left w3-left-align w3-white w3-text-teal';
+    const chatButton = 'menu__item w3-margin-left w3-left-align w3-white w3-text-teal';
+    const messageButton = 'menu__item w3-margin-left w3-left-align w3-white w3-text-teal';
+    const rolesButton = 'menu__item w3-margin-left w3-left-align w3-white w3-text-teal';
+    const soundButton = 'menu__item w3-margin-left w3-left-align w3-white w3-text-teal';
+    const presentationControlButton = 'menu__item w3-margin-left w3-left-align w3-white w3-text-teal';
+    const importExportButton = 'menu__item w3-margin-left w3-left-align w3-white w3-text-teal';
+    const voteButton = 'menu__item w3-margin-left w3-left-align w3-white w3-text-teal';
     ///////
     const soundSettings = {
       muteButton: classNames(
@@ -501,7 +581,7 @@ export default class App extends Component {
     }
 
     const fullscreenButton = classNames(
-      'fullscreen-btn w3-btn w3-btn-floating-large ripple w3-card-4 w3-text-white w3-teal', {
+      'fullscreen-btn w3-btn w3-btn-floating-large ripple w3-card-2 w3-text-white w3-teal', {
       'fullscreen-btn--fullscreen': this.state.whiteboard.fullscreen,
     });
     const fullscreenButtonIcon = classNames(
@@ -520,109 +600,150 @@ export default class App extends Component {
         <button className={fullscreenButton} onClick={this.toggleFullscreen.bind(this)}><i className={fullscreenButtonIcon}/></button>
         {/*<!-- NoteMenu -->*/}
         <button className={noteMenuButton} onClick={this.toggleNoteMenu.bind(this)}><i className="fa-pencil fa fa-fw"/></button>
-        <nav className={noteMenu} style={{zIndex: 4}}>
+        <nav className={noteMenu} style={{zIndex: 12}}>
           <div className="notes-menu w3-text-teal">
-            <span className="notes-menu__item clickable" onClick={this.toggleStickyNotes.bind(this)}>
-              <i className={stickyNotesButton}/>
-              <span className="clickable__tooltip">
+            <ReactTooltip 
+              place="right" 
+              class="tooltip" 
+              effect="solid" 
+              delayShow={1000} 
+              disable={ this.state.window.width > 900 ? false : true }
+            />
+            <span className="menu__item flex-row" data-tip="Sticky Notes" onClick={this.toggleStickyNotes.bind(this)}>
+              <span className="menu__item-button flex-row flex-row--center">
+                <i className={stickyNotesButton}/>
+              </span>
+              <span className="menu__item-description">
                 Sticky Notes
               </span>
             </span>
-            <span className="notes-menu__item clickable">
-              <i className="fa-pencil fa fa-lg fa-fw"/>
-              <span className="clickable__tooltip">
+            <span className="menu__item flex-row" data-tip="Draw">
+              <span className="menu__item-button flex-row flex-row--center">
+                <i className="fa-pencil fa fa-lg fa-fw"/>
+              </span>
+              <span className="menu__item-description">
                 Draw
               </span>
             </span>
-            <span className="notes-menu__item clickable">
-              <i className="fa-comment-o fa fa-lg fa-fw"/>
-              <span className="clickable__tooltip">
+            <span className="menu__item flex-row" data-tip="Text">
+              <span className="menu__item-button flex-row flex-row--center">
+                <i className="fa-comment-o fa fa-lg fa-fw"/>
+              </span>
+              <span className="menu__item-description">
                 Text
               </span>
             </span>
-            <span className="notes-menu__item clickable">
-              <i className="fa-minus fa fa-lg fa-fw fa-rotate-315"/>
-              <span className="clickable__tooltip">
+            <span className="menu__item flex-row" data-tip="Line">
+              <span className="menu__item-button flex-row flex-row--center">
+                <i className="fa-minus fa fa-lg fa-fw fa-rotate-315"/>
+              </span>
+              <span className="menu__item-description">
                 Line
               </span>
             </span>
-            <span className="notes-menu__item clickable">
-              <i className="fa-long-arrow-right fa fa-lg fa-fw fa-rotate-315"/>
-              <span className="clickable__tooltip">
+            <span className="menu__item flex-row" data-tip="Arrow">
+              <span className="menu__item-button flex-row flex-row--center">
+                <i className="fa-long-arrow-right fa fa-lg fa-fw fa-rotate-315"/>
+              </span>
+              <span className="menu__item-description">
                 Arrow
               </span>
             </span>
-            <span className="notes-menu__item clickable">
-              <i className="fa-circle-thin fa fa-lg fa-fw"/>
-              <span className="clickable__tooltip">
+            <span className="menu__item flex-row" data-tip="Circle">
+              <span className="menu__item-button flex-row flex-row--center">
+                <i className="fa-circle-thin fa fa-lg fa-fw"/>
+              </span>
+              <span className="menu__item-description">
                 Circle
               </span>
             </span>
-            <span className="notes-menu__item clickable">
-              <i className="fa-square-o fa fa-lg fa-fw"/>
-              <span className="clickable__tooltip">
+            <span className="menu__item flex-row" data-tip="Box">
+              <span className="menu__item-button flex-row flex-row--center">
+                <i className="fa-square-o fa fa-lg fa-fw"/>
+              </span>
+              <span className="menu__item-description">
                 Box
               </span>
             </span>
-            <span className="notes-menu__item clickable">
-              <i className="fa-eraser fa fa-fw fa-lg"/>
-              <span className="clickable__tooltip">
+            <span className="menu__item flex-row" data-tip="Eraser">
+              <span className="menu__item-button flex-row flex-row--center">
+                <i className="fa-eraser fa fa-fw fa-lg"/>
+              </span>
+              <span className="menu__item-description">
                 Eraser
               </span>
             </span>
-            <span className="notes-menu__item clickable">
-              <span className="notes-menu__clear-slide fa-stack fa-fw">
-                <i className="fa fa-sticky-note-o fa-stack-2x"></i>
-                <i className="fa fa-eraser fa-stack-1x"></i>
+            <span className="menu__item flex-row" data-tip="Clear Slide">
+              <span className="menu__item-button flex-row flex-row--center">
+                <span className="notes-menu__clear-slide fa-stack fa-fw">
+                  <i className="fa fa-sticky-note-o fa-stack-2x"></i>
+                  <i className="fa fa-eraser fa-stack-1x"></i>
+                </span>
               </span>
-              <span className="clickable__tooltip">
+              <span className="menu__item-description">
                 Clear Slide
               </span>
             </span>
-            <span className="notes-menu__styles">
-              <i className="fa-circle fa w3-large w3-text-amber"/>
-              <i className="fa-circle fa w3-large w3-text-light-blue"/>
-              <i className="fa-circle fa w3-large w3-text-green"/>
-              <i className="fa-circle fa w3-large w3-text-deep-orange"/>
-              <i className="fa-circle fa w3-large w3-text-red"/>
+            <span className='roles-menu w3-dropdown-click' data-tip="Colors">
+              <span className="menu__item flex-row" onClick={this.toggleColorsDropdown.bind(this)}>
+              <span className="menu__item-button flex-row flex-row--center">
+                <i className={colorMenuButton}/>
+              </span>
+                <span className="menu__item-description">Colors</span>
+              </span>
+              <div className={colorMenuOptions}>
+                <span className="flex-row flex-row--ends w3-padding-medium">
+                  <i className="fa-circle fa w3-large w3-text-yellow" onClick={this.changeColor.bind(this, "yellow")}/>
+                  <i className="fa-circle fa w3-large w3-text-light-blue" onClick={this.changeColor.bind(this, "blue")}/>
+                  <i className="fa-circle fa w3-large w3-text-orange" onClick={this.changeColor.bind(this, "orange")}/>
+                  <i className="fa-circle fa w3-large w3-text-green" onClick={this.changeColor.bind(this, "green")}/>
+                  <i className="fa-circle fa w3-large w3-text-red" onClick={this.changeColor.bind(this, "red")}/>
+                </span>
+              </div>
             </span>
-            <span className="notes-menu__styles">
-              <i className="fa-circle fa w3-tiny w3-text-grey"/>
-              <i className="fa-circle fa w3-medium w3-text-grey"/>
-              <i className="fa-circle fa w3-large w3-text-grey"/>
-              <i className="fa-circle fa w3-xlarge w3-text-grey"/>
-              <i className="fa-circle fa w3-xxlarge w3-text-grey"/>
+            <span className='roles-menu w3-dropdown-click' data-tip="Sizes">
+              <span className="menu__item flex-row" onClick={this.toggleSizesDropdown.bind(this)}>
+                <span className="menu__item-button flex-row flex-row--center">
+                  <i className={sizeMenuButton}/>
+                </span>
+                <span className="menu__item-description">Sizes</span>
+              </span>
+              <div className={sizeMenuOptions}>
+                <span className="flex-row flex-row--ends w3-padding-medium">
+                  <i className="fa-circle fa note-size--tiny w3-text-grey" onClick={this.changeSize.bind(this, "tiny")}/>
+                  <i className="fa-circle fa note-size--small w3-text-grey" onClick={this.changeSize.bind(this, "small")}/>
+                  <i className="fa-circle fa note-size--medium w3-text-grey" onClick={this.changeSize.bind(this, "medium")}/>
+                  <i className="fa-circle fa note-size--large w3-text-grey" onClick={this.changeSize.bind(this, "large")}/>
+                  <i className="fa-circle fa note-size--huge w3-text-grey" onClick={this.changeSize.bind(this, "huge")}/>
+                </span>
+              </div>
             </span>
-            <div className='roles-menu w3-dropdown-click'>
-              {/**/}
+            <span className='roles-menu w3-dropdown-click' data-tip={this.getRole()}>
               <span className={roleMenuButton} onClick={this.toggleRoleDropdown.bind(this)}>
-                <i className="fa-user fa fa-lg fa-fw"/>
-                <span className="clickable__tooltip">
+                <span className="menu__item-button flex-row flex-row--center">
+                  <i className="fa-user fa fa-lg fa-fw"/>
+                </span>
+                <span className="menu__item-description">
                   {this.getRole()}
                 </span>
               </span>
-              {/**/}
-              {/*<a className={roleMenuButton} onClick={this.toggleRoleDropdown.bind(this)} href="#!">
-                <i className="fa-user fa fa-lg fa-fw w3-margin-right"/>
-                {this.getRole()}
-              </a>*/}
               <div className={roleMenuOptions}>
                 <a className="w3-pale-orange w3-padding-medium w3-text-dark-grey" onClick={this.changeRole.bind(this, 'attendee')} href="#">Attendee</a>
                 <a className="w3-pale-green w3-padding-medium w3-text-dark-grey" onClick={this.changeRole.bind(this, 'contributor')} href="#">Contributor</a>
                 <a className="w3-pale-blue w3-padding-medium w3-text-dark-grey " onClick={this.changeRole.bind(this, 'presenter')} href="#">Presenter</a>
                 <a className="w3-pale-red w3-padding-medium w3-text-dark-grey" onClick={this.changeRole.bind(this, 'admin')} href="#">Admin</a>
               </div>
-            </div>
+            </span>
           </div>
         </nav>
 
         {/*<!-- PanelMenu -->*/}
         <button className={panelMenuButton} onClick={this.togglePanelMenu.bind(this)}><i className="fa-th-list fa fa-fw"/></button>
-        <nav className={panelMenu} style={{zIndex: 4, right:0, width: 225 + 'px'}}>
+        <nav className={panelMenu} style={{zIndex: 12, right:0, width: 225 + 'px', padding: 0}}>
           <div className="panels-menu w3-white">
-            <button onClick={this.togglePanel.bind(this, 'questions')} className={questionsButton}>
+            <span onClick={this.togglePanel.bind(this, 'questions')} className={questionsButton}>
               <i className="fa-sticky-note-o fa fa-lg fa-fw w3-margin-right"/>Questions
-            </button>
+            </span>
             <div className={questions}>
               <header className="panel__header w3-container w3-teal">
                 <a className="w3-teal w3-left-align" onClick={this.togglePanel.bind(this, 'questions')}>
@@ -636,9 +757,9 @@ export default class App extends Component {
                 <p>How do I remove questions?</p>
               </main>
             </div>
-            <button onClick={this.togglePanel.bind(this, 'chat')} className={chatButton}>
+            <span onClick={this.togglePanel.bind(this, 'chat')} className={chatButton}>
               <i className="fa-bullhorn fa fa-lg fa-fw w3-margin-right"/>Chat
-            </button>
+            </span>
             <div className={chat}>
               <header className="panel__header w3-container w3-teal">
                 <a className="w3-teal w3-left-align" onClick={this.togglePanel.bind(this, 'chat')}>
@@ -666,9 +787,9 @@ export default class App extends Component {
                 <textarea className="w3-input w3-border" placeholder="Enter message..." style={{resize:'none'}}></textarea>
               </footer>
             </div>
-            <button onClick={this.togglePanel.bind(this, 'message')} className={messageButton}>
+            <span onClick={this.togglePanel.bind(this, 'message')} className={messageButton}>
               <i className="fa-paper-plane-o fa fa-lg fa-fw w3-margin-right"/>Message
-            </button>
+            </span>
             <div className={message}>
               <header className="panel__header w3-container w3-teal">
                 <div className="flex-row flex-row--center">
@@ -722,9 +843,9 @@ export default class App extends Component {
                 <textarea className="w3-input w3-border" placeholder="Enter message..." style={{resize:'none'}}></textarea>
               </footer>
             </div>
-            <button onClick={this.togglePanel.bind(this, 'roles')} className={rolesButton}>
+            <span onClick={this.togglePanel.bind(this, 'roles')} className={rolesButton}>
               <i className="fa-users fa fa-lg fa-fw w3-margin-right"/>Roles
-            </button>
+            </span>
             <div className={roles}>
               <header className="panel__header w3-container w3-teal">
                 <a className="w3-teal w3-left-align" onClick={this.togglePanel.bind(this, 'roles')}>
@@ -795,9 +916,9 @@ export default class App extends Component {
                 </section>
               </main>
             </div>
-            <button onClick={this.togglePanel.bind(this, 'sound')} className={soundButton}>
+            <span onClick={this.togglePanel.bind(this, 'sound')} className={soundButton}>
               <i className="fa-microphone fa fa-lg fa-fw w3-margin-right"/>Sound
-            </button>
+            </span>
             <div className={sound}>
               <header className="panel__header w3-container w3-teal">
                 <a className="w3-teal w3-left-align" onClick={this.togglePanel.bind(this, 'sound')}>
@@ -841,9 +962,9 @@ export default class App extends Component {
 
               </main>
             </div>
-            <button onClick={this.togglePanel.bind(this, 'presentationControl')} className={presentationControlButton}>
+            <span onClick={this.togglePanel.bind(this, 'presentationControl')} className={presentationControlButton}>
               <i className="fa-tv fa fa-lg fa-fw w3-margin-right"/>Presentation
-            </button>
+            </span>
             <div className={presentationControl}>
               <header className="panel__header w3-container w3-teal">
                 <a className="w3-teal w3-left-align" onClick={this.togglePanel.bind(this, 'presentationControl')}>
@@ -896,9 +1017,9 @@ export default class App extends Component {
                 </ul>
               </main>
             </div>
-            <button onClick={this.togglePanel.bind(this, 'importExport')} className={importExportButton}>
+            <span onClick={this.togglePanel.bind(this, 'importExport')} className={importExportButton}>
               <i className="fa-files-o fa fa-lg fa-fw w3-margin-right"/>Slides
-            </button>
+            </span>
             <div className={importExport}>
               <header className="panel__header w3-container w3-teal">
                 <a className="w3-teal w3-left-align" onClick={this.togglePanel.bind(this, 'importExport')}>
@@ -931,9 +1052,9 @@ export default class App extends Component {
                 </ul>
               </main>
             </div>
-            <button onClick={this.togglePanel.bind(this, 'vote')} className={voteButton}>
+            <span onClick={this.togglePanel.bind(this, 'vote')} className={voteButton}>
               <i className="fa-tasks fa fa-lg fa-fw w3-margin-right"/>Voting
-            </button>
+            </span>
             <div className={vote}>
               <header className="panel__header w3-container w3-teal">
                 <a className="w3-teal w3-left-align" onClick={this.togglePanel.bind(this, 'vote')}>
@@ -1051,12 +1172,12 @@ export default class App extends Component {
               <Draggable axis="x" bounds={{top: 0, left: -1250, right: 0, bottom: 0}}>
                 <div>
                   <div className="flex-row slide-nav__slides">
-                    <a className={slideThumbnail.slide1} onClick={this.changeSlide.bind(this, 'slide1')}><h1>slide 1</h1></a>
-                    <a className={slideThumbnail.slide2} onClick={this.changeSlide.bind(this, 'slide2')}><h1>slide 2</h1></a>
-                    <a className={slideThumbnail.slide3} onClick={this.changeSlide.bind(this, 'slide3')}><h1>slide 3</h1></a>
-                    <a className={slideThumbnail.slide4} onClick={this.changeSlide.bind(this, 'slide4')}><h1>slide 4</h1></a>
-                    <a className={slideThumbnail.slide5} onClick={this.changeSlide.bind(this, 'slide5')}><h1>slide 5</h1></a>
-                    <a className={slideThumbnail.slide6} onClick={this.changeSlide.bind(this, 'slide6')}><h1>slide 6</h1></a>
+                    <a className={slideThumbnail.slide1} onClick={this.changeSlide.bind(this, 'slide1')}><h3>slide 1</h3></a>
+                    <a className={slideThumbnail.slide2} onClick={this.changeSlide.bind(this, 'slide2')}><h3>slide 2</h3></a>
+                    <a className={slideThumbnail.slide3} onClick={this.changeSlide.bind(this, 'slide3')}><h3>slide 3</h3></a>
+                    <a className={slideThumbnail.slide4} onClick={this.changeSlide.bind(this, 'slide4')}><h3>slide 4</h3></a>
+                    <a className={slideThumbnail.slide5} onClick={this.changeSlide.bind(this, 'slide5')}><h3>slide 5</h3></a>
+                    <a className={slideThumbnail.slide6} onClick={this.changeSlide.bind(this, 'slide6')}><h3>slide 6</h3></a>
                   </div>
                 </div>
               </Draggable>
