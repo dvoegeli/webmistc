@@ -286,10 +286,8 @@ export default class App extends Component {
     this.setState(this.state);
   }
   toggleSlideNav(){
-    if(this.state.window.width < 900 ) {
-      _.merge(this.state.slides, { menuOpened: !this.state.slides.menuOpened });
-      this.setState(this.state);
-    }
+    _.merge(this.state.slides, { menuOpened: !this.state.slides.menuOpened });
+    this.setState(this.state);
   }
   changeSlide(slide){
     _.merge(this.state.slides.active,
@@ -329,7 +327,9 @@ export default class App extends Component {
       'mute-btn w3-btn w3-btn-floating-large ripple w3-card-2', {
       'w3-light-green w3-text-white': !this.state.mic.muted,
       'w3-pink w3-text-white': this.state.mic.muted,
+      'mute-btn--fullscreen': this.state.whiteboard.fullscreen,
     });
+
     const muteButtonIcon = classNames(
       'fa fa-fw', {
       'fa-microphone': !this.state.mic.muted,
@@ -343,12 +343,12 @@ export default class App extends Component {
     const noteMenuButton = 'notes-menu-btn w3-opennav w3-btn w3-btn-floating-large ripple w3-teal w3-card-2 w3-hide-large w3-text-white';
     
     const panelMenu = classNames(
-      'menu w3-sidenav w3-card-8 w3-white w3-animate-right', {
+      'menu menu--panels w3-sidenav w3-card-8 w3-white w3-animate-right', {
       'w3-show': this.state.panels.menuOpened,
     });
     const panelMenuButton = 'panels-menu-btn w3-btn w3-btn-floating-large ripple w3-teal w3-card-2 w3-hide-large w3-text-white';
     const overlay = classNames(
-      'w3-overlay w3-animate-opacity', {
+      'overlay w3-animate-opacity', {
       'w3-hide': !this.state.notes.menuOpened && !this.state.panels.menuOpened && !this.state.slides.menuOpened,
       'w3-show': this.state.notes.menuOpened || this.state.panels.menuOpened || this.state.slides.menuOpened,
     });
@@ -543,38 +543,38 @@ export default class App extends Component {
     }
 
     const slideNav = classNames(
-      'menu slide-nav w3-sidenav w3-container w3-white w3-animate-bottom', {
+      'menu--slide-nav menu w3-animate-bottom', {
       'w3-show': this.state.slides.menuOpened,
     });
 
     const slideThumbnail = {
       slide1: classNames(
-        'slide-nav__slide w3-margin flex-absolute-center', {
+        'slide-nav__slide clickable w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide1,
         'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide1,
       }),
       slide2: classNames(
-        'slide-nav__slide w3-margin flex-absolute-center', {
+        'slide-nav__slide clickable w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide2,
         'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide2,
       }),
       slide3: classNames(
-        'slide-nav__slide w3-margin flex-absolute-center', {
+        'slide-nav__slide clickable w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide3,
         'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide3,
       }),
       slide4: classNames(
-        'slide-nav__slide w3-margin flex-absolute-center', {
+        'slide-nav__slide clickable w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide4,
         'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide4,
       }),
       slide5: classNames(
-        'slide-nav__slide w3-margin flex-absolute-center', {
+        'slide-nav__slide clickable w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide5,
         'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide5,
       }),
       slide6: classNames(
-        'slide-nav__slide w3-margin flex-absolute-center', {
+        'slide-nav__slide clickable w3-margin flex-absolute-center', {
         'w3-white w3-text-grey w3-card-2': !this.state.slides.active.slide6,
         'slide-nav__active w3-teal w3-card-4 w3-padding': this.state.slides.active.slide6,
       }),
@@ -594,13 +594,18 @@ export default class App extends Component {
       'whiteboard w3-card-4 w3-light-grey', {
       'whiteboard--fullscreen': this.state.whiteboard.fullscreen,
     });
+
+    const chip = classNames(
+      'chip w3-opacity w3-teal w3-small w3-slim', {
+      'chip--fullscreen': this.state.whiteboard.fullscreen,
+    });
     return (
       <div>
         <button className={muteButton} onClick={this.toggleMute.bind(this)}><i className={muteButtonIcon}/></button>
         <button className={fullscreenButton} onClick={this.toggleFullscreen.bind(this)}><i className={fullscreenButtonIcon}/></button>
         {/*<!-- NoteMenu -->*/}
         <button className={noteMenuButton} onClick={this.toggleNoteMenu.bind(this)}><i className="fa-pencil fa fa-fw"/></button>
-        <nav className={noteMenu} style={{zIndex: 12}}>
+        <nav className={noteMenu}>
           <div className="notes-menu w3-text-teal">
             <ReactTooltip 
               place="right" 
@@ -739,7 +744,7 @@ export default class App extends Component {
 
         {/*<!-- PanelMenu -->*/}
         <button className={panelMenuButton} onClick={this.togglePanelMenu.bind(this)}><i className="fa-th-list fa fa-fw"/></button>
-        <nav className={panelMenu} style={{zIndex: 12, right:0, width: 225 + 'px', padding: 0}}>
+        <nav className={panelMenu} style={{right:0, width: 225 + 'px', padding: 0}}>
           <div className="panels-menu w3-white">
             <span onClick={this.togglePanel.bind(this, 'questions')} className={questionsButton}>
               <i className="fa-sticky-note-o fa fa-lg fa-fw w3-margin-right"/>Questions
@@ -759,6 +764,7 @@ export default class App extends Component {
             </div>
             <span onClick={this.togglePanel.bind(this, 'chat')} className={chatButton}>
               <i className="fa-bullhorn fa fa-lg fa-fw w3-margin-right"/>Chat
+              <span className="w3-badge w3-margin-left w3-pink w3-opacity-min">1</span>
             </span>
             <div className={chat}>
               <header className="panel__header w3-container w3-teal">
@@ -844,7 +850,9 @@ export default class App extends Component {
               </footer>
             </div>
             <span onClick={this.togglePanel.bind(this, 'roles')} className={rolesButton}>
-              <i className="fa-users fa fa-lg fa-fw w3-margin-right"/>Roles
+              <i className="fa-users fa fa-lg fa-fw w3-margin-right"/>
+              Roles
+              <span className="w3-badge w3-margin-left w3-pink w3-opacity-min">1</span>
             </span>
             <div className={roles}>
               <header className="panel__header w3-container w3-teal">
@@ -1158,33 +1166,31 @@ export default class App extends Component {
         </nav>
 
         {/* Slide Navigation*/}
-        <div className="slide-menu w3-progress-container w3-grey w3-opacity" onClick={this.toggleSlideNav.bind(this)}>
+        <div className="slide-nav-progress clickable w3-progress-container w3-grey w3-opacity" onClick={this.toggleSlideNav.bind(this)}>
           <div className="w3-progressbar w3-blue-grey" style={{width: 42 + '%'}}>
           </div>
           <div className="w3-center w3-text-white">10/23</div>
         </div>
+        <span className="slide-nav-prev clickable w3-text-teal w3-opacity-max" onClick={this.moveSlide.bind(this, 'left')}>
+          <i className="fa-chevron-left fa fa-4x"/>
+        </span>
+        <span className="slide-nav-next clickable w3-text-teal w3-opacity-max" onClick={this.moveSlide.bind(this, 'right')}>
+          <i className="fa-chevron-right fa fa-4x"/>
+        </span>
         <nav className={slideNav}>
-          <section className="slide-nav__controls flex-row flex-row--ends flex-row--middle w3-section ">
-            <a className="w3-text-teal" onClick={this.moveSlide.bind(this, 'left')}>
-              <i className="fa-chevron-left fa fa-5x"/>
-            </a>
-            <div className="slide-nav__slides-bounds w3-border-left w3-border-right">
-              <Draggable axis="x" bounds={{top: 0, left: -1250, right: 0, bottom: 0}}>
-                <div>
-                  <div className="flex-row slide-nav__slides">
-                    <a className={slideThumbnail.slide1} onClick={this.changeSlide.bind(this, 'slide1')}><h3>slide 1</h3></a>
-                    <a className={slideThumbnail.slide2} onClick={this.changeSlide.bind(this, 'slide2')}><h3>slide 2</h3></a>
-                    <a className={slideThumbnail.slide3} onClick={this.changeSlide.bind(this, 'slide3')}><h3>slide 3</h3></a>
-                    <a className={slideThumbnail.slide4} onClick={this.changeSlide.bind(this, 'slide4')}><h3>slide 4</h3></a>
-                    <a className={slideThumbnail.slide5} onClick={this.changeSlide.bind(this, 'slide5')}><h3>slide 5</h3></a>
-                    <a className={slideThumbnail.slide6} onClick={this.changeSlide.bind(this, 'slide6')}><h3>slide 6</h3></a>
-                  </div>
-                </div>
-              </Draggable>
-            </div>
-            <a className="w3-text-teal" onClick={this.moveSlide.bind(this, 'right')}>
-              <i className="fa-chevron-right fa fa-5x"/>
-            </a>
+          <section className="slide-nav w3-border-left w3-border-right ">
+            <Draggable axis="x" bounds={{top: 0, left: -1250, right: 0, bottom: 0}}>
+              <div>
+                <span className="slide-nav__slides flex-row">
+                  <a className={slideThumbnail.slide1} onClick={this.changeSlide.bind(this, 'slide1')}><h3>slide 1</h3></a>
+                  <a className={slideThumbnail.slide2} onClick={this.changeSlide.bind(this, 'slide2')}><h3>slide 2</h3></a>
+                  <a className={slideThumbnail.slide3} onClick={this.changeSlide.bind(this, 'slide3')}><h3>slide 3</h3></a>
+                  <a className={slideThumbnail.slide4} onClick={this.changeSlide.bind(this, 'slide4')}><h3>slide 4</h3></a>
+                  <a className={slideThumbnail.slide5} onClick={this.changeSlide.bind(this, 'slide5')}><h3>slide 5</h3></a>
+                  <a className={slideThumbnail.slide6} onClick={this.changeSlide.bind(this, 'slide6')}><h3>slide 6</h3></a>
+                </span>
+              </div>
+            </Draggable>
           </section>
         </nav>
 
@@ -1193,6 +1199,21 @@ export default class App extends Component {
 
         {/*<!-- Page content -->*/}
         <main className={whiteboard}/>
+
+        {/* Toast Example */}
+        <div className={chip} style={{top: '30px'}}>
+          <span className="chip__icon w3-deep-orange">
+            <i className="fa-bullhorn fa fa-fw"/>
+          </span>
+          Student 1
+        </div>
+        <div className={chip} style={{top: '60px'}}>
+          <span className="chip__icon w3-deep-orange">
+            <i className="fa-users fa fa-fw"/>
+          </span>
+          {"Professor \u279C Admin ?"}
+        </div>
+
       </div>
     );
   }

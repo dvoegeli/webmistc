@@ -5,17 +5,76 @@
 @tablet: ~"only screen and (min-width: 600px)";
 @desktop: ~"only screen and (min-width: 900px)";
 
+@z-desktop: 100;
+@z-fullscreen: 200;
+@z-fullscreen-btn: 3;
+@z-mute-btn: 3;
+@z-panels-btn: 3;
+@z-panels-menu: 5;
+@z-notes-btn: 3;
+@z-notes-menu: 5;
+@z-slide-progress: 2;
+@z-slide-menu: 5;
+@z-slide-controls: 3;
+@z-whiteboard: 1;
+@z-overlay: 4;
+
+
 /* move all 'magic numbers' up here as variables */
 
+.overlay {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: @z-overlay;
+    @media @desktop {
+      z-index: (@z-overlay + @z-desktop);
+    }
+}
+/* FLEX */
+
+.flex-absolute-center {
+  display: flex!important;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
+
+.flex-row {
+  display: flex!important;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.flex-row--ends {
+  justify-content: space-between;
+}
+
+.flex-row--center {
+  justify-content: center;
+}
+
+.flex-row--middle {
+  align-items: center;
+  align-content: center;
+}
 
 .whiteboard {
   width: 100vw;
   height: 100vh;
-  z-index: 8;
+  z-index: @z-whiteboard;
+  transition: width .2s, height .2s, top .2s, left .2s;
   @media @desktop {
     position: absolute;
     width: ~"calc(100vw - 75px - 225px - 40px)";
-    height: ~"calc(100vh - 150px)";
+    height: ~"calc(100vh - 40px)";
     left: 95px;
     top: 20px;
   }
@@ -27,19 +86,23 @@
   left: 0!important;
   width: 100vw!important;
   height: 100vh!important;
-  z-index: 30!important;
+  z-index: (@z-whiteboard + @z-fullscreen);
 }
 
 .mute-btn {
   position: absolute;
   top: 2%;
   right: 2%;
-  z-index: 10;
+  z-index: @z-mute-btn;
   @media @desktop {
-    top: ~"calc(100vh - 165px)";
     right: ~"calc(225px + 32px)";
     width: 28px;
     height: 28px;
+  }
+}
+.mute-btn, .fullscreen-btn {
+  @media @desktop {
+    top: ~"calc(100vh - 55px)";
   }
 }
 .mute-btn > i, .fullscreen-btn > i {
@@ -52,23 +115,34 @@
 }
 
 .fullscreen-btn {
-  z-index: 12;
+  z-index: @z-fullscreen-btn;
   position: absolute;
   display: none;
   @media @desktop {
     display: block;
-    top: ~"calc(100vh - 165px)";
     left: ~"calc(75px + 32px)";
     width: 28px;
     height: 28px;
   }
 }
 
-.fullscreen-btn--fullscreen {
+.fullscreen-btn, .mute-btn {
+  transition: right .2s, left .2s, top .2s;
+}
+
+.fullscreen-btn--fullscreen, .mute-btn--fullscreen {
   position: fixed!important;
-  left: 25px!important;
   top: ~"calc(100vh - 50px)";
-  z-index: 100;
+}
+
+.fullscreen-btn--fullscreen {
+  left: 25px!important;
+  z-index: (@z-fullscreen-btn + @z-fullscreen);
+}
+
+.mute-btn--fullscreen {
+  right: 25px!important;
+  z-index: (@z-mute-btn + @z-fullscreen);
 }
 
 .notes-menu-btn {
@@ -76,16 +150,14 @@
   bottom: 2%;
   left: 2%;
   opacity: 1!important;
+  z-index: @z-notes-btn;
 }
 
 .panels-menu-btn {
   position: absolute;
   bottom: 2%;
   right: 2%;
-}
-
-.closed {
-  display: none;
+  z-index: @z-panels-btn;
 }
 
 .mute-btn > i,
@@ -177,94 +249,63 @@
   flex: 0 1 auto;
 }
 
-.flex-row {
-  display: flex!important;
-  flex-flow: row nowrap;
-  align-items: center;
-}
 
-.flex-row--ends {
-  justify-content: space-between;
-}
-
-.flex-row--center {
-  justify-content: center;
-}
-
-.flex-row--middle {
-  align-items: center;
-  align-content: center;
-}
 
 .voting-polls__tag {
   padding: 8px!important;
 }
 
 
-.slide-menu {
+.slide-nav-progress {
   position: absolute;
   bottom: 0;
+  z-index: @z-slide-progress;
   @media @desktop {
     width: ~"calc(100vw - 115px - 225px)";
     left: 95px;
-    bottom: 130px;
-    z-index: 9;
+    bottom: 20px;
+  }
+}
+
+.slide-nav-prev, .slide-nav-next {
+  z-index: @z-slide-controls;
+  position: absolute;
+  top: ~"calc( ( 100vh - 4em ) / 2)";
+}
+
+.slide-nav-prev {
+  left: 0;
+  @media @desktop {
+    left: 95px;
+  }
+}
+
+.slide-nav-next {
+  right: 0;
+  @media @desktop {
+    right: 245px;
   }
 }
 
 .slide-nav {
-  z-index: 4; 
-  postion: absolute;
-  left: 0; 
-  bottom:0; 
-  width: 100%; 
-  height: @slideNavHeight;
-  @media @desktop {
-    width: ~"calc(100% - 75px - 225px)";
-    height: calc(@slideNavHeight * .65);
-    left: 75px;
-    z-index: 2;
-  }
-}
-.slide-nav__controls {
-  position: relative;
-  height: calc(@slideNavHeight - 32px);
-  @media @desktop {
-    height: calc((@slideNavHeight - 32px ) * .65);
-  }
-}
-.slide-nav__slides-bounds {
+  width: 100%;
   overflow: hidden;
-  width: 80%;
 }
+
 .slide-nav__slides {
-  width: 2000px; /*this is a hack for flexbox; how to fix???*/
-  height: @slideNavControlsHeight;
-  @media @desktop {
-    height: calc(@slideNavControlsHeight* .65);
-  }
+  width: 20000px; /*hack*/
+  height: @slideNavHeight;
 }
 .slide-nav__slide {
-  height: 75%;
   width: calc(100vw / 4);
-  @media @desktop {
-    width: ~"calc((100vw - 200px - 225px)/ 6)";
-  }
+  height: 65%;
+  transition: height .1s;
 }
 
 .slide-nav__active {
-  height: 80%!important;
-  transition: height 1s;
+  height: 75%;
+  transition: height .2s;
 }
-
-.flex-absolute-center {
-  display: flex!important;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-  align-content: center;
-}
-
 
 .menu {
   padding: 0.01em 16px;
@@ -277,12 +318,30 @@
     box-shadow: none !important;
   }
 }
+
+.menu--slide-nav {
+  padding: 16px !important;
+  z-index: @z-slide-menu; 
+  left: 0; 
+  bottom:0; 
+  width: 100%; 
+  @media @desktop {
+    display: none;
+    z-index: (@z-slide-menu + @z-desktop); 
+  }
+}
+
 .menu--notes {
   height: 100%;
   width: 200px;
+  z-index: @z-notes-menu;
   @media @desktop {
     width: 75px;
   }
+}
+
+.menu--panels {
+  z-index: @z-panels-menu;
 }
 
 .menu__item-dropdown {
@@ -326,4 +385,39 @@
 
 .menu__item-button {
   width: 50px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.chip {
+  display: none;
+  padding: 0 25px;
+  height: 25px;
+  font-size: 16px;
+  line-height: 25px;
+  border-radius: 25px;
+
+  position: fixed;
+  right: 250px;
+  z-index: 1000;
+  transition: right .1s;
+
+  @media @desktop {
+    display: block;
+  }
+}
+
+.chip--fullscreen {
+  right: 25px;
+}
+
+.chip__icon {
+  float: left;
+  margin: 0 10px 0 -25px;
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  text-align: center;
 }
