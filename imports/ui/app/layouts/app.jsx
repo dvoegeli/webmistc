@@ -5,6 +5,18 @@ import classNames from 'classnames';
 import { DummyText } from '../../../api/dummyText.js';
 import Draggable from 'react-draggable';
 import ReactTooltip from 'react-tooltip';
+import { ReactiveDict } from 'meteor/reactive-dict';
+
+import Whiteboard from '../components/Whiteboard.jsx';
+
+export let AppState = new ReactiveDict('appState');
+AppState.setDefault({
+  whiteboard_fullscreen: false,
+
+  tool_type: 'draw',
+  tool_color: 'blue',
+  tool_size: 'medium',
+});
 
 
 export default class App extends Component {
@@ -53,7 +65,7 @@ export default class App extends Component {
       colors: {
         menuOpened: false,
         options: {
-          yellow: false,
+          purple: false,
           blue: true,
           orange: false,
           green: false,
@@ -103,11 +115,23 @@ export default class App extends Component {
       whiteboard: {
         fullscreen: false,
       },
+      tool: {
+        type: 'draw',
+        color: 'blue',
+        size: 'medium',
+      },
       window: {
         width: undefined,
         height: undefined,
       }
     };
+  }
+  changeTool(property, setting){
+    AppState.set(`tool_${property}`, setting);
+    _.merge(this.state.tool,
+      { [property]: setting }
+    );
+    this.setState(this.state);
   }
 
   updateWindowDimensions() {
@@ -131,6 +155,7 @@ export default class App extends Component {
   }
 
   toggleFullscreen(){
+    AppState.set('whiteboard_fullscreen', !AppState.get('whiteboard_fullscreen'))
     _.merge(this.state.whiteboard, { fullscreen: !this.state.whiteboard.fullscreen });
     this.setState(this.state);
   }
@@ -155,7 +180,7 @@ export default class App extends Component {
   changeColor(color){
     _.merge(this.state.colors.options,
       { 
-        yellow: false,
+        purple: false,
         blue: false,
         orange: false,
         green: false,
@@ -163,6 +188,7 @@ export default class App extends Component {
       },
       { [color]: true }
     );
+    this.changeTool('color', color);
     this.toggleColorsDropdown();
   }
   changeSize(size){
@@ -176,6 +202,7 @@ export default class App extends Component {
       },
       { [size]: true }
     );
+    this.changeTool('size', size);
     this.toggleSizesDropdown();
   }
   toggleSizesDropdown(){
@@ -322,6 +349,31 @@ export default class App extends Component {
     _.merge(this.state.slides.active, slidesObject);
     this.setState(this.state);
   }
+  generateToolCursor(){
+    const colors = {
+      blue: '#2196f3',
+      orange: '#ff9800',
+      purple: '#9c27b0',
+      red: '#f44336',
+      green: '#4caf50'
+    }
+    const types = {
+      draw: '<path d="M491 1536l91-91-235-235-91 91v107h128v128h107zm523-928q0-22-22-22-10 0-17 7l-542 542q-7 7-7 17 0 22 22 22 10 0 17-7l542-542q7-7 7-17zm-54-192l416 416-832 832h-416v-416zm683 96q0 53-37 90l-166 166-416-416 166-165q36-38 90-38 53 0 91 38l235 234q37 39 37 91z"/>',
+      text: '<path d="M1792 896q0 174-120 321.5t-326 233-450 85.5q-70 0-145-8-198 175-460 242-49 14-114 22-17 2-30.5-9t-17.5-29v-1q-3-4-.5-12t2-10 4.5-9.5l6-9 7-8.5 8-9q7-8 31-34.5t34.5-38 31-39.5 32.5-51 27-59 26-76q-157-89-247.5-220t-90.5-281q0-130 71-248.5t191-204.5 286-136.5 348-50.5q244 0 450 85.5t326 233 120 321.5z"/>',
+      circle: '<path d="M1664 896q0 209-103 385.5t-279.5 279.5-385.5 103-385.5-103-279.5-279.5-103-385.5 103-385.5 279.5-279.5 385.5-103 385.5 103 279.5 279.5 103 385.5z"/>',
+      box: '<path d="M1664 416v960q0 119-84.5 203.5t-203.5 84.5h-960q-119 0-203.5-84.5t-84.5-203.5v-960q0-119 84.5-203.5t203.5-84.5h960q119 0 203.5 84.5t84.5 203.5z"/>',
+      line: '<path transform="rotate(-45 902.250,901.969)" d="m1606.250453,805.969801l0,192q0,40 -28,68t-68,28l-1216,0q-40,0 -68,-28t-28,-68l0,-192q0,-40 28,-68t68,-28l1216,0q40,0 68,28t28,68z"/>',
+      arrow: '<path transform="rotate(-45 864,895.930)" d="m1728,893q0,14 -10,24l-384,354q-16,14 -35,6q-19,-9 -19,-29l0,-224l-1248,0q-14,0 -23,-9t-9,-23l0,-192q0,-14 9,-23t23,-9l1248,0l0,-224q0,-21 19,-29t35,5l384,350q10,10 10,23z"/>',
+      eraser: '<path fill="lightcoral" d="M832 1408l336-384h-768l-336 384h768zm1013-1077q15 34 9.5 71.5t-30.5 65.5l-896 1024q-38 44-96 44h-768q-38 0-69.5-20.5t-47.5-54.5q-15-34-9.5-71.5t30.5-65.5l896-1024q38-44 96-44h768q38 0 69.5 20.5t47.5 54.5z"/>',
+    }
+
+    const color = colors[this.state.tool.color];
+    const type = types[this.state.tool.type];
+    
+    return {
+      cursor: `url('data:image/svg+xml,<svg fill="${color}" shape-rendering="auto" width="22" height="22" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">${type}</svg>'), auto`
+    };
+  }
   render() {
     const muteButton = classNames(
       'mute-btn w3-btn w3-btn-floating-large ripple w3-card-2', {
@@ -366,7 +418,7 @@ export default class App extends Component {
     });  
     const colorMenuButton = classNames(
       'fa-circle fa fa-fw w3-large', {
-      'w3-text-yellow': this.state.colors.options.yellow,
+      'w3-text-purple': this.state.colors.options.purple,
       'w3-text-light-blue': this.state.colors.options.blue,
       'w3-text-orange': this.state.colors.options.orange,
       'w3-text-green': this.state.colors.options.green,
@@ -591,7 +643,7 @@ export default class App extends Component {
     });
 
     const whiteboard = classNames(
-      'whiteboard w3-card-4 w3-light-grey', {
+      'whiteboard tool-type--draw w3-card-4 w3-light-grey', {
       'whiteboard--fullscreen': this.state.whiteboard.fullscreen,
     });
 
@@ -623,7 +675,7 @@ export default class App extends Component {
               </span>
             </span>
             <span className="menu__item flex-row" data-tip="Draw">
-              <span className="menu__item-button flex-row flex-row--center">
+              <span className="menu__item-button flex-row flex-row--center" onClick={this.changeTool.bind(this, 'type', 'draw')}>
                 <i className="fa-pencil fa fa-lg fa-fw"/>
               </span>
               <span className="menu__item-description">
@@ -631,14 +683,14 @@ export default class App extends Component {
               </span>
             </span>
             <span className="menu__item flex-row" data-tip="Text">
-              <span className="menu__item-button flex-row flex-row--center">
+              <span className="menu__item-button flex-row flex-row--center" onClick={this.changeTool.bind(this, 'type', 'text')}>
                 <i className="fa-comment-o fa fa-lg fa-fw"/>
               </span>
               <span className="menu__item-description">
                 Text
               </span>
             </span>
-            <span className="menu__item flex-row" data-tip="Line">
+            <span className="menu__item flex-row" data-tip="Line" onClick={this.changeTool.bind(this, 'type', 'line')}>
               <span className="menu__item-button flex-row flex-row--center">
                 <i className="fa-minus fa fa-lg fa-fw fa-rotate-315"/>
               </span>
@@ -646,7 +698,7 @@ export default class App extends Component {
                 Line
               </span>
             </span>
-            <span className="menu__item flex-row" data-tip="Arrow">
+            <span className="menu__item flex-row" data-tip="Arrow" onClick={this.changeTool.bind(this, 'type', 'arrow')}>
               <span className="menu__item-button flex-row flex-row--center">
                 <i className="fa-long-arrow-right fa fa-lg fa-fw fa-rotate-315"/>
               </span>
@@ -654,7 +706,7 @@ export default class App extends Component {
                 Arrow
               </span>
             </span>
-            <span className="menu__item flex-row" data-tip="Circle">
+            <span className="menu__item flex-row" data-tip="Circle" onClick={this.changeTool.bind(this, 'type', 'circle')}>
               <span className="menu__item-button flex-row flex-row--center">
                 <i className="fa-circle-thin fa fa-lg fa-fw"/>
               </span>
@@ -662,7 +714,7 @@ export default class App extends Component {
                 Circle
               </span>
             </span>
-            <span className="menu__item flex-row" data-tip="Box">
+            <span className="menu__item flex-row" data-tip="Box" onClick={this.changeTool.bind(this, 'type', 'box')}>
               <span className="menu__item-button flex-row flex-row--center">
                 <i className="fa-square-o fa fa-lg fa-fw"/>
               </span>
@@ -670,7 +722,7 @@ export default class App extends Component {
                 Box
               </span>
             </span>
-            <span className="menu__item flex-row" data-tip="Eraser">
+            <span className="menu__item flex-row" data-tip="Eraser" onClick={this.changeTool.bind(this, 'type', 'eraser')}>
               <span className="menu__item-button flex-row flex-row--center">
                 <i className="fa-eraser fa fa-fw fa-lg"/>
               </span>
@@ -698,7 +750,7 @@ export default class App extends Component {
               </span>
               <div className={colorMenuOptions}>
                 <span className="flex-row flex-row--ends w3-padding-medium">
-                  <i className="fa-circle fa w3-large w3-text-yellow" onClick={this.changeColor.bind(this, "yellow")}/>
+                  <i className="fa-circle fa w3-large w3-text-purple" onClick={this.changeColor.bind(this, "purple")}/>
                   <i className="fa-circle fa w3-large w3-text-light-blue" onClick={this.changeColor.bind(this, "blue")}/>
                   <i className="fa-circle fa w3-large w3-text-orange" onClick={this.changeColor.bind(this, "orange")}/>
                   <i className="fa-circle fa w3-large w3-text-green" onClick={this.changeColor.bind(this, "green")}/>
@@ -764,7 +816,7 @@ export default class App extends Component {
             </div>
             <span onClick={this.togglePanel.bind(this, 'chat')} className={chatButton}>
               <i className="fa-bullhorn fa fa-lg fa-fw w3-margin-right"/>Chat
-              <span className="w3-badge w3-margin-left w3-pink w3-opacity-min">1</span>
+              {/*<span className="w3-badge w3-margin-left w3-pink w3-opacity-min">1</span>*/}
             </span>
             <div className={chat}>
               <header className="panel__header w3-container w3-teal">
@@ -852,7 +904,7 @@ export default class App extends Component {
             <span onClick={this.togglePanel.bind(this, 'roles')} className={rolesButton}>
               <i className="fa-users fa fa-lg fa-fw w3-margin-right"/>
               Roles
-              <span className="w3-badge w3-margin-left w3-pink w3-opacity-min">1</span>
+              {/*<span className="w3-badge w3-margin-left w3-pink w3-opacity-min">1</span>*/}
             </span>
             <div className={roles}>
               <header className="panel__header w3-container w3-teal">
@@ -1198,7 +1250,8 @@ export default class App extends Component {
         <div className={overlay} onClick={this.closeMenus.bind(this)} style={{cursor:"pointer"}}></div>
 
         {/*<!-- Page content -->*/}
-        <main className={whiteboard}/>
+        <Whiteboard />
+        {/*<main className={whiteboard} style={this.generateToolCursor()}/>*/}
 
         {/* Toast Example */}
         <div className={chip} style={{top: '30px'}}>
