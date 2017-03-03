@@ -5,18 +5,12 @@ import classNames from 'classnames';
 import { DummyText } from '../../../api/dummyText.js';
 import Draggable from 'react-draggable';
 import ReactTooltip from 'react-tooltip';
-import { ReactiveDict } from 'meteor/reactive-dict';
+
+import { AppState, collection as OtherState } from '../../../api/appState.js';
+
 
 import Whiteboard from '../components/Whiteboard.jsx';
-
-export let AppState = new ReactiveDict('appState');
-AppState.setDefault({
-  whiteboard_fullscreen: false,
-
-  tool_type: 'draw',
-  tool_color: 'blue',
-  tool_size: 'medium',
-});
+import MuteButton from '../components/MuteButton.jsx';
 
 
 export default class App extends Component {
@@ -127,6 +121,10 @@ export default class App extends Component {
     };
   }
   changeTool(property, setting){
+    // TODO: remove template literal after extracting components
+    // remember to change the refs, e.g. from type -> tool_type
+    // onClick={this.changeTool.bind(this, 'type', 'text')} to
+    // onClick={this.changeTool.bind(this, 'tool_type', 'text')}
     AppState.set(`tool_${property}`, setting);
     _.merge(this.state.tool,
       { [property]: setting }
@@ -149,13 +147,13 @@ export default class App extends Component {
     window.addEventListener("resize", this.updateWindowDimensions.bind(this));
   }
 
-  toggleMute(){
-    _.merge(this.state.mic, { muted: !this.state.mic.muted });
-    this.setState(this.state);
-  }
+  // toggleMute(){
+  //   _.merge(this.state.mic, { muted: !this.state.mic.muted });
+  //   this.setState(this.state);
+  // }
 
   toggleFullscreen(){
-    AppState.set('whiteboard_fullscreen', !AppState.get('whiteboard_fullscreen'))
+    AppState.toggle('whiteboard_fullscreen');
     _.merge(this.state.whiteboard, { fullscreen: !this.state.whiteboard.fullscreen });
     this.setState(this.state);
   }
@@ -375,18 +373,18 @@ export default class App extends Component {
     };
   }
   render() {
-    const muteButton = classNames(
-      'mute-btn w3-btn w3-btn-floating-large ripple w3-card-2', {
-      'w3-light-green w3-text-white': !this.state.mic.muted,
-      'w3-pink w3-text-white': this.state.mic.muted,
-      'mute-btn--fullscreen': this.state.whiteboard.fullscreen,
-    });
+    // const muteButton = classNames(
+    //   'mute-btn w3-btn w3-btn-floating-large ripple w3-card-2', {
+    //   'w3-light-green w3-text-white': !this.state.mic.muted,
+    //   'w3-pink w3-text-white': this.state.mic.muted,
+    //   'mute-btn--fullscreen': this.state.whiteboard.fullscreen,
+    // });
 
-    const muteButtonIcon = classNames(
-      'fa fa-fw', {
-      'fa-microphone': !this.state.mic.muted,
-      'fa-microphone-slash': this.state.mic.muted,
-    });
+    // const muteButtonIcon = classNames(
+    //   'fa fa-fw', {
+    //   'fa-microphone': !this.state.mic.muted,
+    //   'fa-microphone-slash': this.state.mic.muted,
+    // });
     
     const noteMenu = classNames(
       'menu menu--notes w3-card-8 w3-animate-left',{
@@ -653,7 +651,8 @@ export default class App extends Component {
     });
     return (
       <div>
-        <button className={muteButton} onClick={this.toggleMute.bind(this)}><i className={muteButtonIcon}/></button>
+        {/*<button className={muteButton} onClick={this.toggleMute.bind(this)}><i className={muteButtonIcon}/></button>*/}
+        <MuteButton />
         <button className={fullscreenButton} onClick={this.toggleFullscreen.bind(this)}><i className={fullscreenButtonIcon}/></button>
         {/*<!-- NoteMenu -->*/}
         <button className={noteMenuButton} onClick={this.toggleNoteMenu.bind(this)}><i className="fa-pencil fa fa-fw"/></button>
