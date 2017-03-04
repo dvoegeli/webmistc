@@ -7,26 +7,22 @@ import { AppState } from '../../../api/appState.js';
 
 // FullscreenButton component - fullscreen for the whiteboard
 class FullscreenButton extends Component {
-  toggleMute(){
-    console.log('mic muted')
-    AppState.toggle('mic_muted');
+  toggleFullscreen(){
+    AppState.toggle('whiteboard_fullscreen');
   }
 
   render() {
     const button = classNames(
-      'mute-btn w3-btn w3-btn-floating-large ripple w3-card-2', {
-      'w3-light-green w3-text-white': !this.props.muted,
-      'w3-pink w3-text-white': this.props.muted,
-      'mute-btn--fullscreen': this.props.whiteboard_fullscreen,
+      'fullscreen-btn w3-btn w3-btn-floating-large ripple w3-card-2 w3-text-white w3-teal', {
+      'fullscreen-btn--fullscreen': this.props.whiteboard_fullscreen,
     });
-
     const icon = classNames(
       'fa fa-fw', {
-      'fa-microphone': !this.props.muted,
-      'fa-microphone-slash': this.props.muted,
+      'fa-expand': !this.props.whiteboard_fullscreen,
+      'fa-compress': this.props.whiteboard_fullscreen,
     });
     return (
-      <button className={button} onClick={this.toggleMute}>
+      <button className={button} onClick={this.toggleFullscreen}>
         <i className={icon}/>
       </button>
     );
@@ -36,12 +32,10 @@ class FullscreenButton extends Component {
  
 FullscreenButton.propTypes = {
   whiteboard_fullscreen: PropTypes.bool.isRequired,
-  muted: PropTypes.bool.isRequired,
 };
  
 export default createContainer(() => {
   return {
     whiteboard_fullscreen: AppState.get('whiteboard_fullscreen'),
-    muted: AppState.get('mic_muted'),
   };
 }, FullscreenButton);

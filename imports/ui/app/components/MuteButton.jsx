@@ -11,7 +11,6 @@ class MuteButton extends Component {
     super(props);
   }
   toggleMute(){
-    console.log('mic muted')
     AppState.toggle('mic_muted');
   }
 

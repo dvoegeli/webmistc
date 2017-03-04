@@ -11,7 +11,7 @@ import { AppState } from '../../../api/appState.js';
 
 import Whiteboard from '../components/Whiteboard.jsx';
 import MuteButton from '../components/MuteButton.jsx';
-import FullscreenButton from '../components/MuteButton.jsx';
+import FullscreenButton from '../components/FullscreenButton.jsx';
 
 
 export default class App extends Component {
@@ -146,12 +146,6 @@ export default class App extends Component {
 
   componentDidMount() {
     window.addEventListener("resize", this.updateWindowDimensions.bind(this));
-  }
-
-  toggleFullscreen(){
-    AppState.toggle('whiteboard_fullscreen');
-    _.merge(this.state.whiteboard, { fullscreen: !this.state.whiteboard.fullscreen });
-    this.setState(this.state);
   }
 
   toggleSoundTest(){
@@ -579,16 +573,6 @@ export default class App extends Component {
       }),
     }
 
-    const fullscreenButton = classNames(
-      'fullscreen-btn w3-btn w3-btn-floating-large ripple w3-card-2 w3-text-white w3-teal', {
-      'fullscreen-btn--fullscreen': this.state.whiteboard.fullscreen,
-    });
-    const fullscreenButtonIcon = classNames(
-      'fa fa-fw', {
-      'fa-expand': !this.state.whiteboard.fullscreen,
-      'fa-compress': this.state.whiteboard.fullscreen,
-    });
-
     const whiteboard = classNames(
       'whiteboard tool-type--draw w3-card-4 w3-light-grey', {
       'whiteboard--fullscreen': this.state.whiteboard.fullscreen,
@@ -601,8 +585,7 @@ export default class App extends Component {
     return (
       <div>
         <MuteButton/>
-        {/*<button className={fullscreenButton} onClick={this.toggleFullscreen.bind(this)}><i className={fullscreenButtonIcon}/></button>*/}
-      {/*<FullscreenButton/>*/}
+        <FullscreenButton/>
         {/*<!-- NoteMenu -->*/}
         <button className={noteMenuButton} onClick={this.toggleNoteMenu.bind(this)}><i className="fa-pencil fa fa-fw"/></button>
         <nav className={noteMenu}>
