@@ -26,9 +26,10 @@ import { Mongo } from 'meteor/mongo';
  
 export const AppState = {};
 
-export const collection = new Mongo.Collection(null);
+export const State = new Mongo.Collection(null);
 
-const state = {
+const initialState = {
+  /*WHITEBOARD*/
   whiteboard_fullscreen: false,
 
   mic_muted: false,
@@ -37,16 +38,22 @@ const state = {
   tool_color: 'red',
   tool_size: 'medium',
 }
-collection.insert(state);
+State.insert(initialState);
 
-// TODO: regex on 'state' to build corresponding fields of 'collection'
-// AppState.getAll = (query) => state.findOne( { }, { fields: { [query]: 1} } )[query];
 
-AppState.get = (query) => collection.findOne( { }, { fields: { [query]: 1} } )[query];
+AppState.getAll = (query) => {
+  const fields = Object
+    .keys(initialState)
+    .filter( namespace => !!namespace.match( new RegExp(`^${query}_`)))
+    .reduce( (fields, namespace) => Object.assign(fields, { [namespace]: 1 }), {})
+  return State.findOne( { }, { fields } );
+};
+
+AppState.get = (query) => State.findOne( { }, { fields: { [query]: 1} } )[query];
 
 // TODO: create guard in case query is not a boolean
 AppState.toggle = (query) => {
-  collection.update( { [query]: { $exists: true } }, { 
+  State.update( { [query]: { $exists: true } }, { 
     $set: { 
       [query]: !AppState.get(query) 
     } 
@@ -55,7 +62,7 @@ AppState.toggle = (query) => {
 
 AppState.set = (key, value) => {
   // console.log(`key: ${key}, value: ${value}`)
-  collection.update( { [key]: { $exists: true } }, { 
+  State.update( { [key]: { $exists: true } }, { 
     $set: { 
       [key]: value
     } 

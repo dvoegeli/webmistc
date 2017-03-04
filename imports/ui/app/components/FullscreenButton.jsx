@@ -5,11 +5,8 @@ import classNames from 'classnames';
 import { AppState } from '../../../api/appState.js';
  
 
-// MuteButton component - mutes the microphone
-class MuteButton extends Component {
-  constructor(props) {
-    super(props);
-  }
+// FullscreenButton component - fullscreen for the whiteboard
+class FullscreenButton extends Component {
   toggleMute(){
     console.log('mic muted')
     AppState.toggle('mic_muted');
@@ -37,7 +34,7 @@ class MuteButton extends Component {
 }
  
  
-MuteButton.propTypes = {
+FullscreenButton.propTypes = {
   whiteboard_fullscreen: PropTypes.bool.isRequired,
   muted: PropTypes.bool.isRequired,
 };
@@ -47,4 +44,4 @@ export default createContainer(() => {
     whiteboard_fullscreen: AppState.get('whiteboard_fullscreen'),
     muted: AppState.get('mic_muted'),
   };
-}, MuteButton);
+}, FullscreenButton);
