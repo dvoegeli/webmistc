@@ -13,6 +13,18 @@ import Whiteboard from '../components/Whiteboard.jsx';
 import MuteButton from '../components/MuteButton.jsx';
 import FullscreenButton from '../components/FullscreenButton.jsx';
 
+// STUBS
+import NoteMenuButton from '../components/NoteMenuButton.jsx';
+import NoteMenu from '../components/NoteMenu.jsx';
+import FeaturesMenuButton from '../components/FeaturesMenuButton.jsx';
+import FeaturesMenu from '../components/FeaturesMenu.jsx';
+import SlideProgressBar from '../components/SlideProgressBar.jsx';
+import SlidePrevButton from '../components/SlidePrevButton.jsx';
+import SlideNextButton from '../components/SlideNextButton.jsx';
+import SlideNavigation from '../components/SlideNavigation.jsx';
+import BackgroundOverlay from '../components/BackgroundOverlay.jsx';
+import SmartAlert from '../components/SmartAlert.jsx';
+
 
 export default class App extends Component {
   constructor(props) {
@@ -269,7 +281,7 @@ export default class App extends Component {
      this.setState(this.state);
   }
 
-  togglePanelMenu(){
+  toggleFeaturesMenu(){
     _.merge(this.state.panels, { menuOpened: !this.state.panels.menuOpened });
     this.setState(this.state);
   }
@@ -319,7 +331,7 @@ export default class App extends Component {
     this.setState(this.state);
   }
   moveSlide(direction){
-    // per lodash, (iteration order is not guaranteed, so this may break
+    // per lodash, (iteration order is not guaranteed, so this may break occasionaly)
     let slidesArray = _.toPairs(this.state.slides.active);
     const activeSlideIndex = _.findIndex(slidesArray, (slide) => slide[1] );
     try {
@@ -331,7 +343,7 @@ export default class App extends Component {
       slidesArray[activeSlideIndex + moveDir][1] = true;
       slidesArray[activeSlideIndex][1] = false;
     } catch (error) {
-      // there isn't a next or previous, so change nothing
+      // there isn't a next or previous
     }
     const slidesObject = _.fromPairs(slidesArray);
     _.merge(this.state.slides.active, slidesObject);
@@ -587,7 +599,9 @@ export default class App extends Component {
         <MuteButton/>
         <FullscreenButton/>
         {/*<!-- NoteMenu -->*/}
+        {/*<NoteMenuButton/>*/}
         <button className={noteMenuButton} onClick={this.toggleNoteMenu.bind(this)}><i className="fa-pencil fa fa-fw"/></button>
+        {/*<NoteMenu/>*/}
         <nav className={noteMenu}>
           <div className="notes-menu w3-text-teal">
             <ReactTooltip 
@@ -725,8 +739,10 @@ export default class App extends Component {
           </div>
         </nav>
 
-        {/*<!-- PanelMenu -->*/}
-        <button className={panelMenuButton} onClick={this.togglePanelMenu.bind(this)}><i className="fa-th-list fa fa-fw"/></button>
+        {/*<!-- FeaturesMenu -->*/}
+        {/*<FeaturesMenuButton/>*/}
+        <button className={panelMenuButton} onClick={this.toggleFeaturesMenu.bind(this)}><i className="fa-th-list fa fa-fw"/></button>
+      {/*<FeaturesMenu/>*/}
         <nav className={panelMenu} style={{right:0, width: 225 + 'px', padding: 0}}>
           <div className="panels-menu w3-white">
             <span onClick={this.togglePanel.bind(this, 'questions')} className='menu__item w3-margin-left w3-left-align w3-white w3-text-teal'>
@@ -1149,17 +1165,21 @@ export default class App extends Component {
         </nav>
 
         {/* Slide Navigation*/}
+        {/*<SlideProgressBar/>*/}
         <div className="slide-nav-progress clickable w3-progress-container w3-grey w3-opacity" onClick={this.toggleSlideNav.bind(this)}>
           <div className="w3-progressbar w3-blue-grey" style={{width: 42 + '%'}}>
           </div>
           <div className="w3-center w3-text-white">10/23</div>
         </div>
+        {/*<SlidePrevButton/>*/}
         <span className="slide-nav-prev clickable w3-text-teal w3-opacity-max" onClick={this.moveSlide.bind(this, 'left')}>
           <i className="fa-chevron-left fa fa-4x"/>
         </span>
+        {/*<SlideNextButton/>*/}
         <span className="slide-nav-next clickable w3-text-teal w3-opacity-max" onClick={this.moveSlide.bind(this, 'right')}>
           <i className="fa-chevron-right fa fa-4x"/>
         </span>
+        {/*<SlideNavigation/>*/}
         <nav className={slideNav}>
           <section className="slide-nav w3-border-left w3-border-right ">
             <Draggable axis="x" bounds={{top: 0, left: -1250, right: 0, bottom: 0}}>
@@ -1178,12 +1198,14 @@ export default class App extends Component {
         </nav>
 
         {/*<!-- Overlay -->*/}
+        {/*<BackgroundOverlay/>*/}
         <div className={overlay} onClick={this.closeMenus.bind(this)} style={{cursor:"pointer"}}></div>
 
         {/*<!-- Page content -->*/}
         <Whiteboard />
 
         {/* Toast Example */}
+        {/*<SmartAlert/>*/}
         <div className={chip} style={{top: '30px'}}>
           <span className="chip__icon w3-deep-orange">
             <i className="fa-bullhorn fa fa-fw"/>
