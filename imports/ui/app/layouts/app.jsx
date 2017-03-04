@@ -14,14 +14,13 @@ import MuteButton from '../components/MuteButton.jsx';
 import FullscreenButton from '../components/FullscreenButton.jsx';
 
 // STUBS
-import NoteMenuButton from '../components/NoteMenuButton.jsx';
-import NoteMenu from '../components/NoteMenu.jsx';
+import NotesMenuButton from '../components/NotesMenuButton.jsx';
+import NotesMenu from '../components/NotesMenu.jsx';
 import FeaturesMenuButton from '../components/FeaturesMenuButton.jsx';
 import FeaturesMenu from '../components/FeaturesMenu.jsx';
-import SlideProgressBar from '../components/SlideProgressBar.jsx';
-import SlidePrevButton from '../components/SlidePrevButton.jsx';
-import SlideNextButton from '../components/SlideNextButton.jsx';
-import SlideNavigation from '../components/SlideNavigation.jsx';
+import SlidesButton from '../components/SlidesButton.jsx';
+import SlidesNavigation from '../components/SlidesNavigation.jsx';
+import SlidesProgressBar from '../components/SlidesProgressBar.jsx';
 import BackgroundOverlay from '../components/BackgroundOverlay.jsx';
 import SmartAlert from '../components/SmartAlert.jsx';
 
@@ -276,16 +275,6 @@ export default class App extends Component {
     this.setState(this.state);
   }
 
-  toggleNoteMenu(){
-     _.merge(this.state.notes, { menuOpened: !this.state.notes.menuOpened });
-     this.setState(this.state);
-  }
-
-  toggleFeaturesMenu(){
-    _.merge(this.state.panels, { menuOpened: !this.state.panels.menuOpened });
-    this.setState(this.state);
-  }
-
   toggleRecord(){
     _.merge(this.state.record, { recording: !this.state.record.recording });
     this.setState(this.state);
@@ -330,42 +319,22 @@ export default class App extends Component {
     );
     this.setState(this.state);
   }
-  moveSlide(direction){
-    // per lodash, (iteration order is not guaranteed, so this may break occasionaly)
-    let slidesArray = _.toPairs(this.state.slides.active);
-    const activeSlideIndex = _.findIndex(slidesArray, (slide) => slide[1] );
-    try {
-      if (_.isEqual(direction, 'left') ){
-        var moveDir = -1;
-      } else if (_.isEqual(direction, 'right') ){
-        var moveDir = 1;
-      }
-      slidesArray[activeSlideIndex + moveDir][1] = true;
-      slidesArray[activeSlideIndex][1] = false;
-    } catch (error) {
-      // there isn't a next or previous
-    }
-    const slidesObject = _.fromPairs(slidesArray);
-    _.merge(this.state.slides.active, slidesObject);
-    this.setState(this.state);
-  }
   render() {
-   
+   console.log(AppState.get('notes_menu_open'))
     const noteMenu = classNames(
       'menu menu--notes w3-card-8 w3-animate-left',{
-      'w3-show': this.state.notes.menuOpened,
+      'w3-show': AppState.get('notes_menu_open'),
     });
-    const noteMenuButton = 'notes-menu-btn w3-opennav w3-btn w3-btn-floating-large ripple w3-teal w3-card-2 w3-hide-large w3-text-white';
     
     const panelMenu = classNames(
       'menu menu--panels w3-sidenav w3-card-8 w3-white w3-animate-right', {
       'w3-show': this.state.panels.menuOpened,
     });
-    const panelMenuButton = 'panels-menu-btn w3-btn w3-btn-floating-large ripple w3-teal w3-card-2 w3-hide-large w3-text-white';
+    
     const overlay = classNames(
       'overlay w3-animate-opacity', {
-      'w3-hide': !this.state.notes.menuOpened && !this.state.panels.menuOpened && !this.state.slides.menuOpened,
-      'w3-show': this.state.notes.menuOpened || this.state.panels.menuOpened || this.state.slides.menuOpened,
+      'w3-hide': !AppState.get('notes_menu_open') && !this.state.panels.menuOpened && !this.state.slides.menuOpened,
+      'w3-show': AppState.get('notes_menu_open') || this.state.panels.menuOpened || this.state.slides.menuOpened,
     });
     const stickyNotesButton = classNames(
       'fa fa-lg fa-fw', {
@@ -585,11 +554,6 @@ export default class App extends Component {
       }),
     }
 
-    const whiteboard = classNames(
-      'whiteboard tool-type--draw w3-card-4 w3-light-grey', {
-      'whiteboard--fullscreen': this.state.whiteboard.fullscreen,
-    });
-
     const chip = classNames(
       'chip w3-opacity w3-teal w3-small w3-slim', {
       'chip--fullscreen': this.state.whiteboard.fullscreen,
@@ -598,10 +562,9 @@ export default class App extends Component {
       <div>
         <MuteButton/>
         <FullscreenButton/>
-        {/*<!-- NoteMenu -->*/}
-        {/*<NoteMenuButton/>*/}
-        <button className={noteMenuButton} onClick={this.toggleNoteMenu.bind(this)}><i className="fa-pencil fa fa-fw"/></button>
-        {/*<NoteMenu/>*/}
+        {/*<!-- NotesMenu -->*/}
+        <NotesMenuButton/>
+        {/*<NotesMenu/>*/}
         <nav className={noteMenu}>
           <div className="notes-menu w3-text-teal">
             <ReactTooltip 
@@ -740,10 +703,9 @@ export default class App extends Component {
         </nav>
 
         {/*<!-- FeaturesMenu -->*/}
-        {/*<FeaturesMenuButton/>*/}
-        <button className={panelMenuButton} onClick={this.toggleFeaturesMenu.bind(this)}><i className="fa-th-list fa fa-fw"/></button>
+        <FeaturesMenuButton/>
         {/*<FeaturesMenu/>*/}
-        <nav className={panelMenu} style={{right:0, width: 225 + 'px', padding: 0}}>
+        <nav className={panelMenu}>
           <div className="panels-menu w3-white">
             <span onClick={this.togglePanel.bind(this, 'questions')} className='menu__item w3-margin-left w3-left-align w3-white w3-text-teal'>
               <i className="fa-sticky-note-o fa fa-lg fa-fw w3-margin-right"/>Questions
@@ -1165,21 +1127,15 @@ export default class App extends Component {
         </nav>
 
         {/* Slide Navigation*/}
-        {/*<SlideProgressBar/>*/}
+        {/*<SlidesProgressBar/>*/}
         <div className="slide-nav-progress clickable w3-progress-container w3-grey w3-opacity" onClick={this.toggleSlideNav.bind(this)}>
           <div className="w3-progressbar w3-blue-grey" style={{width: 42 + '%'}}>
           </div>
           <div className="w3-center w3-text-white">10/23</div>
         </div>
-        {/*<SlidePrevButton/>*/}
-        <span className="slide-nav-prev clickable w3-text-teal w3-opacity-max" onClick={this.moveSlide.bind(this, 'left')}>
-          <i className="fa-chevron-left fa fa-4x"/>
-        </span>
-        {/*<SlideNextButton/>*/}
-        <span className="slide-nav-next clickable w3-text-teal w3-opacity-max" onClick={this.moveSlide.bind(this, 'right')}>
-          <i className="fa-chevron-right fa fa-4x"/>
-        </span>
-        {/*<SlideNavigation/>*/}
+        <SlidesButton direction='prev'/>
+        <SlidesButton direction='next'/>
+        {/*<SlidesNavigation/>*/}
         <nav className={slideNav}>
           <section className="slide-nav w3-border-left w3-border-right ">
             <Draggable axis="x" bounds={{top: 0, left: -1250, right: 0, bottom: 0}}>

@@ -22,21 +22,28 @@
 //   }
 // });
 // state.findOne( { }, { fields: { 'foo': 1, _id: 0 } } ); 
-import { Mongo } from 'meteor/mongo';
- 
-export const AppState = {};
 
+import { Mongo } from 'meteor/mongo'; 
+export const AppState = {};
 export const State = new Mongo.Collection(null);
 
 const initialState = {
   /*WHITEBOARD*/
   whiteboard_fullscreen: false,
+  /*MICROPHONE*/
 
   mic_muted: false,
 
+  /*TOOL*/
   tool_type: 'draw',
   tool_color: 'red',
   tool_size: 'medium',
+
+  /*NOTES*/
+  notes_menu_open: false,
+
+  /*FEATURES*/
+  features_menu_open: false,
 }
 State.insert(initialState);
 
@@ -51,18 +58,12 @@ AppState.getAll = (query) => {
 
 AppState.get = (query) => State.findOne( { }, { fields: { [query]: 1} } )[query];
 
-// TODO: create guard in case query is not a boolean
 AppState.toggle = (query) => {
-  State.update( { [query]: { $exists: true } }, { 
-    $set: { 
-      [query]: !AppState.get(query) 
-    } 
-  });
+  AppState.set(query, !AppState.get(query) );
 }
 
-AppState.set = (query, value) => {
-  if(typeof value === "string"){
-    query = { [query]: value };
-  } 
-  State.update( { [query]: { $exists: true } }, { $set: query });
+AppState.set = (key, value) => {
+  const query = (value !== undefined) ? { [key]: value } : key;
+  console.log(query)
+  State.update( { [key]: { $exists: true } }, { $set: query });
 }

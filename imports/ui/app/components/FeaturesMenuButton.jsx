@@ -7,23 +7,20 @@ import { AppState } from '../../../api/appState.js';
 
 // FeaturesMenuButton component - button for features menu
 class FeaturesMenuButton extends Component {
-  toggleFullscreen(){
-    AppState.toggle('whiteboard_fullscreen');
+  toggleFeaturesMenu(){
+    AppState.toggle('features_menu_open');
   }
 
   render() {
     const button = classNames(
-      'fullscreen-btn w3-btn w3-btn-floating-large ripple w3-card-2 w3-text-white w3-teal', {
-      'fullscreen-btn--fullscreen': this.props.whiteboard_fullscreen,
-    });
-    const icon = classNames(
-      'fa fa-fw', {
-      'fa-expand': !this.props.whiteboard_fullscreen,
-      'fa-compress': this.props.whiteboard_fullscreen,
-    });
+      'panels-menu-btn ripple',
+      'w3-btn w3-btn-floating-large',
+      'w3-card-2 w3-teal w3-text-white',
+      'w3-hide-large'
+    );
     return (
-      <button className={button} onClick={this.toggleFullscreen}>
-        <i className={icon}/>
+      <button className={button} onClick={this.toggleFeaturesMenu}>
+        <i className="fa-th-list fa fa-fw"/>
       </button>
     );
   }
@@ -31,11 +28,11 @@ class FeaturesMenuButton extends Component {
  
  
 FeaturesMenuButton.propTypes = {
-  whiteboard_fullscreen: PropTypes.bool.isRequired,
+  features_menu_open: PropTypes.bool.isRequired,
 };
  
 export default createContainer(() => {
   return {
-    whiteboard_fullscreen: AppState.get('whiteboard_fullscreen'),
+    features_menu_open: AppState.get('features_menu_open'),
   };
 }, FeaturesMenuButton);
