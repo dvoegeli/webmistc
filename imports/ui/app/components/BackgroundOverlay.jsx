@@ -7,35 +7,48 @@ import { AppState } from '../../../api/appState.js';
 
 // BackgroundOverlay component - background overlay for menus and navigation
 class BackgroundOverlay extends Component {
-  toggleFullscreen(){
-    AppState.toggle('whiteboard_fullscreen');
+  closeMenus(){
+    _.merge(this.state.notes, { menuOpened: false });
+    _.merge(this.state.panels, { 
+      menuOpened: false, 
+      showing: {
+        questions: false,
+        chat: false,
+        message: false,
+        roles: false,
+        sound: false,
+        presentationControl: false,
+        importExport: false,
+        vote: false,
+    }});
+    _.merge(this.state.roles, { menuOpened: false });
+    _.merge(this.state.slides, { menuOpened: false });
+    this.setState(this.state);
   }
 
   render() {
-    const button = classNames(
-      'fullscreen-btn w3-btn w3-btn-floating-large ripple w3-card-2 w3-text-white w3-teal', {
-      'fullscreen-btn--fullscreen': this.props.whiteboard_fullscreen,
-    });
-    const icon = classNames(
-      'fa fa-fw', {
-      'fa-expand': !this.props.whiteboard_fullscreen,
-      'fa-compress': this.props.whiteboard_fullscreen,
+    const overlay = classNames(
+      'overlay w3-animate-opacity', {
+      'w3-hide': !this.state.notes.menuOpened && !this.state.panels.menuOpened && !this.state.slides.menuOpened,
+      'w3-show': this.state.notes.menuOpened || this.state.panels.menuOpened || this.state.slides.menuOpened,
     });
     return (
-      <button className={button} onClick={this.toggleFullscreen}>
-        <i className={icon}/>
-      </button>
+      <div className={overlay} onClick={this.closeMenus} style={{cursor:"pointer"}}></div>
     );
   }
 }
  
  
 BackgroundOverlay.propTypes = {
-  whiteboard_fullscreen: PropTypes.bool.isRequired,
+  notes_menu_open: PropTypes.bool.isRequired,
+  features_menu_open: PropTypes.bool.isRequired,
+  slides_nav_open: PropTypes.bool.isRequired,
 };
  
 export default createContainer(() => {
   return {
-    whiteboard_fullscreen: AppState.get('whiteboard_fullscreen'),
+    notes_menu_opened: AppState.get('notes_menu_opened'),
+    features_menu_opened: AppState.get('features_menu_opened'),
+    slides_nav_opened: AppState.get('slides_nav_opened'),
   };
 }, BackgroundOverlay);

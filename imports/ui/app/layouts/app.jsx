@@ -742,7 +742,7 @@ export default class App extends Component {
         {/*<!-- FeaturesMenu -->*/}
         {/*<FeaturesMenuButton/>*/}
         <button className={panelMenuButton} onClick={this.toggleFeaturesMenu.bind(this)}><i className="fa-th-list fa fa-fw"/></button>
-      {/*<FeaturesMenu/>*/}
+        {/*<FeaturesMenu/>*/}
         <nav className={panelMenu} style={{right:0, width: 225 + 'px', padding: 0}}>
           <div className="panels-menu w3-white">
             <span onClick={this.togglePanel.bind(this, 'questions')} className='menu__item w3-margin-left w3-left-align w3-white w3-text-teal'>

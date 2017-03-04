@@ -60,11 +60,9 @@ AppState.toggle = (query) => {
   });
 }
 
-AppState.set = (key, value) => {
-  // console.log(`key: ${key}, value: ${value}`)
-  State.update( { [key]: { $exists: true } }, { 
-    $set: { 
-      [key]: value
-    } 
-  });
+AppState.set = (query, value) => {
+  if(typeof value === "string"){
+    query = { [query]: value };
+  } 
+  State.update( { [query]: { $exists: true } }, { $set: query });
 }
