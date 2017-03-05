@@ -28,34 +28,71 @@ export const AppState = {};
 export const State = new Mongo.Collection(null);
 
 const initialState = {
-  /*WHITEBOARD*/
+  /* WHITEBOARD */
   whiteboard_fullscreen: false,
-  /*MICROPHONE*/
+  /* MICROPHONE */
 
   mic_muted: false,
 
-  /*TOOL*/
+  /* TOOL */
   tool_type: 'draw',
   tool_color: 'red',
   tool_size: 'medium',
 
-  /*NOTES*/
+  /* NOTES */
   notes_menu_open: false,
+  /* NOTES SERVER DATA*/
+  notes_sticky: true,
 
-  /*FEATURES*/
+  /* FEATURES */
   features_menu_open: false,
-  features_menu_show_questions: false,
-  features_menu_show_chat: false,
-  features_menu_show_message: false,
-  features_menu_show_roles: false,
-  features_menu_show_sound: false,
-  features_menu_show_presentation_control: false,
-  features_menu_show_import_export: false,
-  features_menu_show_vote: false,
+  features_show: undefined, 
+  /*[undefined|question|chat|role|sound|presentation|importExport|vote]*/
 
-  /* SLIDES*/
+  /* ROLES */
+  roles_menu_open: false,
+  roles_sort: 'attendee', /*[attendee|contributor|presenter|host]*/
+  /* USER SERVER DATA*/
+  user_role: 'attendee', /*[attendee|contributor|presenter|host]*/
+
+  /* COLORS */
+  colors_menu_open: false,
+  /* COLORS SERVER DATA*/
+  colors_option: 'blue', /* [purple|blue|orange|green|red] */
+
+  /* SIZES */
+  sizes_menu_open: false,
+  /* COLORS SERVER DATA*/
+  sizes_option: 'medium', /* [tiny|small|medium|large|huge] */
+
+  /* SOUND */
+  sound_test: false,
+
+  /* RECORD */
+  record_start: false,
+
+  /* PLAYBACK */
+  playback_start: false,
+
+  /* MESSAGES */
+  messages_list_open: false,
+  messages_recipient: undefined, /*[undefined|user_id]*/
+
+  /* VOTE */
+  vote_list_open: false,
+  vote_poll: undefined, /*[undefined|vote_poll_id]*/
+
+  /* SLIDES */
   slides_menu_opened: false,
+  /* SLIDE SERVER DATA*/
+  slide_active: 'slide1' /*[slide1|...|slideN]*/
+  slide_count: 10, /*[Integer], replace with implicit count*/
+
+  /* WINDOW */
+  window_height: undefined, /*[undefined|Integer]*/ 
+  window_width: undefined, /*[undefined|Integer]*/
 }
+
 State.insert(initialState);
 
 

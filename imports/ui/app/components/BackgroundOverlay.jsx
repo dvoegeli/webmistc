@@ -31,14 +31,14 @@ class BackgroundOverlay extends Component {
     AppState.set('notes_menu_open', false); 
     AppState.set('slides_menu_open', false);
     AppState.set('features_menu_open', false); 
-    AppState.set('features_menu_show_questions', false);
-    AppState.set('features_menu_show_chat', false);
-    AppState.set('features_menu_show_message', false);
-    AppState.set('features_menu_show_roles', false);
-    AppState.set('features_menu_show_sound', false);
-    AppState.set('features_menu_show_presentationControl', false);
-    AppState.set('features_menu_show_importExport', false);
-    AppState.set('features_menu_show_vote', false);
+    AppState.set('features_show_questions', false);
+    AppState.set('features_show_chat', false);
+    AppState.set('features_show_message', false);
+    AppState.set('features_show_roles', false);
+    AppState.set('features_show_sound', false);
+    AppState.set('features_show_presentationControl', false);
+    AppState.set('features_show_importExport', false);
+    AppState.set('features_show_vote', false);
   }
 
   render() {
