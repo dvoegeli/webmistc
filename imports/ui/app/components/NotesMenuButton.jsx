@@ -9,7 +9,7 @@ import { AppState } from '../../../api/appState.js';
 class NoteMenuButton extends Component {
   toggleNoteMenu(){
     console.log('tada!')
-     AppState.toggle('notes_menu_open');
+     AppState.set('notes_menu_open', !this.props.notes_menu_open);
   }
 
   render() {

@@ -44,6 +44,17 @@ const initialState = {
 
   /*FEATURES*/
   features_menu_open: false,
+  features_menu_show_questions: false,
+  features_menu_show_chat: false,
+  features_menu_show_message: false,
+  features_menu_show_roles: false,
+  features_menu_show_sound: false,
+  features_menu_show_presentation_control: false,
+  features_menu_show_import_export: false,
+  features_menu_show_vote: false,
+
+  /* SLIDES*/
+  slides_menu_opened: false,
 }
 State.insert(initialState);
 
@@ -57,10 +68,6 @@ AppState.getAll = (query) => {
 };
 
 AppState.get = (query) => State.findOne( { }, { fields: { [query]: 1} } )[query];
-
-AppState.toggle = (query) => {
-  AppState.set(query, !AppState.get(query) );
-}
 
 AppState.set = (key, value) => {
   const query = (value !== undefined) ? { [key]: value } : key;

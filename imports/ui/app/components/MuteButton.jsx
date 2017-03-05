@@ -11,21 +11,21 @@ class MuteButton extends Component {
     super(props);
   }
   toggleMute(){
-    AppState.toggle('mic_muted');
+    AppState.set('mic_muted', !this.props.mic_muted,);
   }
 
   render() {
     const button = classNames(
       'mute-btn w3-btn w3-btn-floating-large ripple w3-card-2', {
-      'w3-light-green w3-text-white': !this.props.muted,
-      'w3-pink w3-text-white': this.props.muted,
+      'w3-light-green w3-text-white': !this.props.mic_muted,
+      'w3-pink w3-text-white': this.props.mic_muted,
       'mute-btn--fullscreen': this.props.whiteboard_fullscreen,
     });
 
     const icon = classNames(
       'fa fa-fw', {
-      'fa-microphone': !this.props.muted,
-      'fa-microphone-slash': this.props.muted,
+      'fa-microphone': !this.props.mic_muted,
+      'fa-microphone-slash': this.props.mic_muted,
     });
     return (
       <button className={button} onClick={this.toggleMute}>
@@ -38,12 +38,12 @@ class MuteButton extends Component {
  
 MuteButton.propTypes = {
   whiteboard_fullscreen: PropTypes.bool.isRequired,
-  muted: PropTypes.bool.isRequired,
+  mic_muted: PropTypes.bool.isRequired,
 };
  
 export default createContainer(() => {
   return {
     whiteboard_fullscreen: AppState.get('whiteboard_fullscreen'),
-    muted: AppState.get('mic_muted'),
+    mic_muted: AppState.get('mic_muted'),
   };
 }, MuteButton);

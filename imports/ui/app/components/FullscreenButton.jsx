@@ -8,7 +8,7 @@ import { AppState } from '../../../api/appState.js';
 // FullscreenButton component - fullscreen for the whiteboard
 class FullscreenButton extends Component {
   toggleFullscreen(){
-    AppState.toggle('whiteboard_fullscreen');
+    AppState.set('whiteboard_fullscreen', !this.props.whiteboard_fullscreen);
   }
 
   render() {
