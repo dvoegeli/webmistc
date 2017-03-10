@@ -2,40 +2,32 @@ import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
  
-import { AppState } from '../../../api/appState.js';
+import AppState from '/imports/api/appState.js';
  
 
-// SlideProgress component - progress bar for slide progress
-class SlideProgress extends Component {
-  toggleFullscreen(){
-    AppState.toggle('whiteboard_fullscreen');
+// SlidesProgressBar component - progress bar for slide progress
+class SlidesProgressBar extends Component {
+  toggleSlideNav(){
+    AppState.set('slides_nav_open', !this.props.slides_nav_open);
   }
-
   render() {
-    const button = classNames(
-      'fullscreen-btn w3-btn w3-btn-floating-large ripple w3-card-2 w3-text-white w3-teal', {
-      'fullscreen-btn--fullscreen': this.props.whiteboard_fullscreen,
-    });
-    const icon = classNames(
-      'fa fa-fw', {
-      'fa-expand': !this.props.whiteboard_fullscreen,
-      'fa-compress': this.props.whiteboard_fullscreen,
-    });
     return (
-      <button className={button} onClick={this.toggleFullscreen}>
-        <i className={icon}/>
-      </button>
+      <div className="slide-nav-progress clickable w3-progress-container w3-grey w3-opacity" onClick={()=>this.toggleSlideNav()}>
+        <div className="w3-progressbar w3-blue-grey" style={{width: 42 + '%'}}>
+        </div>
+        <div className="w3-center w3-text-white">10/23</div>
+      </div>
     );
   }
 }
  
  
-SlideProgress.propTypes = {
-  whiteboard_fullscreen: PropTypes.bool.isRequired,
+SlidesProgressBar.propTypes = {
+  slides_nav_open: PropTypes.bool.isRequired,
 };
  
 export default createContainer(() => {
   return {
-    whiteboard_fullscreen: AppState.get('whiteboard_fullscreen'),
+    slides_nav_open: AppState.get('slides_nav_open'),
   };
-}, SlideProgress);
+}, SlidesProgressBar);

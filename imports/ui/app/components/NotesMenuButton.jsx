@@ -2,13 +2,12 @@ import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
  
-import { AppState } from '../../../api/appState.js';
+import AppState from '/imports/api/appState.js';
  
 
 // NoteMenuButton component - button for note menu
 class NoteMenuButton extends Component {
   toggleNoteMenu(){
-    console.log('tada!')
      AppState.set('notes_menu_open', !this.props.notes_menu_open);
   }
 

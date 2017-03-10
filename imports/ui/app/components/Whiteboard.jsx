@@ -2,9 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
  
-import { AppState } from '../../../api/appState.js';
-// console.log(AppState.findOne( { }, { fields: { 'foo': 1, _id: 0 } } ) );
- 
+import AppState from '/imports/api/appState.js';
 
 // Whiteboard component - represents the drawing area over the slides
 class Whiteboard extends Component {
@@ -37,8 +35,9 @@ class Whiteboard extends Component {
       'whiteboard w3-card-4 w3-light-grey', {
       'whiteboard--fullscreen': this.props.fullscreen,
     });
+    const {note_color, note_type} = this.props;
     return (
-      <main className={classes} style={this.generateToolCursor(this.props.tool_color, this.props.tool_type)}/>
+      <main className={classes} style={this.generateToolCursor(note_color, note_type)}/>
     );
   }
 }
@@ -46,14 +45,14 @@ class Whiteboard extends Component {
  
 Whiteboard.propTypes = {
   fullscreen: PropTypes.bool.isRequired,
-  tool_color: PropTypes.string.isRequired,
-  tool_type: PropTypes.string.isRequired,
+  note_color: PropTypes.string.isRequired,
+  note_type: PropTypes.string.isRequired,
 };
  
 export default createContainer(() => {
   return {
     fullscreen: AppState.get('whiteboard_fullscreen'),
-    tool_color: AppState.get('tool_color'),
-    tool_type: AppState.get('tool_type'),
+    note_color: AppState.get('note_color'),
+    note_type: AppState.get('note_type'),
   };
 }, Whiteboard);

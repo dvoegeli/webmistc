@@ -3,56 +3,58 @@ import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
 import _ from 'lodash';
  
-import { AppState } from '../../../api/appState.js';
- 
+import AppState from '/imports/api/appState.js';
 
 // SlidesButton component - button to control slides
 class SlidesButton extends Component {
-  moveSlide(direction){
-    // per lodash, (iteration order is not guaranteed, so this may break occasionaly)
-    let slidesArray = _.toPairs(this.state.slides.active);
-    const activeSlideIndex = _.findIndex(slidesArray, (slide) => slide[1] );
-    try {
-      if (_.isEqual(direction, 'prev') ){
-        var moveDir = -1;
-      } else if (_.isEqual(direction, 'next') ){
-        var moveDir = 1;
-      }
-      slidesArray[activeSlideIndex + moveDir][1] = true;
-      slidesArray[activeSlideIndex][1] = false;
-    } catch (error) {
-      // there isn't a next or previous
+  moveSlide(){
+    let {slides_labels, direction, slide_active} = this.props;
+    let active_slide = _.findIndex(slides_labels, (slide) =>
+      _.isEqual(slide, slide_active)
+    );
+    switch(direction) {
+      case 'prev':
+        active_slide -= 1;
+        break;
+      case 'next':
+        active_slide += 1;
+        break;
     }
-    const slidesObject = _.fromPairs(slidesArray);
-    AppState.set(slidesObject);
+    const moveIsValid = (0 <= active_slide) && (active_slide < slides_labels.length);
+    if(moveIsValid){
+      AppState.set('slide_active', slides_labels[active_slide]);
+    }
   }
 
   render() {
+    const {direction} = this.props;
     const button = classNames(
       'clickable w3-text-teal w3-opacity-max', {
-      'slide-nav-prev': _.isEqual(this.props.direction, 'prev'),
-      'slide-nav-next': _.isEqual(this.props.direction, 'next'),
+      'slide-nav-prev': _.isEqual(direction, 'prev'),
+      'slide-nav-next': _.isEqual(direction, 'next'),
     });
     const icon = classNames(
       'fa fa-4x', {
-      'fa-chevron-left ': _.isEqual(this.props.direction, 'prev'),
-      'fa-chevron-right ': _.isEqual(this.props.direction, 'next'),
+      'fa-chevron-left ': _.isEqual(direction, 'prev'),
+      'fa-chevron-right ': _.isEqual(direction, 'next'),
     });
     return (
-      <span className={button} onClick={this.moveSlide.bind(this, this.props.direction)}>
+      <span className={button} onClick={()=>this.moveSlide()}>
         <i className={icon}/>
       </span>
     );
   }
 }
  
- 
 SlidesButton.propTypes = {
-  /*direction: PropTypes.string.isRequired,*/
+  direction: PropTypes.string.isRequired,
+  slides_labels: PropTypes.arrayOf(React.PropTypes.string),
+  slide_active: PropTypes.string.isRequired,
 };
  
 export default createContainer(() => {
   return {
-    /*direction: AppState.get('direction'),*/
+    slides_labels: AppState.get('slides_labels'),
+    slide_active: AppState.get('slide_active')
   };
 }, SlidesButton);

@@ -1,9 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
- 
-import { AppState } from '../../../api/appState.js';
- 
+import AppState from '/imports/api/appState.js';
 
 // FeaturesMenuButton component - button for features menu
 class FeaturesMenuButton extends Component {
@@ -25,8 +23,7 @@ class FeaturesMenuButton extends Component {
     );
   }
 }
- 
- 
+
 FeaturesMenuButton.propTypes = {
   features_menu_open: PropTypes.bool.isRequired,
 };

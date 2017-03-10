@@ -24,9 +24,11 @@
 // state.findOne( { }, { fields: { 'foo': 1, _id: 0 } } ); 
 
 import { Mongo } from 'meteor/mongo'; 
-export const AppState = {};
-export const State = new Mongo.Collection(null);
+import _ from 'lodash';
 
+export default AppState = {};
+
+const State = new Mongo.Collection(null);
 const initialState = {
   /* WHITEBOARD */
   whiteboard_fullscreen: false,
@@ -34,20 +36,23 @@ const initialState = {
 
   mic_muted: false,
 
-  /* TOOL */
-  tool_type: 'draw',
-  tool_color: 'red',
-  tool_size: 'medium',
+  // /* TOOL */ /* should this be notes? */
+  // tool_type: 'box',
+  // tool_color: 'red',
+  // tool_size: 'medium',
 
   /* NOTES */
   notes_menu_open: false,
+  note_type: 'draw',    /* [draw|text|line|arrow|circle|box|eraser] */
+  note_color: 'red',    /* [purple|blue|orange|green|red] */
+  note_size: 'medium',  /* [tiny|small|medium|large|huge] */
   /* NOTES SERVER DATA*/
   notes_sticky: true,
 
   /* FEATURES */
   features_menu_open: false,
-  features_show: undefined, 
-  /*[undefined|question|chat|role|sound|presentation|importExport|vote]*/
+  features_show: 'none', 
+  /*[none|question|chat|message|role|sound|presentation|slides|vote]*/
 
   /* ROLES */
   roles_menu_open: false,
@@ -57,13 +62,9 @@ const initialState = {
 
   /* COLORS */
   colors_menu_open: false,
-  /* COLORS SERVER DATA*/
-  colors_option: 'blue', /* [purple|blue|orange|green|red] */
 
   /* SIZES */
   sizes_menu_open: false,
-  /* COLORS SERVER DATA*/
-  sizes_option: 'medium', /* [tiny|small|medium|large|huge] */
 
   /* SOUND */
   sound_test: false,
@@ -76,17 +77,19 @@ const initialState = {
 
   /* MESSAGES */
   messages_list_open: false,
-  messages_recipient: undefined, /*[undefined|user_id]*/
+  messages_recipient: 'none', /*[none|user_id]*/
 
   /* VOTE */
   vote_list_open: false,
-  vote_poll: undefined, /*[undefined|vote_poll_id]*/
+  vote_start: false,
+  vote_poll: 'none', /*[none|vote_poll_id]*/
 
   /* SLIDES */
-  slides_menu_opened: false,
+  slides_nav_open: false,
   /* SLIDE SERVER DATA*/
-  slide_active: 'slide1' /*[slide1|...|slideN]*/
-  slide_count: 10, /*[Integer], replace with implicit count*/
+  slide_active: 'slide1', /*[slide1|...|slideN]*/
+  /* this will be generated server side when uploading slides */
+  slides_labels: [ "slide1", "slide2", "slide3", "slide4", "slide5", "slide6", "slide7"],
 
   /* WINDOW */
   window_height: undefined, /*[undefined|Integer]*/ 
@@ -108,6 +111,5 @@ AppState.get = (query) => State.findOne( { }, { fields: { [query]: 1} } )[query]
 
 AppState.set = (key, value) => {
   const query = (value !== undefined) ? { [key]: value } : key;
-  console.log(query)
-  State.update( { [key]: { $exists: true } }, { $set: query });
+  State.update( {}, { $set: query });
 }

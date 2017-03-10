@@ -1,9 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
- 
-import { AppState } from '../../../api/appState.js';
- 
+import AppState from '/imports/api/appState.js';
 
 // MuteButton component - mutes the microphone
 class MuteButton extends Component {
@@ -28,14 +26,13 @@ class MuteButton extends Component {
       'fa-microphone-slash': this.props.mic_muted,
     });
     return (
-      <button className={button} onClick={this.toggleMute}>
+      <button className={button} onClick={() => this.toggleMute()}>
         <i className={icon}/>
       </button>
     );
   }
 }
- 
- 
+
 MuteButton.propTypes = {
   whiteboard_fullscreen: PropTypes.bool.isRequired,
   mic_muted: PropTypes.bool.isRequired,

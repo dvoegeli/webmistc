@@ -1,41 +1,45 @@
 import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
- 
-import { AppState } from '../../../api/appState.js';
- 
+import Draggable from 'react-draggable';
+import AppState from '/imports/api/appState.js';
+import SlideThumbnail from './SlideThumbnail.jsx';
+// Random is needed until the slides come from mongodb with an _id
+import { Random } from 'meteor/random';
 
-// SlideNavigation component - slide-style navigation for slides
-class SlideNavigation extends Component {
-  toggleFullscreen(){
-    AppState.toggle('whiteboard_fullscreen');
-  }
-
+// SlidesNavigation component - slide-style navigation for slides
+class SlidesNavigation extends Component {
   render() {
-    const button = classNames(
-      'fullscreen-btn w3-btn w3-btn-floating-large ripple w3-card-2 w3-text-white w3-teal', {
-      'fullscreen-btn--fullscreen': this.props.whiteboard_fullscreen,
+    const slideNav = classNames(
+      'menu--slide-nav menu w3-animate-bottom', {
+      'w3-show': this.props.slides_nav_open,
     });
-    const icon = classNames(
-      'fa fa-fw', {
-      'fa-expand': !this.props.whiteboard_fullscreen,
-      'fa-compress': this.props.whiteboard_fullscreen,
-    });
+
     return (
-      <button className={button} onClick={this.toggleFullscreen}>
-        <i className={icon}/>
-      </button>
+      <nav className={slideNav}>
+        <section className="slide-nav w3-border-left w3-border-right ">
+          <Draggable axis="x" bounds={{top: 0, left: -1250, right: 0, bottom: 0}}>
+            <div>
+              <span className="slide-nav__slides flex-row">
+                {this.props.labels.map((label) => 
+                  <SlideThumbnail key={Random.id()} label={label} />
+                )}
+              </span>
+            </div>
+          </Draggable>
+        </section>
+      </nav>
     );
   }
 }
  
- 
-SlideNavigation.propTypes = {
-  whiteboard_fullscreen: PropTypes.bool.isRequired,
+SlidesNavigation.propTypes = {
+  slides_nav_open: PropTypes.bool.isRequired,
 };
  
 export default createContainer(() => {
   return {
-    whiteboard_fullscreen: AppState.get('whiteboard_fullscreen'),
+    slides_nav_open: AppState.get('slides_nav_open'),
+    labels: AppState.get('slides_labels'),
   };
-}, SlideNavigation);
+}, SlidesNavigation);
