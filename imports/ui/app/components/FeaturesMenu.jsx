@@ -24,9 +24,7 @@ class FeaturesMenu extends Component {
     return (
       <nav className={menu}>
         <div className="panels-menu w3-white">
-          {/*
           <Roles/>
-          */}
           <FeatureButton label='questions' iconClass='fa-sticky-note-o'/>
           <Questions/>
           <FeatureButton label='chat' iconClass='fa-bullhorn'/>

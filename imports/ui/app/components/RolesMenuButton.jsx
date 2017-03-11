@@ -24,7 +24,7 @@ class RolesMenuButton extends Component {
       'w3-text-deep-orange': _.isEqual(user_role, 'attendee'),
       'w3-text-green': _.isEqual(user_role, 'contributor'),
       'w3-text-blue': _.isEqual(user_role, 'presenter'),
-      'w3-text-pink': _.isEqual(user_role, 'admin'),
+      'w3-text-pink': _.isEqual(user_role, 'host'),
     }); 
     const options = classNames(
       'menu__item-dropdown--roles w3-dropdown-content w3-white w3-card-4', {
@@ -33,7 +33,7 @@ class RolesMenuButton extends Component {
     const attendee = 'w3-pale-orange w3-padding-medium w3-text-dark-grey';
     const contributor = 'w3-pale-green w3-padding-medium w3-text-dark-grey';
     const presenter = 'w3-pale-blue w3-padding-medium w3-text-dark-grey ';
-    const admin = 'w3-pale-red w3-padding-medium w3-text-dark-grey';
+    const host = 'w3-pale-red w3-padding-medium w3-text-dark-grey';
     const role = _.capitalize(user_role);
     return (
       <span className='roles-menu w3-dropdown-click' data-tip={role}>
@@ -47,7 +47,7 @@ class RolesMenuButton extends Component {
           <a className={attendee} onClick={()=>this.changeRole('attendee')} href='#'>Attendee</a>
           <a className={contributor} onClick={()=>this.changeRole('contributor')} href='#'>Contributor</a>
           <a className={presenter} onClick={()=>this.changeRole('presenter')} href='#'>Presenter</a>
-          <a className={admin} onClick={()=>this.changeRole('admin')} href='#'>Admin</a>
+          <a className={host} onClick={()=>this.changeRole('host')} href='#'>Host</a>
         </div>
       </span>
     );

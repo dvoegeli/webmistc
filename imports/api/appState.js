@@ -58,7 +58,7 @@ const initialState = {
   roles_menu_open: false,
   roles_sort: 'attendee', /*[attendee|contributor|presenter|host]*/
   /* USER SERVER DATA*/
-  user_role: 'attendee', /*[attendee|contributor|presenter|host]*/
+  user_role: 'host', /*[attendee|contributor|presenter|host]*/
 
   /* COLORS */
   colors_menu_open: false,

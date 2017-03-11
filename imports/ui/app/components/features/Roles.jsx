@@ -10,81 +10,72 @@ class Roles extends Component {
     AppState.set('features_show', 'none');
   }
   sortRolesBy(role){
-    _.merge(this.state.roles.sortBy,
-      { 
-        attendee: false, 
-        contributor: false,
-        presenter: false,
-        admin: false,
-      },
-      { [role]: true }
-    );
-    this.setState(this.state);
+    AppState.set('roles_sort', role);
   }
-
   render() {
+    const {roles_sort, features_show} = this.props;
     const roles = classNames(
       'panel w3-card-4 w3-animate-right', {
-      'w3-hide': !_.isEqual(this.props.features_show, 'roles'),
+      'w3-hide': !_.isEqual(features_show, 'roles'),
     });
     const roleControl = {
       sortBy: {
         attendee: classNames({
-          'w3-show': this.state.roles.sortBy.attendee,
-          'w3-hide': !this.state.roles.sortBy.attendee,
+          'w3-show': _.isEqual(roles_sort, 'attendee'),
+          'w3-hide': !_.isEqual(roles_sort, 'attendee'),
         }),
         contributor: classNames({
-          'w3-show': this.state.roles.sortBy.contributor,
-          'w3-hide': !this.state.roles.sortBy.contributor,
+          'w3-show': _.isEqual(roles_sort, 'contributor'),
+          'w3-hide': !_.isEqual(roles_sort, 'contributor'),
         }),
         presenter: classNames({
-          'w3-show': this.state.roles.sortBy.presenter,
-          'w3-hide': !this.state.roles.sortBy.presenter,
+          'w3-show': _.isEqual(roles_sort, 'presenter'),
+          'w3-hide': !_.isEqual(roles_sort, 'presenter'),
         }),
-        admin: classNames({
-          'w3-show': this.state.roles.sortBy.admin,
-          'w3-hide': !this.state.roles.sortBy.admin,
+        host: classNames({
+          'w3-show': _.isEqual(roles_sort, 'host'),
+          'w3-hide': !_.isEqual(roles_sort, 'host'),
         }),
       },
       tab: {
         attendee: classNames(
           'w3-btn w3-deep-orange', {
-          'w3-opacity-max': !this.state.roles.sortBy.attendee,
+          'w3-opacity-max': !_.isEqual(roles_sort, 'attendee'),
         }),
         contributor: classNames(
           'w3-btn w3-green', {
-          'w3-opacity-max': !this.state.roles.sortBy.contributor,
+          'w3-opacity-max': !_.isEqual(roles_sort, 'contributor'),
         }),
         presenter: classNames(
           'w3-btn w3-blue', {
-          'w3-opacity-max': !this.state.roles.sortBy.presenter,
+          'w3-opacity-max': !_.isEqual(roles_sort, 'presenter'),
         }),
-        admin: classNames(
+        host: classNames(
           'w3-btn w3-pink', {
-          'w3-opacity-max': !this.state.roles.sortBy.admin,
+          'w3-opacity-max': !_.isEqual(roles_sort, 'host'),
         }),
       }
     }
     return (
       <div className={roles}>
             <header className="panel__header w3-container w3-teal">
-              <a className="w3-teal w3-left-align" onClick={this.togglePanel.bind(this, 'roles')}>
+              <a className="w3-teal w3-left-align" onClick={()=>this.closeMenu()}>
                 <i className="fa-chevron-left fa fa-lg fa-fw w3-margin-right"/>
                 Audience Roles
               </a>
             </header>
             <main className="panel__content">
               <div className="w3-btn-group">
-                <button className={roleControl.tab.attendee} style={{width: 25 + '%'}} onClick={this.sortRolesBy.bind(this, 'attendee')}>
+                <button className={roleControl.tab.attendee} style={{width: 25 + '%'}} onClick={()=>this.sortRolesBy('attendee')}>
                   <i className="fa-user fa fa-fw fa-lg "/>
                 </button>
-                <button className={roleControl.tab.contributor} style={{width: 25 + '%'}} onClick={this.sortRolesBy.bind(this, 'contributor')}>
+                <button className={roleControl.tab.contributor} style={{width: 25 + '%'}} onClick={()=>this.sortRolesBy('contributor')}>
                   <i className="fa-user fa fa-fw fa-lg "/>
                 </button>
-                <button className={roleControl.tab.presenter} style={{width: 25 + '%'}} onClick={this.sortRolesBy.bind(this, 'presenter')}>
+                <button className={roleControl.tab.presenter} style={{width: 25 + '%'}} onClick={()=>this.sortRolesBy('presenter')}>
                   <i className="fa-user fa fa-fw fa-lg "/>
                 </button>
-                <button className={roleControl.tab.admin} style={{width: 25 + '%'}} onClick={this.sortRolesBy.bind(this, 'admin')}>
+                <button className={roleControl.tab.host} style={{width: 25 + '%'}} onClick={()=>this.sortRolesBy('host')}>
                   <i className="fa-user fa fa-fw fa-lg "/>
                 </button>
               </div>
@@ -122,7 +113,7 @@ class Roles extends Component {
                   <p className="w3-text-deep-orange">Student Prime</p>
                   <p className="w3-text-deep-orange">Student Solo</p>
                 </div>
-                <div className={roleControl.sortBy.admin}>
+                <div className={roleControl.sortBy.host}>
                   <h4 className="w3-text-teal">Sort By Admin</h4>
                   <p className="w3-text-pink">Dorian</p>
                   <p className="w3-text-blue">Professor</p>
@@ -143,10 +134,14 @@ class Roles extends Component {
  
 Roles.propTypes = {
   features_show: PropTypes.string.isRequired,
+  roles_menu_open: PropTypes.bool.isRequired,
+  roles_sort: PropTypes.string.isRequired,
 };
  
 export default createContainer(() => {
   return {
     features_show: AppState.get('features_show'),
+    roles_menu_open: AppState.get('roles_menu_open'),
+    roles_sort: AppState.get('roles_sort'),
   };
 }, Roles);
