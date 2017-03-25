@@ -17,13 +17,14 @@ class SlidesImport extends Component {
   }
   storePdfSlides(slides) {
     slides.forEach((slide) => {
-      const canvas = this.canvas;
+      // const canvas = this.canvas;
+      const canvas = document.createElement('canvas');
       const scale = 1.5;
       const viewport = slide.getViewport(scale);
       const context = canvas.getContext('2d');
       canvas.height = viewport.height;
       canvas.width = viewport.width;
-      const task = slide.render({ canvasContext: context, viewport: viewport })
+      const task = slide.render({ canvasContext: context, viewport: viewport });
       task.promise.then(function() {
         const slideData = canvas.toDataURL('image/png');
         Meteor.call('slides.insert', slideData);
@@ -61,12 +62,11 @@ class SlidesImport extends Component {
           <i className="fa-sign-in fa fa-lg fa-fw w3-margin-right"/>
           Import Slides
         </label>
-        <canvas ref={canvas => this.canvas = canvas} style={{display: "none"}}/>
       </a>
     );
   }
 }
-
+/*style={{display: "none"}}*/
 SlidesImport.propTypes = {
 };
 

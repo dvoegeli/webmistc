@@ -4,12 +4,18 @@ import { check } from 'meteor/check';
  
 export const Slides = new Mongo.Collection('slides');
 
+if (Meteor.isServer) {
+  Meteor.publish('slides', function slidesPublication() {
+    return Slides.find();
+  });
+}
+
 Meteor.methods({
-  'slides.insert'(slide) {
-    check(slide, String);
+  'slides.insert'(data) {
+    check(data, String);
  
     Slides.insert({
-      slide,
+      data,
       createdAt: new Date(),
     });
   },

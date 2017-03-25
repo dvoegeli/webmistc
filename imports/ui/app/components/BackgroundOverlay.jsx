@@ -14,7 +14,7 @@ class BackgroundOverlay extends Component {
       'notes_menu_open': false, 
       'roles_menu_open': false,
       'features_menu_open': false, 
-      'features_show': undefined,
+      'features_show': 'none',
     });
   }
 

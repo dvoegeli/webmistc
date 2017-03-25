@@ -7,19 +7,20 @@ import AppState from '/imports/api/appState.js';
 // SlideThumbnail component - small preview image of a slide
 class SlideThumbnail extends Component {
   changeSlide(){
-    AppState.set('slide_active', this.props.label);
+    AppState.set('slide_active', this.props.key);
   }
 
   render() {
-    const {label, active} = this.props;
+    console.log(this.props)
+    const {key, active, slide} = this.props;
     const thumbnail = classNames(
       'slide-nav__slide clickable w3-margin flex-absolute-center', {
-      'w3-white w3-text-grey w3-card-2': !_.isEqual(label, active),
-      'slide-nav__active w3-teal w3-card-4 w3-padding': _.isEqual(label, active),
+      'w3-white w3-text-grey w3-card-2': !_.isEqual(key, active),
+      'slide-nav__active w3-teal w3-card-4 w3-padding': _.isEqual(key, active),
     })
     return (
       <a className={thumbnail} onClick={()=>this.changeSlide()}>
-        <h3>{this.props.label}</h3>
+        <img width='auto' height='95%' src={this.props.slide}/>
       </a>
     );
   }
