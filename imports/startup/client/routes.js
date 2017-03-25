@@ -2,7 +2,7 @@ import React from 'react';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 
 // app component
-import App from '../../ui/app/layouts/app.jsx';
+import App from '../../ui/app/layouts/App.jsx';
 // page components for site
 import Home from '../../ui/site/pages/home/home.jsx';
 import Setup from '../../ui/site/pages/setup/setup.jsx';

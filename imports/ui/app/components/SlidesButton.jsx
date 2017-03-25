@@ -8,21 +8,13 @@ import AppState from '/imports/api/appState.js';
 // SlidesButton component - button to control slides
 class SlidesButton extends Component {
   moveSlide(){
-    let {slides_labels, direction, slide_active} = this.props;
-    let active_slide = _.findIndex(slides_labels, (slide) =>
-      _.isEqual(slide, slide_active)
-    );
-    switch(direction) {
-      case 'prev':
-        active_slide -= 1;
-        break;
-      case 'next':
-        active_slide += 1;
-        break;
+    const {slides_labels, direction, slide_active} = this.props;
+    const active = _.findIndex(slides_labels, (slide)=>_.isEqual(slide, slide_active));
+    if(_.isEqual(direction, 'prev') && (active - 1) >= 0){
+      AppState.set('slide_active', slides_labels[active - 1]);
     }
-    const moveIsValid = (0 <= active_slide) && (active_slide < slides_labels.length);
-    if(moveIsValid){
-      AppState.set('slide_active', slides_labels[active_slide]);
+    if(_.isEqual(direction, 'next') && (active + 1) <= slides_labels.length){
+      AppState.set('slide_active', slides_labels[active + 1]);
     }
   }
 
