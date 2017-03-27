@@ -28,13 +28,6 @@ class Slides extends Component {
         <main className="panel__content w3-container">
           <ul className="w3-ul">
             <li>
-              {/*<a className="flex-row w3-padding-0 w3-section w3-text-teal">
-                <label>
-                  <input type="file" accept=".pdf,.jpg,.png," style={{display: "none"}}/>
-                  <i className="fa-sign-in fa fa-lg fa-fw w3-margin-right"/>
-                  Import Slides
-                </label>
-              </a>*/}
               <SlidesImport/>
             </li>
             <li>

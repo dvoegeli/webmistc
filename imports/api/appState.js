@@ -87,9 +87,9 @@ const initialState = {
   /* SLIDES */
   slides_nav_open: false,
   /* SLIDE SERVER DATA*/
-  slide_active: 'slide1', /*[slide1|...|slideN]*/
+  /*slide_active: 'slide1',*/ /*[slide1|...|slideN]*/
   /* this will be generated server side when uploading slides */
-  slides_labels: [ "slide1", "slide2", "slide3", "slide4", "slide5", "slide6", "slide7"],
+  /*slides_labels: [ "slide1", "slide2", "slide3", "slide4", "slide5", "slide6", "slide7"],*/
 
   /* WINDOW */
   window_height: undefined, /*[undefined|Integer]*/ 
