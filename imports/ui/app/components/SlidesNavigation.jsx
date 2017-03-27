@@ -21,9 +21,10 @@ class SlidesNavigation extends Component {
           <Draggable axis="x" bounds={{top: 0, left: -1250, right: 0, bottom: 0}}>
             <div>
               <span className="slide-nav__slides flex-row">
-                {this.props.slides.map((slide) => 
-                  <SlideThumbnail key={slide._id} slide={slide.data} />
-                )}
+                {this.props.slides.map((slide) => {
+                  const {data, number, active, _id} = slide;
+                  return <SlideThumbnail key={_id} slide={data} number={number} active={active}/>
+                })}
               </span>
             </div>
           </Draggable>
@@ -41,7 +42,6 @@ export default createContainer(() => {
   Meteor.subscribe('slides');
   return {
     slides_nav_open: AppState.get('slides_nav_open'),
-    labels: AppState.get('slides_labels'),
-    slides: Slides.find({}).fetch(),
+    slides: _.sortBy(Slides.find({}).fetch(), ['number']),
   };
 }, SlidesNavigation);
