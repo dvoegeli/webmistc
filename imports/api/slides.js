@@ -17,8 +17,7 @@ Meteor.methods({
       number: Number,
       data: String
     });
-
-    Object.assign(slide, {
+    slide = Object.assign(slide, {
       createdAt: new Date()
     });
     Slides.insert(slide);
@@ -62,17 +61,5 @@ Meteor.methods({
       });
     }
 
-  },
-  'slides.makeActive'(number) {
-    check(number, Number);
-
-    const active = Slides.findOne({active: true});
-
-    Slides.update(active._id, {
-      $set: { active: false },
-    });
-    Slides.update({number}, {
-      $set: { active: true },
-    });
   },
 });

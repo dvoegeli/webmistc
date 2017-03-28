@@ -4,8 +4,6 @@ import classNames from 'classnames';
 import Draggable from 'react-draggable';
 import AppState from '/imports/api/appState.js';
 import SlideThumbnail from './SlideThumbnail.jsx';
-// Random is needed until the slides come from mongodb with an _id
-import { Random } from 'meteor/random';
 import { Slides } from '/imports/api/slides.js';
 
 // SlidesNavigation component - slide-style navigation for slides
