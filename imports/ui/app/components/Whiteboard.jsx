@@ -3,6 +3,7 @@ import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
  
 import AppState from '/imports/api/appState.js';
+import { Slides } from '/imports/api/slides.js';
 
 // Whiteboard component - represents the drawing area over the slides
 class Whiteboard extends Component {
@@ -31,13 +32,17 @@ class Whiteboard extends Component {
   }
 
   render() {
+    const {note_color, note_type, fullscreen, slide} = this.props;
     const classes = classNames(
       'whiteboard w3-card-4 w3-light-grey', {
-      'whiteboard--fullscreen': this.props.fullscreen,
+      'whiteboard--fullscreen': fullscreen,
     });
-    const {note_color, note_type} = this.props;
     return (
-      <main className={classes} style={this.generateToolCursor(note_color, note_type)}/>
+      <main className={classes} style={this.generateToolCursor(note_color, note_type)}>
+        <section style={{width:'auto', height:'100%'}} className='flex-absolute-center'>
+          <img width='auto' height='100%' style={{marginBottom: 0}} src={slide}/>
+        </section>
+      </main>
     );
   }
 }
@@ -50,9 +55,11 @@ Whiteboard.propTypes = {
 };
  
 export default createContainer(() => {
+  Meteor.subscribe('slides');
   return {
     fullscreen: AppState.get('whiteboard_fullscreen'),
     note_color: AppState.get('note_color'),
     note_type: AppState.get('note_type'),
+    slide: Slides.findOne({active: true}) && Slides.findOne({active: true}).data,
   };
 }, Whiteboard);
