@@ -16,8 +16,7 @@ class SlidesImport extends Component {
     PDFJS.workerSrc = '/packages/pascoual_pdfjs/build/pdf.worker.js';
   }
   storePdfSlides(slides) {
-    slides.forEach((slide) => {
-      // const canvas = this.canvas;
+    slides.forEach((slide, number) => {
       const canvas = document.createElement('canvas');
       const scale = 1.5;
       const viewport = slide.getViewport(scale);
@@ -26,8 +25,12 @@ class SlidesImport extends Component {
       canvas.width = viewport.width;
       const task = slide.render({ canvasContext: context, viewport: viewport });
       task.promise.then(function() {
-        const slideData = canvas.toDataURL('image/png');
-        Meteor.call('slides.insert', slideData);
+        // this is broken for importing more than 1 set of slides
+        Meteor.call('slides.insert', {
+          active: !number, /*first slide is active*/
+          number: number + 1, /*index should be 1, not 0*/
+          data: canvas.toDataURL('image/png'),
+        });
       });
     });
 
@@ -35,9 +38,8 @@ class SlidesImport extends Component {
   parsePdf(pdf) {
     const slides = [];
     _.times(pdf.numPages, (pageNum) => {
-      // pageNum needs to start at 1
-      pageNum += 1;
-      slides.push(pdf.getPage(pageNum));
+      // index should be 1, not 0
+      slides.push(pdf.getPage(pageNum + 1));
     });
     Promise.all(slides).then((slides) => this.storePdfSlides(slides));
   }
@@ -66,11 +68,8 @@ class SlidesImport extends Component {
     );
   }
 }
-/*style={{display: "none"}}*/
-SlidesImport.propTypes = {
-};
+SlidesImport.propTypes = {};
 
 export default createContainer(() => {
-  return {
-  };
+  return {};
 }, SlidesImport);
