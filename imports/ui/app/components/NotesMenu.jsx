@@ -82,14 +82,13 @@ class NoteMenu extends Component {
     );
   }
 }
- 
- 
+
 NoteMenu.propTypes = {
-  /*whiteboard_fullscreen: PropTypes.bool.isRequired,*/
+  notes_menu_open: PropTypes.bool.isRequired,
 };
  
 export default createContainer(() => {
   return {
-    /*whiteboard_fullscreen: AppState.get('whiteboard_fullscreen'),*/
+    notes_menu_open: AppState.get('notes_menu_open'),
   };
 }, NoteMenu);

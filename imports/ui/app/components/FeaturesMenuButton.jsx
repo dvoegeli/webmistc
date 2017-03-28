@@ -6,7 +6,7 @@ import AppState from '/imports/api/appState.js';
 // FeaturesMenuButton component - button for features menu
 class FeaturesMenuButton extends Component {
   toggleFeaturesMenu(){
-    AppState.toggle('features_menu_open');
+    AppState.set('features_menu_open', !this.props.features_menu_open);
   }
 
   render() {
@@ -17,7 +17,7 @@ class FeaturesMenuButton extends Component {
       'w3-hide-large'
     );
     return (
-      <button className={button} onClick={this.toggleFeaturesMenu}>
+      <button className={button} onClick={()=>this.toggleFeaturesMenu()}>
         <i className="fa-th-list fa fa-fw"/>
       </button>
     );

@@ -19,7 +19,7 @@ class NoteMenuButton extends Component {
       'w3-hide-large'
     );
     return (
-      <button className={button} onClick={this.toggleNoteMenu}>
+      <button className={button} onClick={()=>this.toggleNoteMenu()}>
         <i className="fa-pencil fa fa-fw"/>
       </button>
     );
