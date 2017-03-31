@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
-import AppState from '../../../../api/appState.js';
+import AppState from '/imports/api/appState.js';
 
 // BoxButton component - button for selecting the box note tool
 class BoxButton extends Component {

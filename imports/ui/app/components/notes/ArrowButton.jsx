@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
-import AppState from '../../../../api/appState.js';
+import AppState from '/imports/api/appState.js';
 
 // ArrowButton component - button for selecting the arrow note tool
 class ArrowButton extends Component {
