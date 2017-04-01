@@ -34,8 +34,9 @@ class NotesLayer extends Component {
       x: (event.nativeEvent.offsetX || event.nativeEvent.touches[0].clientX ),
       y: (event.nativeEvent.offsetY || event.nativeEvent.touches[0].clientY ),
     }
-    coords = _.forEach(coords, (value, coord, coords) => { coords[coord] = value + this.cursorOffset });
-    return coords;
+    return _.forEach(coords, (value, coord, coords) => { 
+      coords[coord] = value + this.cursorOffset;
+    });
   }
   startTaking(event){
     const coords = this.generateCoords(event);
@@ -45,6 +46,10 @@ class NotesLayer extends Component {
     AppState.set('note_x2', coords.x);
     AppState.set('note_y2', coords.y);
   }
+  handleTaking(event){
+    event.persist();
+    this.takeNote(event);
+  }
   takeNote(event){
     const {isNoteDisplaying} = this.props;
     if(isNoteDisplaying){
@@ -53,13 +58,9 @@ class NotesLayer extends Component {
       AppState.set('note_y2', coords.y);
     }
   }
-  handleTaking(event){
-    event.persist();
-    this.takeNote(event);
-  }
-
   stopTaking(event){
     AppState.set('note_displaying', false);
+    // 'lines.insert' needs to be `${note.type}.insert`
     Meteor.call('lines.insert', {
       x1: AppState.get('note_x1'), 
       y1: AppState.get('note_y1'),
@@ -72,13 +73,13 @@ class NotesLayer extends Component {
     const {isNoteDisplaying, style} = this.props;
     const {note_x1, note_y1, note_x2, note_y2} = this.props;
     const notePreview = {
-      type: 'line',
+      type: 'line', // 'line' needs to be note.type
       x1: note_x1, 
       y1: note_y1,
       x2: note_x2, 
       y2: note_y2,
-      color: 'black',
-      size: 2,
+      color: 'black', // should come from AppState
+      size: 2, // should come from AppState
     };
     return (
       <svg style={style} 
@@ -106,9 +107,9 @@ NotesLayer.propTypes = {
  
 export default createContainer(() => {
   Meteor.subscribe('notes');
-  const activeSlide = Slides.findOne({active: true}) && Slides.findOne({active: true})._id;
+  const activeSlide = Slides.activeSlide('_id');
   return {
-    notes: Notes.find({slide: activeSlide}, { sort: { createdAt: -1 } }).fetch() || [],
+    notes: Notes.getNotes(),
     isNoteDisplaying: AppState.get('note_displaying'),
     note_x1: AppState.get('note_x1'),
     note_y1: AppState.get('note_y1'),

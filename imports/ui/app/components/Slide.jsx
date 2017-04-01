@@ -16,6 +16,6 @@ class Slide extends Component {
 export default createContainer(() => {
   Meteor.subscribe('slides');
   return {
-    slide: Slides.findOne({active: true}) && Slides.findOne({active: true}).data,
+    slide: Slides.activeSlide('data'),
   };
 }, Slide);

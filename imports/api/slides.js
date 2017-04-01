@@ -10,6 +10,11 @@ if (Meteor.isServer) {
   });
 }
 
+Slides.activeSlide = (attr) => {
+  const slide = Slides.findOne({active: true});
+  return slide ? (attr ? slide[attr] : slide) : undefined;
+}
+
 Meteor.methods({
   'slides.insert'(slide) {
     check(slide, {
