@@ -36,16 +36,16 @@ const initialState = {
 
   mic_muted: false,
 
-  // /* TOOL */ /* should this be notes? */
-  // tool_type: 'box',
-  // tool_color: 'red',
-  // tool_size: 'medium',
-
   /* NOTES */
   notes_menu_open: false,
   note_type: 'draw',    /* [draw|text|line|arrow|circle|box|eraser] */
   note_color: 'red',    /* [purple|blue|orange|green|red] */
   note_size: 'medium',  /* [tiny|small|medium|large|huge] */
+  note_displaying: false,
+  note_x1: 0,
+  note_y1: 0,
+  note_x2: 0,
+  note_y2: 0,
   /* NOTES SERVER DATA*/
   notes_sticky: true,
 
@@ -86,10 +86,6 @@ const initialState = {
 
   /* SLIDES */
   slides_nav_open: false,
-  /* SLIDE SERVER DATA*/
-  /*slide_active: 'slide1',*/ /*[slide1|...|slideN]*/
-  /* this will be generated server side when uploading slides */
-  /*slides_labels: [ "slide1", "slide2", "slide3", "slide4", "slide5", "slide6", "slide7"],*/
 
   /* WINDOW */
   window_height: undefined, /*[undefined|Integer]*/ 

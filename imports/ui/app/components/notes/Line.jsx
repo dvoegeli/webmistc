@@ -8,7 +8,7 @@ class Line extends Component {
   render() {
     const {_id,x1,y1,x2,y2,size,color} = this.props;
     return (
-      <line data-id={_id} x1={x1} y1={y1} x2={x2} y2={y2}
+      <line id={_id} x1={x1} y1={y1} x2={x2} y2={y2}
       strokeWidth={size} stroke={color}/>
     );
   }
