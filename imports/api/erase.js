@@ -7,9 +7,12 @@ import { Slides } from './slides';
 
 Meteor.methods({
   'erase.slide'() {
-    const slide = Slides.findOne({active: true}) && Slides.findOne({active: true})._id;
+    const slide = Slides.activeSlide('_id');
     if(slide){
       Notes.remove({slide});
     }
+  },
+  'erase.presentation'() {
+    Notes.remove({});
   },
 });

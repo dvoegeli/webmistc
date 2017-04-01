@@ -12,11 +12,18 @@ class ClearSlideButton extends Component {
     Meteor.call('erase.slide');
     this.toggleOptionsMenu();
   }
+  clearPresentation(){
+    Meteor.call('erase.presentation');
+    this.toggleOptionsMenu();
+  }
   render() {
     const options = classNames(
       'menu__item-dropdown--clear-slide w3-dropdown-content w3-white w3-card-4', {
       'w3-show': this.props.erase_slide_menu_open,
     });
+    const cancel = 'fa-times-circle fa w3-large w3-text-pink';
+    const confirm = 'fa-check-circle fa w3-large w3-text-green';
+    const clearPresentation = 'fa-exclamation-circle fa w3-large w3-text-red';
     return (
       <span className='roles-menu w3-dropdown-click' data-tip='Clear Slide'>
         <span className='menu__item flex-row' onClick={()=>this.toggleOptionsMenu()}>
@@ -30,8 +37,9 @@ class ClearSlideButton extends Component {
         </span>
         <div className={options}>
           <span className='flex-row flex-row--ends w3-padding-medium'>
-            <i className='fa-times-circle fa w3-large w3-text-pink' onClick={()=>this.toggleOptionsMenu()}/>
-            <i className='fa-check-circle fa w3-large w3-text-green' onClick={()=>this.clearSlide()}/>
+            <i className={cancel} onClick={()=>this.toggleOptionsMenu()}/>
+            <i className={confirm} onClick={()=>this.clearSlide()}/>
+            <i className={clearPresentation} onClick={()=>this.clearPresentation()}/>
           </span>
         </div>
       </span>
