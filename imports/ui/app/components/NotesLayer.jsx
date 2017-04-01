@@ -29,22 +29,28 @@ class NotesLayer extends Component {
   fetch(note){
     return this.notes[note.type](note);
   }
+  generateCoords(event){
+    let coords = {
+      x: (event.nativeEvent.offsetX || event.nativeEvent.touches[0].clientX ),
+      y: (event.nativeEvent.offsetY || event.nativeEvent.touches[0].clientY ),
+    }
+    coords = _.forEach(coords, (value, coord, coords) => { coords[coord] = value + this.cursorOffset });
+    return coords;
+  }
   startTaking(event){
-    const x1 = event.nativeEvent.offsetX + this.cursorOffset;
-    const y1 = event.nativeEvent.offsetY + this.cursorOffset;
+    const coords = this.generateCoords(event);
     AppState.set('note_displaying', true);
-    AppState.set('note_x1', x1);
-    AppState.set('note_y1', y1);
-    AppState.set('note_x2', x1);
-    AppState.set('note_y2', y1);
+    AppState.set('note_x1', coords.x);
+    AppState.set('note_y1', coords.y);
+    AppState.set('note_x2', coords.x);
+    AppState.set('note_y2', coords.y);
   }
   takeNote(event){
     const {isNoteDisplaying} = this.props;
     if(isNoteDisplaying){
-      const x2 = event.nativeEvent.offsetX + this.cursorOffset;
-      const y2 = event.nativeEvent.offsetY + this.cursorOffset;
-      AppState.set('note_x2', x2);
-      AppState.set('note_y2', y2);
+      const coords = this.generateCoords(event);
+      AppState.set('note_x2', coords.x);
+      AppState.set('note_y2', coords.y);
     }
   }
   handleTaking(event){
@@ -79,6 +85,9 @@ class NotesLayer extends Component {
         onMouseDown={(event)=>this.startTaking(event)}
         onMouseMove={(event)=>this.handleTaking(event)}
         onMouseUp={(event)=>this.stopTaking(event)}
+        onTouchStart={(event)=>this.startTaking(event)}
+        onTouchMove={(event)=>this.handleTaking(event)}
+        onTouchEnd={(event)=>this.stopTaking(event)}
       >
         {this.props.notes.map((note)=>this.fetch(note))}
         {isNoteDisplaying ? this.fetch(notePreview) : ''}

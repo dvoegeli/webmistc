@@ -1,9 +1,6 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
-import classNames from 'classnames';
- 
-import AppState from '/imports/api/appState.js';
-import { Slides } from '/imports/api/slides.js';
+import { Slides } from '/imports/api/slides';
 
 // Slide component - represents the slide in the whiteboard
 class Slide extends Component {

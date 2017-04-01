@@ -66,6 +66,9 @@ const initialState = {
   /* SIZES */
   sizes_menu_open: false,
 
+  /* ERASER */
+  erase_slide_menu_open: false,
+
   /* SOUND */
   sound_test: false,
 

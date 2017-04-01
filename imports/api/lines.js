@@ -1,10 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { check, Match } from 'meteor/check';
-import { Notes } from './notes.js';
+import { Notes } from './notes';
 import { Slides } from './slides';
 
-import AppState from '/imports/api/appState.js';
+import AppState from '/imports/api/appState';
 
 Meteor.methods({
   'lines.insert'(line) {
