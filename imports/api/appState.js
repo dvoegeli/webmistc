@@ -38,7 +38,7 @@ const initialState = {
 
   /* NOTES */
   notes_menu_open: false,
-  note_type: 'draw',    /* [draw|text|line|arrow|circle|box|eraser] */
+  note_type: 'box',    /* [draw|text|line|arrow|circle|box|eraser] */
   note_color: 'red',    /* [purple|blue|orange|green|red] */
   note_size: 'medium',  /* [tiny|small|medium|large|huge] */
   note_displaying: false,

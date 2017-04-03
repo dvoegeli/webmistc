@@ -9,6 +9,7 @@ import { Lines } from '/imports/api/lines.js';
 import { Slides } from '/imports/api/slides.js';
 
 import Line from './notes/Line.jsx';
+import Box from './notes/Box.jsx';
 
 
 // Notes component - represents the notes layer on the whiteboard
@@ -16,12 +17,12 @@ class NotesLayer extends Component {
   constructor(props) {
     super(props);
     this.notes = { 
-      /*draw:   (note) => <Draw note={note}/>,
-      text:     (note) => <Text note={note}/>,*/
+      /*draw:   (note) => <Draw note={note}/>,*/
+      /*text:   (note) => <Text note={note}/>,*/
       line:     (note) => <Line {...note} key={note._id}/>,
-      /*arrow:  (note) => <Arrow note={note}/>
-      circle:   (note) => <Circle note={note}/>,
-      box:      (note) => <Box note={note}/>,*/
+      /*arrow:  (note) => <Arrow note={note}/>*/
+      /*circle: (note) => <Circle note={note}/>,*/
+      box:      (note) => <Box {...note} key={note._id}/>,
     };
     this.takeNote = _.throttle(this.takeNote.bind(this), 40);
     this.cursorOffset = 10;
@@ -40,11 +41,13 @@ class NotesLayer extends Component {
   }
   startTaking(event){
     const coords = this.generateCoords(event);
-    AppState.set('note_displaying', true);
-    AppState.set('note_x1', coords.x);
-    AppState.set('note_y1', coords.y);
-    AppState.set('note_x2', coords.x);
-    AppState.set('note_y2', coords.y);
+    AppState.set({
+      'note_displaying': true,
+      'note_x1': coords.x,
+      'note_y1': coords.y,
+      'note_x2': coords.x,
+      'note_y2': coords.y,
+    });
   }
   handleTaking(event){
     event.persist();
@@ -60,20 +63,23 @@ class NotesLayer extends Component {
   }
   stopTaking(event){
     AppState.set('note_displaying', false);
-    // 'lines.insert' needs to be `${note.type}.insert`
-    Meteor.call('lines.insert', {
-      x1: AppState.get('note_x1'), 
-      y1: AppState.get('note_y1'),
-      x2: AppState.get('note_x2'), 
-      y2: AppState.get('note_y2'),
+    const {note_x1, note_y1, note_x2, note_y2} = this.props;
+     // '[type].insert' needs to be `${note.type}.insert`
+    Meteor.call('boxes.insert', {
+      x1: note_x1, 
+      y1: note_y1,
+      x2: note_x2, 
+      y2: note_y2,
     });
   }
 
   render() {
     const {isNoteDisplaying, style} = this.props;
     const {note_x1, note_y1, note_x2, note_y2} = this.props;
+    //this needs to be dynamic
+    //maybe a preview function?
     const notePreview = {
-      type: 'line', // 'line' needs to be note.type
+      type: 'box', // 'type' needs to be note.type, but probably should come from AppState
       x1: note_x1, 
       y1: note_y1,
       x2: note_x2, 
@@ -107,7 +113,6 @@ NotesLayer.propTypes = {
  
 export default createContainer(() => {
   Meteor.subscribe('notes');
-  const activeSlide = Slides.activeSlide('_id');
   return {
     notes: Notes.getNotes(),
     isNoteDisplaying: AppState.get('note_displaying'),

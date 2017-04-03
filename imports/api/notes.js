@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 
 import { Lines } from './lines';
+import { Boxes } from './boxes';
 import { Slides } from './slides';
 import { Erase } from './erase';
  
