@@ -8,8 +8,8 @@ import Colors from './colors';
 import AppState from '/imports/api/appState';
 
 Meteor.methods({
-  'line.insert'(line) {
-    check(line, {
+  'circle.insert'(circle) {
+    check(circle, {
       x1: Number,
       y1: Number,
       x2: Number,
@@ -17,11 +17,11 @@ Meteor.methods({
       color: String,
       size: Number,
     });
-    line = Object.assign(line, {
-      type: 'line',
+    circle = Object.assign(circle, {
+      type: 'circle',
       slide: Slides.activeSlide('_id'),
       createdAt: new Date()
     });
-    Notes.insert(line);
+    Notes.insert(circle);
   },
 });

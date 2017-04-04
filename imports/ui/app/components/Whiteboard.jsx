@@ -2,8 +2,10 @@ import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
  
-import AppState from '/imports/api/appState.js';
-import { Slides } from '/imports/api/slides.js';
+import AppState from '/imports/api/appState';
+import { Slides } from '/imports/api/slides';
+import Colors from '/imports/api/colors';
+
 import Slide from './Slide.jsx';
 import NotesLayer from './NotesLayer.jsx';
 
@@ -11,15 +13,6 @@ import NotesLayer from './NotesLayer.jsx';
 class Whiteboard extends Component {
   constructor(props) {
     super(props);
-    // TODO extract colors into lib file for centralized reference
-    this.colors = {
-      blue: '#2196f3',
-      orange: '#ff9800',
-      purple: '#9c27b0',
-      red: '#f44336',
-      green: '#4caf50'
-    };
-
     this.types = {
       draw: '<path d="M491 1536l91-91-235-235-91 91v107h128v128h107zm523-928q0-22-22-22-10 0-17 7l-542 542q-7 7-7 17 0 22 22 22 10 0 17-7l542-542q7-7 7-17zm-54-192l416 416-832 832h-416v-416zm683 96q0 53-37 90l-166 166-416-416 166-165q36-38 90-38 53 0 91 38l235 234q37 39 37 91z"/>',
       text: '<path d="M1792 896q0 174-120 321.5t-326 233-450 85.5q-70 0-145-8-198 175-460 242-49 14-114 22-17 2-30.5-9t-17.5-29v-1q-3-4-.5-12t2-10 4.5-9.5l6-9 7-8.5 8-9q7-8 31-34.5t34.5-38 31-39.5 32.5-51 27-59 26-76q-157-89-247.5-220t-90.5-281q0-130 71-248.5t191-204.5 286-136.5 348-50.5q244 0 450 85.5t326 233 120 321.5z"/>',
@@ -32,11 +25,11 @@ class Whiteboard extends Component {
   }
   
   generateToolCursor(color, type){   
-    return `url('data:image/svg+xml,<svg fill="${this.colors[color]}" shape-rendering="auto" width="22" height="22" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">${this.types[type]}</svg>'), auto`;
+    return `url('data:image/svg+xml,<svg fill="${Colors.getHex(color)}" shape-rendering="auto" width="22" height="22" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">${this.types[type]}</svg>'), auto`;
   }
 
   render() {
-    const {note_color, note_type, fullscreen, slide} = this.props;
+    const {note_color, note_type, fullscreen} = this.props;
     const classes = classNames(
       'whiteboard w3-card-4 w3-light-grey', {
       'whiteboard--fullscreen': fullscreen,
@@ -45,7 +38,7 @@ class Whiteboard extends Component {
       cursor: this.generateToolCursor(note_color, note_type),
       textAlign: 'center',
     };
-    const theSlide = {
+    const slide = {
       height:'100%',
       display: 'inline-block',
     };
@@ -58,7 +51,7 @@ class Whiteboard extends Component {
     };
     return (
       <main className={classes} style={container}>
-        <Slide style={theSlide}/>
+        <Slide style={slide}/>
         <NotesLayer style={notesLayer}/>
     </main>
     );
