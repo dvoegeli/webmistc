@@ -3,7 +3,6 @@ import { Mongo } from 'meteor/mongo';
 import { check, Match } from 'meteor/check';
 import { Notes } from './notes';
 import { Slides } from './slides';
-import Colors from './colors';
 
 import AppState from '/imports/api/appState';
 

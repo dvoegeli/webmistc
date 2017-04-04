@@ -40,7 +40,7 @@ const initialState = {
   notes_menu_open: false,
   note_type: 'line',   /* [draw|text|line|arrow|circle|box|eraser] */
   note_color: 'blue',  /* [purple|blue|orange|green|red] */
-  note_size: 'medium', /* [tiny|small|medium|large|huge] */
+  note_size: 'small', /* [tiny|small|medium|large|huge] */
   note_displaying: false,
   note_x1: 0,
   note_y1: 0,

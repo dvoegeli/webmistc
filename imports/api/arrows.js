@@ -7,8 +7,8 @@ import { Slides } from './slides';
 import AppState from '/imports/api/appState';
 
 Meteor.methods({
-  'circle.insert'(circle) {
-    check(circle, {
+  'arrow.insert'(arrow) {
+    check(arrow, {
       x1: Number,
       y1: Number,
       x2: Number,
@@ -16,11 +16,11 @@ Meteor.methods({
       color: String,
       size: Number,
     });
-    circle = Object.assign(circle, {
-      type: 'circle',
+    arrow = Object.assign(arrow, {
+      type: 'arrow',
       slide: Slides.activeSlide('_id'),
       createdAt: new Date()
     });
-    Notes.insert(circle);
+    Notes.insert(arrow);
   },
 });

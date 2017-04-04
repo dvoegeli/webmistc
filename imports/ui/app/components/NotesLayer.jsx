@@ -11,6 +11,7 @@ import { Lines } from '/imports/api/lines';
 import { Slides } from '/imports/api/slides';
 
 import Line from './notes/Line.jsx';
+import Arrow from './notes/Arrow.jsx';
 import Box from './notes/Box.jsx';
 import Circle from './notes/Circle.jsx';
 
@@ -20,12 +21,12 @@ class NotesLayer extends Component {
   constructor(props) {
     super(props);
     this.notes = { 
-      /*draw:   (note) => <Draw {...note} key={note._id}/>,*/
-      /*text:   (note) => <Text {...note} key={note._id}/>,*/
-      line:     (note) => <Line {...note} key={note._id}/>,
-      /*arrow:  (note) => <Arrow {...note} key={note._id}/>,*/
-      circle:   (note) => <Circle {...note} key={note._id}/>,
-      box:      (note) => <Box {...note} key={note._id}/>,
+      /*draw: (note) => <Draw {...note} key={note._id}/>,*/
+      /*text: (note) => <Text {...note} key={note._id}/>,*/
+      line:   (note) => <Line {...note} key={note._id}/>,
+      arrow:  (note) => <Arrow {...note} key={note._id}/>,
+      circle: (note) => <Circle {...note} key={note._id}/>,
+      box:    (note) => <Box {...note} key={note._id}/>,
     };
     this.takeNote = _.throttle(this.takeNote.bind(this), 40);
     this.cursorOffset = 10;

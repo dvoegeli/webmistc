@@ -1,9 +1,12 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 
-import { Lines } from './lines';
-import { Boxes } from './boxes';
 import { Slides } from './slides';
+
+import { Lines } from './lines';
+import { Arrows } from './arrows';
+import { Boxes } from './boxes';
+import { Circles } from './circles';
 import { Erase } from './erase';
  
 export const Notes = new Mongo.Collection('notes');

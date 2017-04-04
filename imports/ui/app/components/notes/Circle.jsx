@@ -3,7 +3,7 @@ import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
 import AppState from '/imports/api/appState.js';
 
-// Circle component - box for the notes layer
+// Circle component - circle for the notes layer
 class Circle extends Component {
   render() {
     const {_id,x1,y1,x2,y2,size,color} = this.props;

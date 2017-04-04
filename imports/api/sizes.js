@@ -1,8 +1,8 @@
 export default Sizes = {};
 
 const sizes = {
-  tiny: 1,
-  small: 3,
+  tiny: 2,
+  small: 4,
   medium: 6,
   large: 10,
   huge: 16,
