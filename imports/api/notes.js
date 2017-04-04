@@ -11,12 +11,18 @@ import { Erase } from './erase';
  
 export const Notes = new Mongo.Collection('notes');
 
-Notes.getNotes = () => {
-  return Notes.find({slide: Slides.activeSlide('_id')}, { sort: { createdAt: 1 } }).fetch() || [];
-}
-
 if (Meteor.isServer) {
   Meteor.publish('notes', function notesPublication() {
     return Notes.find();
   });
 }
+
+Notes.getNotes = () => {
+  return Notes.find({slide: Slides.activeSlide('_id')}, { sort: { createdAt: 1 } }).fetch() || [];
+}
+
+Meteor.methods({
+  'notes.remove'(id) {
+    Notes.remove(id);
+  },
+});

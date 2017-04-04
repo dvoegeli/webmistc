@@ -46,8 +46,12 @@ const initialState = {
   note_y1: 0,
   note_x2: 0,
   note_y2: 0,
-  /* NOTES SERVER DATA*/
   notes_sticky: true,
+  note_sticky_next: '',
+
+  /* STICKY NOTES */
+  sticky_notes: true,
+  sticky_notes: true,
 
   /* FEATURES */
   features_menu_open: false,

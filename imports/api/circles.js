@@ -21,6 +21,6 @@ Meteor.methods({
       slide: Slides.activeSlide('_id'),
       createdAt: new Date()
     });
-    Notes.insert(circle);
+    return Notes.insert(circle);
   },
 });

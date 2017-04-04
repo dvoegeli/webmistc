@@ -58,8 +58,8 @@ class NotesLayer extends Component {
     this.takeNote(event);
   }
   takeNote(event){
-    const {isNoteDisplaying} = this.props;
-    if(isNoteDisplaying){
+    const {note_displaying} = this.props;
+    if(note_displaying){
       const coords = this.generateCoords(event);
       AppState.set('note_x2', coords.x);
       AppState.set('note_y2', coords.y);
@@ -67,6 +67,7 @@ class NotesLayer extends Component {
   }
   stopTaking(event){
     AppState.set('note_displaying', false);
+    const {notes_sticky} = this.props;
     const {note_type, note_color, note_size} = this.props;
     const {note_x1, note_y1, note_x2, note_y2} = this.props;
     Meteor.call(`${note_type}.insert`, {
@@ -76,11 +77,20 @@ class NotesLayer extends Component {
       y2: note_y2,
       color: Colors.getHex(note_color),
       size: Sizes.getHex(note_size),
-    });
+    }, this.handleStickyNote.bind(this));
+  }
+  handleStickyNote(error, note){
+    if(!this.props.notes_sticky){
+      const nextNote = AppState.get('note_sticky_next');
+      if(nextNote){
+        Meteor.call('notes.remove', nextNote);
+      }
+      AppState.set('note_sticky_next', note);
+    }
   }
 
   render() {
-    const {isNoteDisplaying, style} = this.props;
+    const {note_displaying, notes_sticky, style} = this.props;
     const {note_type, note_color, note_size} = this.props;
     const {note_x1, note_y1, note_x2, note_y2} = this.props;
     const notePreview = {
@@ -102,14 +112,16 @@ class NotesLayer extends Component {
         onTouchEnd={(event)=>this.stopTaking(event)}
       >
         {this.props.notes.map((note)=>this.fetch(note))}
-        {isNoteDisplaying ? this.fetch(notePreview) : ''}
+        {note_displaying ? this.fetch(notePreview) : ''}
       </svg>
     );
   }
 }
 
 NotesLayer.propTypes = {
-  isNoteDisplaying: PropTypes.bool.isRequired,
+  note_displaying: PropTypes.bool.isRequired,
+  notes_sticky: PropTypes.bool.isRequired,
+  note_sticky_next: PropTypes.string.isRequired,
   note_x1: PropTypes.number.isRequired,
   note_y1: PropTypes.number.isRequired,
   note_x2: PropTypes.number.isRequired,
@@ -121,9 +133,12 @@ NotesLayer.propTypes = {
  
 export default createContainer(() => {
   Meteor.subscribe('notes');
+  Meteor.subscribe('stickyNotes');
   return {
     notes: Notes.getNotes(),
-    isNoteDisplaying: AppState.get('note_displaying'),
+    notes_sticky: AppState.get('notes_sticky'),
+    note_sticky_next: AppState.get('note_sticky_next'),
+    note_displaying: AppState.get('note_displaying'),
     note_x1: AppState.get('note_x1'),
     note_y1: AppState.get('note_y1'),
     note_x2: AppState.get('note_x2'),
