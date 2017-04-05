@@ -8,4 +8,4 @@ const sizes = {
   huge: 16,
 };
 
-Sizes.getHex = (size)=>sizes[size];
+Sizes.get = (size)=>sizes[size];

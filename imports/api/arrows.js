@@ -9,6 +9,7 @@ import AppState from '/imports/api/appState';
 Meteor.methods({
   'arrow.insert'(arrow) {
     check(arrow, {
+      type: String,
       x1: Number,
       y1: Number,
       x2: Number,
@@ -17,7 +18,6 @@ Meteor.methods({
       size: Number,
     });
     arrow = Object.assign(arrow, {
-      type: 'arrow',
       slide: Slides.activeSlide('_id'),
       createdAt: new Date()
     });

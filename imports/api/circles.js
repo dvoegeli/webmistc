@@ -9,6 +9,7 @@ import AppState from '/imports/api/appState';
 Meteor.methods({
   'circle.insert'(circle) {
     check(circle, {
+      type: String,
       x1: Number,
       y1: Number,
       x2: Number,
@@ -17,7 +18,6 @@ Meteor.methods({
       size: Number,
     });
     circle = Object.assign(circle, {
-      type: 'circle',
       slide: Slides.activeSlide('_id'),
       createdAt: new Date()
     });

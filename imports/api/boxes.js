@@ -9,6 +9,7 @@ import AppState from '/imports/api/appState';
 Meteor.methods({
   'box.insert'(box) {
     check(box, {
+      type: String,
       x1: Number,
       y1: Number,
       x2: Number,
@@ -17,7 +18,6 @@ Meteor.methods({
       size: Number,
     });
     box = Object.assign(box, {
-      type: 'box',
       slide: Slides.activeSlide('_id'),
       createdAt: new Date()
     });

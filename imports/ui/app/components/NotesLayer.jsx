@@ -1,118 +1,43 @@
 import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
-import classNames from 'classnames';
 import _ from 'lodash';
  
 import AppState from '/imports/api/appState';
-import Colors from '/imports/api/colors';
-import Sizes from '/imports/api/sizes';
+import { default as Layer } from '/imports/api/notesLayer';
 import { Notes } from '/imports/api/notes';
-import { Lines } from '/imports/api/lines';
-import { Slides } from '/imports/api/slides';
-
-import Line from './notes/Line.jsx';
-import Arrow from './notes/Arrow.jsx';
-import Box from './notes/Box.jsx';
-import Circle from './notes/Circle.jsx';
 
 
-// Notes component - represents the notes layer on the whiteboard
+// Notes Layer component - represents the notes layer on the whiteboard
 class NotesLayer extends Component {
   constructor(props) {
     super(props);
-    this.notes = { 
-      /*draw: (note) => <Draw {...note} key={note._id}/>,*/
-      /*text: (note) => <Text {...note} key={note._id}/>,*/
-      line:   (note) => <Line {...note} key={note._id}/>,
-      arrow:  (note) => <Arrow {...note} key={note._id}/>,
-      circle: (note) => <Circle {...note} key={note._id}/>,
-      box:    (note) => <Box {...note} key={note._id}/>,
-    };
-    this.takeNote = _.throttle(this.takeNote.bind(this), 40);
-    this.cursorOffset = 10;
+    this.takeNote = _.throttle(Layer.takeNote, 40);
   }
-  fetch(note){
-    return this.notes[note.type](note);
-  }
-  generateCoords(event){
-    let coords = {
-      x: (event.nativeEvent.offsetX || event.nativeEvent.touches[0].clientX ),
-      y: (event.nativeEvent.offsetY || event.nativeEvent.touches[0].clientY ),
-    }
-    return _.forEach(coords, (value, coord, coords) => { 
-      coords[coord] = value + this.cursorOffset;
-    });
-  }
-  startTaking(event){
-    const coords = this.generateCoords(event);
-    AppState.set({
-      'note_displaying': true,
-      'note_x1': coords.x,
-      'note_y1': coords.y,
-      'note_x2': coords.x,
-      'note_y2': coords.y,
-    });
+  handleStartTaking(event){ 
+    Layer.startTaking(event) 
   }
   handleTaking(event){
+    // _.throttle needs event.persist() 
     event.persist();
     this.takeNote(event);
   }
-  takeNote(event){
-    const {note_displaying} = this.props;
-    if(note_displaying){
-      const coords = this.generateCoords(event);
-      AppState.set('note_x2', coords.x);
-      AppState.set('note_y2', coords.y);
-    }
+  handleStopTaking(event){ 
+    Layer.stopTaking(event) 
   }
-  stopTaking(event){
-    AppState.set('note_displaying', false);
-    const {notes_sticky} = this.props;
-    const {note_type, note_color, note_size} = this.props;
-    const {note_x1, note_y1, note_x2, note_y2} = this.props;
-    Meteor.call(`${note_type}.insert`, {
-      x1: note_x1, 
-      y1: note_y1,
-      x2: note_x2, 
-      y2: note_y2,
-      color: Colors.getHex(note_color),
-      size: Sizes.getHex(note_size),
-    }, this.handleStickyNote.bind(this));
-  }
-  handleStickyNote(error, note){
-    if(!this.props.notes_sticky){
-      const nextNote = AppState.get('note_sticky_next');
-      if(nextNote){
-        Meteor.call('notes.remove', nextNote);
-      }
-      AppState.set('note_sticky_next', note);
-    }
-  }
-
   render() {
-    const {note_displaying, notes_sticky, style} = this.props;
-    const {note_type, note_color, note_size} = this.props;
-    const {note_x1, note_y1, note_x2, note_y2} = this.props;
-    const notePreview = {
-      type: note_type,
-      x1: note_x1, 
-      y1: note_y1,
-      x2: note_x2, 
-      y2: note_y2,
-      color: Colors.getHex(note_color),
-      size: Sizes.getHex(note_size),
-    };
+    const {notes, note_displaying, style} = this.props;
+    const notePreview = Layer.generateNote();
     return (
       <svg style={style} 
-        onMouseDown={(event)=>this.startTaking(event)}
+        onMouseDown={(event)=>this.handleStartTaking(event)}
         onMouseMove={(event)=>this.handleTaking(event)}
-        onMouseUp={(event)=>this.stopTaking(event)}
-        onTouchStart={(event)=>this.startTaking(event)}
+        onMouseUp={(event)=>this.handleStopTaking(event)}
+        onTouchStart={(event)=>this.handleStartTaking(event)}
         onTouchMove={(event)=>this.handleTaking(event)}
-        onTouchEnd={(event)=>this.stopTaking(event)}
+        onTouchEnd={(event)=>this.handleStopTaking(event)}
       >
-        {this.props.notes.map((note)=>this.fetch(note))}
-        {note_displaying ? this.fetch(notePreview) : ''}
+        {notes.map((note)=>Layer.fetch(note))}
+        {note_displaying ? Layer.fetch(notePreview) : ''}
       </svg>
     );
   }
@@ -122,13 +47,14 @@ NotesLayer.propTypes = {
   note_displaying: PropTypes.bool.isRequired,
   notes_sticky: PropTypes.bool.isRequired,
   note_sticky_next: PropTypes.string.isRequired,
+  note_type: PropTypes.string.isRequired,
+  note_color: PropTypes.string.isRequired,
+  note_size: PropTypes.string.isRequired,
+  /*note_data: AppState.get('note_data'),*/
   note_x1: PropTypes.number.isRequired,
   note_y1: PropTypes.number.isRequired,
   note_x2: PropTypes.number.isRequired,
   note_y2: PropTypes.number.isRequired,
-  note_type: PropTypes.string.isRequired,
-  note_color: PropTypes.string.isRequired,
-  note_size: PropTypes.string.isRequired,
 };
  
 export default createContainer(() => {
@@ -139,12 +65,15 @@ export default createContainer(() => {
     notes_sticky: AppState.get('notes_sticky'),
     note_sticky_next: AppState.get('note_sticky_next'),
     note_displaying: AppState.get('note_displaying'),
+    note_type: AppState.get('note_type'),
+    note_color: AppState.get('note_color'),
+    note_size: AppState.get('note_size'),
+    /* this must be included for reactive purposes */
+    /* it will encompass coords, text, and/or points */
+    /*note_data: AppState.get('note_data'),*/
     note_x1: AppState.get('note_x1'),
     note_y1: AppState.get('note_y1'),
     note_x2: AppState.get('note_x2'),
     note_y2: AppState.get('note_y2'),
-    note_type: AppState.get('note_type'),
-    note_color: AppState.get('note_color'),
-    note_size: AppState.get('note_size'),
   };
 }, NotesLayer);  

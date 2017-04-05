@@ -9,6 +9,7 @@ import AppState from '/imports/api/appState';
 Meteor.methods({
   'line.insert'(line) {
     check(line, {
+      type: String,
       x1: Number,
       y1: Number,
       x2: Number,
@@ -17,7 +18,6 @@ Meteor.methods({
       size: Number,
     });
     line = Object.assign(line, {
-      type: 'line',
       slide: Slides.activeSlide('_id'),
       createdAt: new Date()
     });
