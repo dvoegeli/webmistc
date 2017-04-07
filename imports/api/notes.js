@@ -3,12 +3,13 @@ import { Mongo } from 'meteor/mongo';
 
 import { Slides } from './slides';
 
+import { Erase } from './erase';
 import { Lines } from './lines';
 import { Arrows } from './arrows';
 import { Boxes } from './boxes';
 import { Circles } from './circles';
-import { Erase } from './erase';
- 
+import { Drawings } from './drawings';
+
 export const Notes = new Mongo.Collection('notes');
 
 if (Meteor.isServer) {

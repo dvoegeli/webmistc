@@ -7,7 +7,7 @@ import ReactTooltip from 'react-tooltip';
 import AppState from '/imports/api/appState.js';
 
 import StickyNotesButton from './notes/StickyNotesButton.jsx';
-import DrawButton from './notes/DrawButton.jsx';
+import DrawingButton from './notes/DrawingButton.jsx';
 import TextButton from './notes/TextButton.jsx';
 import LineButton from './notes/LineButton.jsx';
 import ArrowButton from './notes/ArrowButton.jsx';
@@ -66,7 +66,7 @@ class NoteMenu extends Component {
             disable={ this.state.window_width > 900 ? false : true }
           />
           <StickyNotesButton/>
-          <DrawButton select={this.changeNote}/>
+          <DrawingButton select={this.changeNote}/>
           <TextButton select={this.changeNote}/>
           <LineButton select={this.changeNote}/>
           <ArrowButton select={this.changeNote}/>

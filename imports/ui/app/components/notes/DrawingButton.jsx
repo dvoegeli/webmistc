@@ -3,14 +3,14 @@ import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
 import AppState from '/imports/api/appState.js';
  
-// DrawButton component - button for selecting the draw note tool
-class DrawButton extends Component {
+// DrawingButton component - button for selecting the draw note tool
+class DrawingButton extends Component {
   render() {
     return (
       <span className="menu__item flex-row" data-tip="Draw">
         <span 
           className="menu__item-button flex-row flex-row--center" 
-          onClick={()=>this.props.select('type', 'draw')}
+          onClick={()=>this.props.select('type', 'drawing')}
         >
           <i className="fa-pencil fa fa-lg fa-fw"/>
         </span>
@@ -22,7 +22,7 @@ class DrawButton extends Component {
   }
 }
  
-DrawButton.propTypes = {
+DrawingButton.propTypes = {
   select: PropTypes.func.isRequired,
 };
  
@@ -30,4 +30,4 @@ export default createContainer(() => {
   return {
 
   };
-}, DrawButton);
+}, DrawingButton);

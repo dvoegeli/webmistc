@@ -7,22 +7,20 @@ import { Slides } from './slides';
 import AppState from '/imports/api/appState';
 
 Meteor.methods({
-  'line.insert'(line) {
-    check(line, {
+  'drawing.insert' (drawing) {
+    check(drawing, {
       type: String,
-      data: {
-        x1: Number,
-        y1: Number,
-        x2: Number,
-        y2: Number,
-      },
+      data: [{
+        x: Number,
+        y: Number,
+      }],
       color: String,
       size: Number,
     });
-    line = Object.assign(line, {
+    drawing = Object.assign(drawing, {
       slide: Slides.activeSlide('_id'),
       createdAt: new Date()
     });
-    return Notes.insert(line);
+    return Notes.insert(drawing);
   },
 });

@@ -26,7 +26,7 @@ class NotesLayer extends Component {
   }
   render() {
     const {notes, note_displaying, style} = this.props;
-    const notePreview = Layer.generateNote();
+    const notePreview = Layer.fetchNoteData();
     return (
       <svg style={style} 
         onMouseDown={(event)=>this.handleStartTaking(event)}
@@ -36,8 +36,8 @@ class NotesLayer extends Component {
         onTouchMove={(event)=>this.handleTaking(event)}
         onTouchEnd={(event)=>this.handleStopTaking(event)}
       >
-        {notes.map((note)=>Layer.fetch(note))}
-        {note_displaying ? Layer.fetch(notePreview) : ''}
+        {notes.map((note)=>Layer.fetchNote(note))}
+        {note_displaying ? Layer.fetchNote(notePreview) : ''}
       </svg>
     );
   }
@@ -50,11 +50,10 @@ NotesLayer.propTypes = {
   note_type: PropTypes.string.isRequired,
   note_color: PropTypes.string.isRequired,
   note_size: PropTypes.string.isRequired,
-  /*note_data: AppState.get('note_data'),*/
-  note_x1: PropTypes.number.isRequired,
-  note_y1: PropTypes.number.isRequired,
-  note_x2: PropTypes.number.isRequired,
-  note_y2: PropTypes.number.isRequired,
+  note_data: PropTypes.oneOfType([
+    React.PropTypes.object,
+    React.PropTypes.array,
+  ]),
 };
  
 export default createContainer(() => {
@@ -68,12 +67,6 @@ export default createContainer(() => {
     note_type: AppState.get('note_type'),
     note_color: AppState.get('note_color'),
     note_size: AppState.get('note_size'),
-    /* this must be included for reactive purposes */
-    /* it will encompass coords, text, and/or points */
-    /*note_data: AppState.get('note_data'),*/
-    note_x1: AppState.get('note_x1'),
-    note_y1: AppState.get('note_y1'),
-    note_x2: AppState.get('note_x2'),
-    note_y2: AppState.get('note_y2'),
+    note_data: AppState.get('note_data'),
   };
 }, NotesLayer);  

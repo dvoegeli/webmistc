@@ -10,10 +10,12 @@ Meteor.methods({
   'circle.insert'(circle) {
     check(circle, {
       type: String,
-      x1: Number,
-      y1: Number,
-      x2: Number,
-      y2: Number,
+      data: {
+        x1: Number,
+        y1: Number,
+        x2: Number,
+        y2: Number,
+      },
       color: String,
       size: Number,
     });

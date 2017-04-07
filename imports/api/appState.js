@@ -38,10 +38,11 @@ const initialState = {
 
   /* NOTES */
   notes_menu_open: false,
-  note_type: 'line',   /* [draw|text|line|arrow|circle|box|eraser] */
+  note_type: 'line',   /* [drawing|text|line|arrow|circle|box|eraser] */
   note_color: 'blue',  /* [purple|blue|orange|green|red] */
   note_size: 'small', /* [tiny|small|medium|large|huge] */
   note_displaying: false,
+  note_data: {},
   note_x1: 0,
   note_y1: 0,
   note_x2: 0,
