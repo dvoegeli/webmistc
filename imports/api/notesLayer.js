@@ -4,38 +4,30 @@ import Colors from '/imports/api/colors';
 import Sizes from '/imports/api/sizes';
 import PathSimplifier from '/imports/api/pathSimplifier';
 
+import Drawing from '/imports/ui/app/components/notes/Drawing.jsx';
 import Line from '/imports/ui/app/components/notes/Line.jsx';
 import Arrow from '/imports/ui/app/components/notes/Arrow.jsx';
 import Box from '/imports/ui/app/components/notes/Box.jsx';
 import Circle from '/imports/ui/app/components/notes/Circle.jsx';
-import Drawing from '/imports/ui/app/components/notes/Drawing.jsx';
 
 const cursorOffset = 10;
 const notes = {
-  drawing: (note) => <Drawing {...note} key={note._id}/>,
-  /*text: (note) => <Text {...note} key={note._id}/>,*/
-  line: (note) => <Line {...note} key={note._id}/>,
-  arrow: (note) => <Arrow {...note} key={note._id}/>,
-  circle: (note) => <Circle {...note} key={note._id}/>,
-  box: (note) => <Box {...note} key={note._id}/>,
-};
-const initNote = {
-  drawing: (event) => MultiPointNote.init(event),
-  /*text: (event) => OnePointNote.init(event),*/
-  line: (event) => TwoPointNote.init(event),
-  arrow: (event) => TwoPointNote.init(event),
-  circle: (event) => TwoPointNote.init(event),
-  box: (event) => TwoPointNote.init(event),
-};
-const captureNote = {
-  drawing: (event) => MultiPointNote.capture(event),
-  /*text: (event) => OnePointNote.capture(event),*/
-  line: (event) => TwoPointNote.capture(event),
-  arrow: (event) => TwoPointNote.capture(event),
-  circle: (event) => TwoPointNote.capture(event),
-  box: (event) => TwoPointNote.capture(event),
+  drawing: Drawing,
+  /*text: Text,*/
+  line: Line,
+  arrow: Arrow,
+  circle: Circle,
+  box: Box,
 };
 
+const captures = {
+  drawing: (event) => captureNote(event, ['points']),
+  /*text: (event) => captureNote(event, ['text', 'end-point']),*/
+  line: (event) => captureNote(event, ['end-point']),
+  arrow: (event) => captureNote(event, ['end-point']),
+  circle: (event) => captureNote(event, ['end-point']),
+  box: (event) => captureNote(event, ['end-point']),
+};
 
 export default NotesLayer = {
   fetchNoteData() {
@@ -48,15 +40,16 @@ export default NotesLayer = {
     };
   },
   fetchNote(note) {
-    return notes[note.type](note);
+    const Note = notes[note.type];
+    return <Note {...note} key={note._id}/>;
   },
   startTaking(event) {
     const note = AppState.get('note_type');
-    initNote[note](event)
+    initNote(event);
   },
   takeNote(event) {
     const note = AppState.get('note_type');
-    captureNote[note](event)
+    captures[note](event);
   },
   stopTaking(event) {
     AppState.set('note_displaying', false);
@@ -85,52 +78,47 @@ const handleStickyNote = (error, note) => {
     AppState.set('note_sticky_next', note);
   }
 };
-const TwoPointNote = {
-  init(event) {
-    const coords = generateCoords(event);
-    AppState.set({
-      'note_displaying': true,
-      'note_data': {
-        'x1': coords.x,
-        'y1': coords.y,
-        'x2': coords.x,
-        'y2': coords.y,
-      }
-    });
-  },
-  capture(event) {
-    const isNoteDisplaying = AppState.get('note_displaying');
-    if (isNoteDisplaying) {
-      const coords = generateCoords(event);
-      const data = AppState.get('note_data');
-      data.x2 = coords.x;
-      data.y2 = coords.y;
-      AppState.set('note_data', data);
-    }
-  },
+const captureNote = (event, data) => {
+  const note = data.reduce((data, datum) => {
+    return Object.assign(data, Capture[datum](event));
+  }, {});
+  AppState.set('note_data', note)
 }
-const MultiPointNote = {
-  init(event) {
-    const coords = generateCoords(event);
-    AppState.set({
-      'note_displaying': true,
-      'note_data': [{
-        'x': coords.x,
-        'y': coords.y,
-      }]
-    });
-  },
-  capture(event) {
-    const isNoteDisplaying = AppState.get('note_displaying');
-    if (isNoteDisplaying) {
-      const coords = generateCoords(event);
-      const data = AppState.get('note_data');
-      data.push({
-        x: coords.x,
-        y: coords.y,
-      });
-      const simplifiedData = PathSimplifier(data, 2.0, true);
-      AppState.set('note_data', simplifiedData);
+
+const initNote = (event) => {
+  const coords = generateCoords(event);
+  const initial = {
+    'x': coords.x,
+    'y': coords.y,
+  };
+  AppState.set({
+    'note_displaying': true,
+    'note_data': {
+      coords: [initial, initial],
     }
+  });
+}
+const Capture = {
+  'end-point' (event) {
+    const coords = generateCoords(event);
+    const data = AppState.get('note_data');
+    data.coords[1] = {
+      x: coords.x,
+      y: coords.y,
+    }
+    return data;
+  },
+  points(event) {
+    const coords = generateCoords(event);
+    const data = AppState.get('note_data');
+    data.coords.push({
+      x: coords.x,
+      y: coords.y,
+    });
+    data.coords = PathSimplifier(data.coords, 0.9, true);
+    return data;
+  },
+  text(event) {
+    //magic
   },
 }

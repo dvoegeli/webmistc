@@ -11,10 +11,10 @@ Meteor.methods({
     check(box, {
       type: String,
       data: {
-        x1: Number,
-        y1: Number,
-        x2: Number,
-        y2: Number,
+        coords: [{
+          x: Number,
+          y: Number,
+        }]
       },
       color: String,
       size: Number,

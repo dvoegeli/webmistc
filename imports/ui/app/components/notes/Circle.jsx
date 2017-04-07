@@ -6,11 +6,12 @@ import AppState from '/imports/api/appState.js';
 // Circle component - circle for the notes layer
 class Circle extends Component {
   render() {
-    const {_id,data,size,color} = this.props;
-    const x1 = data.x1;
-    const y1 = data.y1;
-    const x2 = data.x2;
-    const y2 = data.y2;
+    const { _id, size, color } = this.props;
+    const coords = this.props.data.coords;
+    const x1 = coords[0].x;
+    const y1 = coords[0].y;
+    const x2 = coords[1].x;
+    const y2 = coords[1].y;
     const origin = {
       x: (x2 >= x1) ? x1 : x2, 
       y: (y2 >= y1) ? y1 : y2,
@@ -43,12 +44,14 @@ Circle.propTypes = {
   note: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     data: PropTypes.shape({
-      x1: PropTypes.number.isRequired,
-      y1: PropTypes.number.isRequired,
-      x2: PropTypes.number.isRequired,
-      y2: PropTypes.number.isRequired,
+      coords: PropTypes.arrayOf(
+        PropTypes.shape({
+          x: PropTypes.number.isRequired,
+          y: PropTypes.number.isRequired,
+        })
+      ),
     }),
-    size: PropTypes.number.isRequired,
+    size: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
   }),
 };

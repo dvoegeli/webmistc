@@ -17,9 +17,12 @@ class NotesLayer extends Component {
     Layer.startTaking(event) 
   }
   handleTaking(event){
+    const isNoteDisplaying = AppState.get('note_displaying');
     // _.throttle needs event.persist() 
     event.persist();
-    this.takeNote(event);
+    if (isNoteDisplaying) {
+      this.takeNote(event);
+    }
   }
   handleStopTaking(event){ 
     Layer.stopTaking(event) 

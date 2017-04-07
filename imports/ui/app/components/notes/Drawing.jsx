@@ -7,15 +7,16 @@ import AppState from '/imports/api/appState.js';
 // Drawing component - drawing for the notes layer
 class Drawing extends Component {
   render() {
-    const { _id, data, size, color } = this.props;
+    const { _id, size, color } = this.props;
+    const coords = this.props.data.coords;
     const line = d3.line()
       .curve(d3.curveCardinal)
-      .x(function(coord) { return Math.round(coord.x); })
-      .y(function(coord) { return Math.round(coord.y); })
-      (data)
-    const denoisedLine = line.replace(/(\.\d).*?(,)/g, '$1$2');
+      .x(function(coord) { return coord.x; })
+      .y(function(coord) { return coord.y; })
+      (coords)
+    const truncatedLine = line.replace(/(\.\d).*?(,)/g, '$1$2');
     return (
-      <path id={_id} d={denoisedLine}
+      <path id={_id} d={truncatedLine}
       strokeWidth={size} stroke={color} fill='none'/>
     );
   }
@@ -24,12 +25,14 @@ class Drawing extends Component {
 Drawing.propTypes = {
   note: PropTypes.shape({
     _id: PropTypes.string.isRequired,
-    data: PropTypes.arrayOf(
-      PropTypes.shape({
-        x: PropTypes.number.isRequired,
-        y: PropTypes.number.isRequired,
-      })
-    ),
+    data: PropTypes.shape({
+      coords: PropTypes.arrayOf(
+        PropTypes.shape({
+          x: PropTypes.number.isRequired,
+          y: PropTypes.number.isRequired,
+        })
+      ),
+    }),
     size: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
   }),

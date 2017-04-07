@@ -10,10 +10,12 @@ Meteor.methods({
   'drawing.insert' (drawing) {
     check(drawing, {
       type: String,
-      data: [{
-        x: Number,
-        y: Number,
-      }],
+      data: {
+        coords: [{
+          x: Number,
+          y: Number,
+        }]
+      },
       color: String,
       size: Number,
     });
