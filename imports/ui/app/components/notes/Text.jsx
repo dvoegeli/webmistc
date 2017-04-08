@@ -34,7 +34,7 @@ class Text extends Component {
     const textStyle = {
       fontFamily: 'monospace',
       fontSize: (size * 3),
-      backgroundColor: 'rgba(169,169,169,0.90)',
+      backgroundColor: 'rgba(220,220,220,0.95)',
       color,
       padding: 5,
       cursor: 'text',
@@ -48,13 +48,13 @@ class Text extends Component {
         onMouseMove={(event)=>event.stopPropagation()}
         onMouseUp={(event)=>event.stopPropagation()}
       >
-        <div className='w3-card-2' style={textStyle}
+        <div style={textStyle}
           onInput={(event)=>this.handleEdit(event)} 
           onBlur={(event)=>this.handleDoneEditing(event)}
           onKeyPress={(event)=>this.handleDoneEditing(event)}
           ref={(input) => { this.textInput = input; }}
           contentEditable
-          dangerouslySetInnerHTML={{ __html: text || 'Enter farts' }}
+          dangerouslySetInnerHTML={{ __html: text || 'Enter text' }}
         />
       </foreignObject>
     );

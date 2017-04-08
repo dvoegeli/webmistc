@@ -48,6 +48,7 @@ class Whiteboard extends Component {
       left: 0, 
       width: '100%', 
       height: '100%',
+      filter: 'drop-shadow(  1px 1px 2px rgba(0,0,0,0.35) )',
     };
     return (
       <main className={classes} style={container}>
