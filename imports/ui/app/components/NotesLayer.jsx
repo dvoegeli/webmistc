@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import _ from 'lodash';
- 
+
 import AppState from '/imports/api/appState';
 import { default as Layer } from '/imports/api/notesLayer';
 import { Notes } from '/imports/api/notes';
@@ -13,10 +13,10 @@ class NotesLayer extends Component {
     super(props);
     this.takeNote = _.throttle(Layer.takeNote, 40);
   }
-  handleStartTaking(event){ 
-    Layer.startTaking(event) 
+  handleStartTaking(event) {
+    Layer.startTaking(event);
   }
-  handleTaking(event){
+  handleTaking(event) {
     const isNoteDisplaying = AppState.get('note_displaying');
     // _.throttle needs event.persist() 
     event.persist();
@@ -24,11 +24,11 @@ class NotesLayer extends Component {
       this.takeNote(event);
     }
   }
-  handleStopTaking(event){ 
-    Layer.stopTaking(event) 
+  handleStopTaking(event) {
+    Layer.stopTaking(event);
   }
   render() {
-    const {notes, note_displaying, style} = this.props;
+    const { notes, note_displaying, note_data, style } = this.props;
     const notePreview = Layer.fetchNoteData();
     return (
       <svg style={style} 
@@ -58,7 +58,7 @@ NotesLayer.propTypes = {
     React.PropTypes.array,
   ]),
 };
- 
+
 export default createContainer(() => {
   Meteor.subscribe('notes');
   Meteor.subscribe('stickyNotes');
@@ -72,4 +72,4 @@ export default createContainer(() => {
     note_size: AppState.get('note_size'),
     note_data: AppState.get('note_data'),
   };
-}, NotesLayer);  
+}, NotesLayer);

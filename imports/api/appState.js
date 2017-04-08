@@ -42,17 +42,15 @@ const initialState = {
   note_color: 'blue',  /* [purple|blue|orange|green|red] */
   note_size: 'small', /* [tiny|small|medium|large|huge] */
   note_displaying: false,
-  note_data: {},
-  note_x1: 0,
-  note_y1: 0,
-  note_x2: 0,
-  note_y2: 0,
+  note_data: {/*
+    coords: {
+      x: Number,
+      y: Number,
+    },
+    text: String*/
+  },
   notes_sticky: true,
   note_sticky_next: '',
-
-  /* STICKY NOTES */
-  sticky_notes: true,
-  sticky_notes: true,
 
   /* FEATURES */
   features_menu_open: false,

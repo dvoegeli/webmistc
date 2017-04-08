@@ -5,6 +5,7 @@ import Sizes from '/imports/api/sizes';
 import PathSimplifier from '/imports/api/pathSimplifier';
 
 import Drawing from '/imports/ui/app/components/notes/Drawing.jsx';
+import Text from '/imports/ui/app/components/notes/Text.jsx';
 import Line from '/imports/ui/app/components/notes/Line.jsx';
 import Arrow from '/imports/ui/app/components/notes/Arrow.jsx';
 import Box from '/imports/ui/app/components/notes/Box.jsx';
@@ -13,7 +14,7 @@ import Circle from '/imports/ui/app/components/notes/Circle.jsx';
 const cursorOffset = 10;
 const notes = {
   drawing: Drawing,
-  /*text: Text,*/
+  text: Text,
   line: Line,
   arrow: Arrow,
   circle: Circle,
@@ -22,7 +23,7 @@ const notes = {
 
 const captures = {
   drawing: (event) => captureNote(event, ['points']),
-  /*text: (event) => captureNote(event, ['text', 'end-point']),*/
+  text: (event) => captureNote(event, ['end-point']),
   line: (event) => captureNote(event, ['end-point']),
   arrow: (event) => captureNote(event, ['end-point']),
   circle: (event) => captureNote(event, ['end-point']),
@@ -51,10 +52,10 @@ export default NotesLayer = {
     const note = AppState.get('note_type');
     captures[note](event);
   },
-  stopTaking(event) {
+  stopTaking(noteType) {
     AppState.set('note_displaying', false);
-    const insertNote = `${AppState.get('note_type')}.insert`;
     const note = NotesLayer.fetchNoteData();
+    const insertNote = `${note.type}.insert`;
     Meteor.call(insertNote, note, handleStickyNote);
   },
 };
@@ -117,8 +118,5 @@ const Capture = {
     });
     data.coords = PathSimplifier(data.coords, 0.9, true);
     return data;
-  },
-  text(event) {
-    //magic
   },
 }
