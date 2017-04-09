@@ -17,7 +17,7 @@ Meteor.methods({
         }],
       },
       color: String,
-      size: Number,
+      size: String,
     });
     text = Object.assign(text, {
       slide: Slides.activeSlide('_id'),
@@ -37,7 +37,7 @@ Meteor.methods({
         text: String,
       },
       color: String,
-      size: Number,
+      size: String,
     });
     text = Object.assign(text, {
       slide: Slides.activeSlide('_id'),

@@ -36,8 +36,8 @@ export default NotesLayer = {
     return {
       type: AppState.get('note_type'),
       data: AppState.get('note_data'),
-      color: Colors.getHex(AppState.get('note_color')),
-      size: Sizes.get(AppState.get('note_size')),
+      color: AppState.get('note_color'),
+      size: AppState.get('note_size'),
     };
   },
   fetchNote(note) {

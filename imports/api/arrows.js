@@ -17,7 +17,7 @@ Meteor.methods({
         }]
       },
       color: String,
-      size: Number,
+      size: String,
     });
     arrow = Object.assign(arrow, {
       slide: Slides.activeSlide('_id'),

@@ -2,11 +2,15 @@ import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
 import AppState from '/imports/api/appState.js';
+import Colors from '/imports/api/colors';
+import Sizes from '/imports/api/sizes';
 
 // Circle component - circle for the notes layer
 class Circle extends Component {
   render() {
-    const { _id, size, color } = this.props;
+    const { _id } = this.props;
+    const color = Colors.getHex(this.props.color);
+    const size = Sizes.get(this.props.size);
     const coords = this.props.data.coords;
     const x1 = coords[0].x;
     const y1 = coords[0].y;

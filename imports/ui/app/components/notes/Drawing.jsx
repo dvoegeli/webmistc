@@ -3,11 +3,15 @@ import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
 import d3 from 'd3';
 import AppState from '/imports/api/appState.js';
+import Colors from '/imports/api/colors';
+import Sizes from '/imports/api/sizes';
 
 // Drawing component - drawing for the notes layer
 class Drawing extends Component {
   render() {
-    const { _id, size, color } = this.props;
+    const { _id } = this.props;
+    const color = Colors.getHex(this.props.color);
+    const size = Sizes.get(this.props.size);
     const coords = this.props.data.coords;
     const line = d3.line()
       .curve(d3.curveCardinal)

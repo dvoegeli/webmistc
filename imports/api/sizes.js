@@ -8,4 +8,13 @@ const sizes = {
   huge: 16,
 };
 
+const text = {
+  tiny: '2ch',
+  small: '3ch',
+  medium: '4ch',
+  large: '5ch',
+  huge: '6ch',
+};
+
 Sizes.get = (size)=>sizes[size];
+Sizes.getText = (size)=>text[size];

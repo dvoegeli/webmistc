@@ -17,7 +17,7 @@ Meteor.methods({
         }]
       },
       color: String,
-      size: Number,
+      size: String,
     });
     circle = Object.assign(circle, {
       slide: Slides.activeSlide('_id'),

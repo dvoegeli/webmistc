@@ -17,7 +17,7 @@ Meteor.methods({
         }]
       },
       color: String,
-      size: Number,
+      size: String,
     });
     box = Object.assign(box, {
       slide: Slides.activeSlide('_id'),
