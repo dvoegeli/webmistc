@@ -10,7 +10,7 @@ import Sizes from '/imports/api/sizes';
 class Text extends Component {
   constructor(props){
     super(props);
-    this.defaultText = 'Enter text';
+    this.defaultText = 'Entering text...';
   }
   handleEdit(event) {
     event.stopPropagation();
@@ -20,7 +20,9 @@ class Text extends Component {
   }
   handleDoneEditing(event) {
     event.stopPropagation();
-    if(event.type === 'onBlur' || event.charCode == 13){
+    const isUnfocused = _.isEqual('blur', event.type);
+    const isEnterPressed = _.isEqual(event.charCode, 13);
+    if(isUnfocused || isEnterPressed){
       event.preventDefault();
       event.target.blur();  
       const text = $(this.textInput).text();
@@ -39,7 +41,7 @@ class Text extends Component {
     const hasDefaultText = _.isEqual(text, this.defaultText);
     if (hasDefaultText) {
       $(this.textInput).focus();
-      $(this.textInput).select();
+      document.execCommand('selectAll', false, null);
     }
   }
   render() {
