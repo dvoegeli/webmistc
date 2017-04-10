@@ -7,6 +7,12 @@ import Sizes from '/imports/api/sizes';
 
 // Circle component - circle for the notes layer
 class Circle extends Component {
+  handleErase(){
+    const { _id, note_erasing } = this.props;
+    if(note_erasing){
+      Meteor.call('notes.remove', _id);
+    }
+  }
   render() {
     const { _id } = this.props;
     const color = Colors.getHex(this.props.color);
@@ -39,7 +45,8 @@ class Circle extends Component {
 
     return (
       <ellipse id={_id} cx={center.x} cy={center.y} rx={radius.x} ry={radius.y}
-        strokeWidth={size} stroke={color} fill='none'/>
+        strokeWidth={size} stroke={color} fill='none'
+        onMouseOver={()=>this.handleErase()}/>
     );
   }
 }
@@ -61,5 +68,7 @@ Circle.propTypes = {
 };
  
 export default createContainer(() => {
-  return {};
+  return {
+    note_erasing: AppState.get('note_erasing')
+  };
 }, Circle);

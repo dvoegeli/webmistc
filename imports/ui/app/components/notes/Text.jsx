@@ -24,6 +24,12 @@ class Text extends Component {
     const nextText = nextProps.data.text;
     return !_.isEqual(text, nextText);
   }
+  handleErase(){
+    const { _id, note_erasing } = this.props;
+    if(note_erasing){
+      Meteor.call('notes.remove', _id);
+    }
+  }
   handleEdit(event) {
     event.stopPropagation();
     const text = $(this.textInput).text();
@@ -85,6 +91,7 @@ class Text extends Component {
         onMouseDown={(event)=>event.stopPropagation()}
         onMouseMove={(event)=>event.stopPropagation()}
         onMouseUp={(event)=>event.stopPropagation()}
+        onMouseOver={()=>this.handleErase()}
       >
         <div style={textStyle}
           onInput={(event)=>this.handleEdit(event)} 
@@ -117,5 +124,7 @@ Text.propTypes = {
 };
 
 export default createContainer(() => {
-  return {};
+  return {
+    note_erasing: AppState.get('note_erasing')
+  };
 }, Text);

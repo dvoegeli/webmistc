@@ -7,6 +7,12 @@ import Sizes from '/imports/api/sizes';
 
 // Arrow component - arrow for the notes layer
 class Arrow extends Component {
+  handleErase(){
+    const { _id, note_erasing } = this.props;
+    if(note_erasing){
+      Meteor.call('notes.remove', _id);
+    }
+  }
   render() {
     const { _id } = this.props;
     const color = Colors.getHex(this.props.color);
@@ -18,7 +24,8 @@ class Arrow extends Component {
     const y2 = coords[1].y;
     const arrowHead = `arrow-head-${_id}`;
     return (
-      <g id={_id}>
+      <g id={_id}
+        onMouseOver={()=>this.handleErase()}>
         <marker 
           id={arrowHead} orient='auto' 
           markerWidth='2' markerHeight='4'
@@ -52,5 +59,7 @@ Arrow.propTypes = {
 };
  
 export default createContainer(() => {
-  return {};
+  return {
+    note_erasing: AppState.get('note_erasing')
+  };
 }, Arrow);

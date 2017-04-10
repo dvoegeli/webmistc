@@ -7,6 +7,12 @@ import Sizes from '/imports/api/sizes';
 
 // Line component - line for the notes layer
 class Line extends Component {
+  handleErase(){
+    const { _id, note_erasing } = this.props;
+    if(note_erasing){
+      Meteor.call('notes.remove', _id);
+    }
+  }
   render() {
     const { _id } = this.props;
     const color = Colors.getHex(this.props.color);
@@ -21,6 +27,7 @@ class Line extends Component {
         x1={x1} y1={y1} 
         x2={x2} y2={y2}
         strokeWidth={size} stroke={color}
+        onMouseOver={()=>this.handleErase()}
       />
     );
   }
@@ -43,5 +50,7 @@ Line.propTypes = {
 };
 
 export default createContainer(() => {
-  return {};
+  return {
+    note_erasing: AppState.get('note_erasing')
+  };
 }, Line);

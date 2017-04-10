@@ -42,6 +42,7 @@ const initialState = {
   note_color: 'blue',  /* [purple|blue|orange|green|red] */
   note_size: 'small', /* [tiny|small|medium|large|huge] */
   note_displaying: false,
+  note_erasing: false,
   note_data: {/*
     coords: {
       x: Number,

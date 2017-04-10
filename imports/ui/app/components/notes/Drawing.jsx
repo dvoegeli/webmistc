@@ -8,6 +8,12 @@ import Sizes from '/imports/api/sizes';
 
 // Drawing component - drawing for the notes layer
 class Drawing extends Component {
+  handleErase(){
+    const { _id, note_erasing } = this.props;
+    if(note_erasing){
+      Meteor.call('notes.remove', _id);
+    }
+  }
   render() {
     const { _id } = this.props;
     const color = Colors.getHex(this.props.color);
@@ -21,7 +27,8 @@ class Drawing extends Component {
     const truncatedLine = line.replace(/(\.\d).*?(,)/g, '$1$2');
     return (
       <path id={_id} d={truncatedLine}
-      strokeWidth={size} stroke={color} fill='none'/>
+      strokeWidth={size} stroke={color} fill='none'
+      onMouseOver={()=>this.handleErase()}/>
     );
   }
 }
@@ -43,5 +50,7 @@ Drawing.propTypes = {
 };
 
 export default createContainer(() => {
-  return {};
+  return {
+    note_erasing: AppState.get('note_erasing')
+  };
 }, Drawing);

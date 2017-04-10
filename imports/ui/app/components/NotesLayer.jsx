@@ -14,9 +14,16 @@ class NotesLayer extends Component {
     this.takeNote = _.throttle(Layer.takeNote, 40);
   }
   handleStartTaking(event) {
+    const isErasing = _.isEqual(this.props.note_type, 'eraser');
+    if(isErasing){
+      AppState.set('note_erasing', true);
+      return;
+    };
     Layer.startTaking(event);
   }
   handleTaking(event) {
+    const isErasing = _.isEqual(this.props.note_type, 'eraser');
+    if(isErasing) return;
     const isNoteDisplaying = AppState.get('note_displaying');
     // _.throttle needs event.persist() 
     event.persist();
@@ -25,6 +32,11 @@ class NotesLayer extends Component {
     }
   }
   handleStopTaking(event) {
+    const isErasing = _.isEqual(this.props.note_type, 'eraser');
+    if(isErasing) {
+      AppState.set('note_erasing', false);
+      return;
+    };
     Layer.stopTaking(event);
   }
   render() {

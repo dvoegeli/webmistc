@@ -7,6 +7,12 @@ import Sizes from '/imports/api/sizes';
 
 // Box component - box for the notes layer
 class Box extends Component {
+  handleErase(){
+    const { _id, note_erasing } = this.props;
+    if(note_erasing){
+      Meteor.call('notes.remove', _id);
+    }
+  }
   render() {
     const { _id } = this.props;
     const color = Colors.getHex(this.props.color);
@@ -30,7 +36,8 @@ class Box extends Component {
     }
     return (
       <rect id={_id} x={origin.x} y={origin.y} width={dim.x} height={dim.y}
-        strokeWidth={size} stroke={color} fill='none'/>
+        strokeWidth={size} stroke={color} fill='none'
+        onMouseOver={()=>this.handleErase()}/>
     );
   }
 }
@@ -51,5 +58,7 @@ Box.propTypes = {
   }),};
  
 export default createContainer(() => {
-  return {};
+  return {
+    note_erasing: AppState.get('note_erasing')
+  };
 }, Box);
