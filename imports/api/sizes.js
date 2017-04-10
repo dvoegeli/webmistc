@@ -9,11 +9,11 @@ const sizes = {
 };
 
 const text = {
-  tiny: '2ch',
-  small: '3ch',
-  medium: '4ch',
-  large: '5ch',
-  huge: '6ch',
+  tiny: '1ch',
+  small: '2ch',
+  medium: '3ch',
+  large: '4ch',
+  huge: '5ch',
 };
 
 Sizes.get = (size)=>sizes[size];

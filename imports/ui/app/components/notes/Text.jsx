@@ -5,6 +5,13 @@ import _ from 'lodash';
 import AppState from '/imports/api/appState';
 import Colors from '/imports/api/colors';
 import Sizes from '/imports/api/sizes';
+import StickyNotes from '/imports/api/stickyNotes';
+
+// TODO: refactor, comment
+// TODO: soft returns, tabs, and reposition
+// BUG: accidental select when placing notes
+// BUG: incorrect preview when dragging during initial placement
+// BUG: sticky notes should remove last note after text is entered
 
 // Text component - text for the notes layer
 class Text extends Component {
@@ -12,28 +19,38 @@ class Text extends Component {
     super(props);
     this.defaultText = 'Entering text...';
   }
+  shouldComponentUpdate(nextProps){
+    const { text } = this.props.data;
+    const nextText = nextProps.data.text;
+    return !_.isEqual(text, nextText);
+  }
   handleEdit(event) {
     event.stopPropagation();
     const text = $(this.textInput).text();
     const width = Math.min(text.length+1, 50);
     $(this.textInput).css('width', `${width}ch`);
+    AppState.set('note_sticky_next', '');
   }
   handleDoneEditing(event) {
     event.stopPropagation();
-    const isUnfocused = _.isEqual('blur', event.type);
+    event.preventDefault(); 
+    const text = $(this.textInput).text();
+    const { _id, data, size, color, type } = this.props;
+    const note = { _id, type, data, color, size };
+    const hasDefaultText = _.isEqual(text, this.defaultText);
+    if(text && !hasDefaultText){
+      data.text = text;
+      Meteor.call(`${note.type}.update`, note, (error) => StickyNotes.handler(error, note._id))
+    } else {
+      Meteor.call('notes.remove', note._id);
+    }
+  }
+  handleKeyPress(event) {
+    event.stopPropagation();
     const isEnterPressed = _.isEqual(event.charCode, 13);
-    if(isUnfocused || isEnterPressed){
+    if(isEnterPressed){
       event.preventDefault();
       event.target.blur();  
-      const text = $(this.textInput).text();
-      const { _id, data, size, color, type } = this.props;
-      const note = { _id, type, data, color, size };
-      if(text){
-        data.text = text;
-        Meteor.call(`${note.type}.update`, note, /*handleStickyNote*/);
-      } else {
-        Meteor.call('notes.remove', note._id);
-      }
     }
   }
   componentDidMount(){
@@ -72,7 +89,7 @@ class Text extends Component {
         <div style={textStyle}
           onInput={(event)=>this.handleEdit(event)} 
           onBlur={(event)=>this.handleDoneEditing(event)}
-          onKeyPress={(event)=>this.handleDoneEditing(event)}
+          onKeyPress={(event)=>this.handleKeyPress(event)}
           ref={(input) => { this.textInput = input; }}
           contentEditable
           dangerouslySetInnerHTML={{ __html: _.escape(text)}}

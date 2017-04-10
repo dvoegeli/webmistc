@@ -3,6 +3,7 @@ import AppState from '/imports/api/appState';
 import Colors from '/imports/api/colors';
 import Sizes from '/imports/api/sizes';
 import PathSimplifier from '/imports/api/pathSimplifier';
+import StickyNotes from '/imports/api/stickyNotes';
 
 import Drawing from '/imports/ui/app/components/notes/Drawing.jsx';
 import Text from '/imports/ui/app/components/notes/Text.jsx';
@@ -56,7 +57,7 @@ export default NotesLayer = {
     AppState.set('note_displaying', false);
     const note = NotesLayer.fetchNoteData();
     const insertNote = `${note.type}.insert`;
-    Meteor.call(insertNote, note, handleStickyNote);
+    Meteor.call(insertNote, note, StickyNotes.handler);
   },
 };
 
@@ -68,16 +69,6 @@ const generateCoords = (event) => {
   coords.x += cursorOffset;
   coords.y += cursorOffset;
   return coords;
-};
-const handleStickyNote = (error, note) => {
-  const areNotesSticky = AppState.get('notes_sticky');
-  if (!areNotesSticky) {
-    const nextNote = AppState.get('note_sticky_next');
-    if (nextNote) {
-      Meteor.call('notes.remove', nextNote);
-    }
-    AppState.set('note_sticky_next', note);
-  }
 };
 const captureNote = (event, data) => {
   const note = data.reduce((data, datum) => {

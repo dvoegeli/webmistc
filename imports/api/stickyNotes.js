@@ -1,31 +1,16 @@
-import { Meteor } from 'meteor/meteor';
-import { Mongo } from 'meteor/mongo';
-import { check, Match } from 'meteor/check';
-import { Notes } from './notes';
- 
-export const StickyNotes = new Mongo.Collection('stickyNotes');
+import AppState from '/imports/api/appState';
+import _ from 'lodash';
 
-const initialState = {
-  nextNote: undefined,
-}
-
-if (Meteor.isServer) {
-  Meteor.publish('stickyNotes', function stickyNotesPublication() {
-    return StickyNotes.find();
-  });
-  StickyNotes.upsert({}, initialState);
-}
-
-Meteor.methods({
-  'stickyNotes.reset'() {
-    StickyNotes.update({}, { $set: { nextNote: undefined } });
-  },
-  'stickyNotes.next'(note) {
-    check(note, String);
-    const nextNote = StickyNotes.findOne({}).nextNote;
-    if(nextNote){
-      Notes.remove(nextNote);
+export default StickyNotes = {
+  handler(error, note) {
+    const areNotesSticky = AppState.get('notes_sticky');
+    if (!areNotesSticky) {
+      const nextNote = AppState.get('note_sticky_next');
+      const isDiff = !_.isEqual(note, nextNote);
+      if (nextNote) {
+        Meteor.call('notes.remove', nextNote);
+      }
+      AppState.set('note_sticky_next', note);
     }
-    StickyNotes.update({}, { $set: {nextNote: note} });
   },
-});
+};
