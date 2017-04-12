@@ -62,14 +62,31 @@ export default NotesLayer = {
 };
 
 const generateCoords = (event) => {
+  // const coords = Whiteboard.generateWhiteboardCoords(event);
   let coords = {
     x: (event.nativeEvent.offsetX || event.nativeEvent.touches[0].clientX),
     y: (event.nativeEvent.offsetY || event.nativeEvent.touches[0].clientY),
   }
   coords.x += cursorOffset;
   coords.y += cursorOffset;
+  console.log(coords)
   return coords;
 };
+/*
+const windowCoords = this.refs.whiteboard.createSVGPoint(); // just once
+const generateWhiteboardCoords = (event) => { // on mouse move
+  const windowCoords = {
+    x: event.clientX, 
+    y: event.clientY,
+  };
+  // whiteboardCoords = { x: undefined, y: undefined };
+  const whiteboardCoords = windowCoords.matrixTransform(this.refs.whiteboard.getScreenCTM().inverse());
+  whiteboardCoords.x = Math.round(whiteboardCoords.x);
+  whiteboardCoords.y = Math.round(whiteboardCoords.y);
+  return whiteboardCoords;
+}
+*/
+
 const captureNote = (event, data) => {
   const note = data.reduce((data, datum) => {
     return Object.assign(data, Capture[datum](event));
@@ -77,8 +94,8 @@ const captureNote = (event, data) => {
   AppState.set('note_data', note)
 }
 
-const initNote = (event) => {
-  const coords = generateCoords(event);
+const initNote = (coords) => {
+  //const coords = generateCoords(event);
   const initial = {
     'x': coords.x,
     'y': coords.y,
@@ -91,8 +108,8 @@ const initNote = (event) => {
   });
 }
 const Capture = {
-  'end-point' (event) {
-    const coords = generateCoords(event);
+  'end-point' (coords) {
+    //const coords = generateCoords(event);
     const data = AppState.get('note_data');
     data.coords[1] = {
       x: coords.x,
@@ -100,8 +117,8 @@ const Capture = {
     }
     return data;
   },
-  points(event) {
-    const coords = generateCoords(event);
+  points(coords) {
+    //const coords = generateCoords(event);
     const data = AppState.get('note_data');
     data.coords.push({
       x: coords.x,

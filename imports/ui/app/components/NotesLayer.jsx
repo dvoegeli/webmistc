@@ -3,41 +3,58 @@ import { createContainer } from 'meteor/react-meteor-data';
 import _ from 'lodash';
 
 import AppState from '/imports/api/appState';
-import { default as Layer } from '/imports/api/notesLayer';
+import {
+  default as Layer } from '/imports/api/notesLayer';
 import { Notes } from '/imports/api/notes';
-
 
 // Notes Layer component - represents the notes layer on the whiteboard
 class NotesLayer extends Component {
   constructor(props) {
     super(props);
     this.takeNote = _.throttle(Layer.takeNote, 40);
+    this.layer;
+    this.coords = { /*x: Number, y: Number*/ };
+  }
+  componentDidMount(){
+    //console.log(this.layer)
+    this.coords = this.layer.createSVGPoint();
+  }
+  generateCoords(event){
+    // x: (event.nativeEvent.clientX || event.nativeEvent.touches[0].clientX),
+    // y: (event.nativeEvent.clientX || event.nativeEvent.touches[0].clientY),
+    this.coords.x = event.clientX || (event.nativeEvent.touches[0] && event.nativeEvent.touches[0].clientX) || this.coords.x;
+    this.coords.y = event.clientY || (event.nativeEvent.touches[0] && event.nativeEvent.touches[0].clientY) || this.coords.y;
+    const coords = this.coords.matrixTransform(this.layer.getScreenCTM().inverse());
+    const cursorOffset = 10;
+    coords.x = Math.round(coords.x) + 8;
+    coords.y = Math.round(coords.y) + 25;
+    return coords;
   }
   handleStartTaking(event) {
-    const isErasing = _.isEqual(this.props.note_type, 'eraser');
-    if(isErasing){
+    const { note_erasing } = this.props;
+    if (note_erasing) {
       AppState.set('note_erasing', true);
       return;
     };
-    Layer.startTaking(event);
+    Layer.startTaking(this.generateCoords(event));
   }
   handleTaking(event) {
-    const isErasing = _.isEqual(this.props.note_type, 'eraser');
-    if(isErasing) return;
-    const isNoteDisplaying = AppState.get('note_displaying');
+    //console.log(this.generateCoords(event))
+    const { note_displaying, note_type, note_erasing } = this.props;
+    if (note_erasing) return;
     // _.throttle needs event.persist() 
     event.persist();
-    if (isNoteDisplaying) {
-      this.takeNote(event);
+    if (note_displaying) {
+      this.takeNote(this.generateCoords(event));
     }
   }
   handleStopTaking(event) {
-    const isErasing = _.isEqual(this.props.note_type, 'eraser');
-    if(isErasing) {
+    const { note_erasing } = this.props;
+    if (note_erasing) {
       AppState.set('note_erasing', false);
       return;
     };
-    Layer.stopTaking(event);
+    Layer.stopTaking(this.generateCoords(event));
   }
   render() {
     const { notes, note_displaying, note_data, style } = this.props;
@@ -50,6 +67,9 @@ class NotesLayer extends Component {
         onTouchStart={(event)=>this.handleStartTaking(event)}
         onTouchMove={(event)=>this.handleTaking(event)}
         onTouchEnd={(event)=>this.handleStopTaking(event)}
+        preserveAspectRatio='xMidYMin meet'
+        viewBox='0 0 1026 635'
+        ref={(layer) => { this.layer = layer; }}
       >
         {notes.map((note)=>Layer.fetchNote(note))}
         {note_displaying ? Layer.fetchNote(notePreview) : ''}
@@ -77,6 +97,7 @@ export default createContainer(() => {
   return {
     notes: Notes.getNotes(),
     notes_sticky: AppState.get('notes_sticky'),
+    note_erasing: _.isEqual(AppState.get('note_type'), 'eraser'),
     note_sticky_next: AppState.get('note_sticky_next'),
     note_displaying: AppState.get('note_displaying'),
     note_type: AppState.get('note_type'),
