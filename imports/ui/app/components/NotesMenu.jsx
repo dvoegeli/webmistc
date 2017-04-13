@@ -22,26 +22,6 @@ import RolesMenuButton from './RolesMenuButton.jsx';
 
 // NoteMenu component - note and role options
 class NoteMenu extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      window_width: undefined,
-      window_height: undefined,
-    };
-  }
-  componentWillMount() {
-    this.updateWindowDimensions();
-  }
-
-  componentDidMount() {
-    window.addEventListener("resize", this.updateWindowDimensions.bind(this));
-  }
-  updateWindowDimensions() {
-    this.setState({
-      window_width: $(window).width(),
-      window_height: $(window).height(),
-    });
-  }
   changeNote(property, setting){
     AppState.set({
       [`note_${property}`]: setting,
@@ -54,7 +34,7 @@ class NoteMenu extends Component {
       'menu menu--notes w3-card-8 w3-animate-left',{
       'w3-show': AppState.get('notes_menu_open'),
     }); 
-     
+    const {window_width} = this.props;
     return (
       <nav className={noteMenu}>
         <div className="notes-menu w3-text-teal">
@@ -63,7 +43,7 @@ class NoteMenu extends Component {
             class="tooltip" 
             effect="solid" 
             delayShow={1000} 
-            disable={ this.state.window_width > 900 ? false : true }
+            disable={ window_width > 900 ? false : true }
           />
           <StickyNotesButton/>
           <DrawingButton select={this.changeNote}/>
@@ -90,5 +70,7 @@ NoteMenu.propTypes = {
 export default createContainer(() => {
   return {
     notes_menu_open: AppState.get('notes_menu_open'),
+    window_height: AppState.get('window_height'),
+    window_width: AppState.get('window_width'),
   };
 }, NoteMenu);

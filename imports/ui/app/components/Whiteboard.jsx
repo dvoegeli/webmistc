@@ -22,7 +22,19 @@ class Whiteboard extends Component {
       arrow: '<path transform="rotate(-45 864,895.930)" d="m1728,893q0,14 -10,24l-384,354q-16,14 -35,6q-19,-9 -19,-29l0,-224l-1248,0q-14,0 -23,-9t-9,-23l0,-192q0,-14 9,-23t23,-9l1248,0l0,-224q0,-21 19,-29t35,5l384,350q10,10 10,23z"/>',
       eraser: '<path fill="lightcoral" d="M832 1408l336-384h-768l-336 384h768zm1013-1077q15 34 9.5 71.5t-30.5 65.5l-896 1024q-38 44-96 44h-768q-38 0-69.5-20.5t-47.5-54.5q-15-34-9.5-71.5t30.5-65.5l896-1024q38-44 96-44h768q38 0 69.5 20.5t47.5 54.5z"/>',
     };
+    this.whiteboard; // reference to the whiteboard ReactDOM element
   }  
+  componentDidMount() {
+    this.updateDimensions();
+    window.addEventListener("resize", this.updateDimensions.bind(this));
+  }
+  updateDimensions() {
+    const { whiteboard } = this;
+    AppState.set({
+      whiteboard_width: $(whiteboard).width(),
+      whiteboard_height: $(whiteboard).height(),
+    });
+  }
   generateToolCursor(color, type){   
     return `url('data:image/svg+xml,<svg fill="${Colors.getHex(color)}" shape-rendering="auto" width="22" height="22" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">${this.types[type]}</svg>'), auto`;
   }
@@ -36,10 +48,6 @@ class Whiteboard extends Component {
       cursor: this.generateToolCursor(note_color, note_type),
       textAlign: 'center',
     };
-    const slide = {
-      height:'100%',
-      display: 'inline-block',
-    };
     const notesLayer = {
       position: 'absolute', 
       top: 0, 
@@ -49,9 +57,11 @@ class Whiteboard extends Component {
       filter: 'drop-shadow(  1px 1px 2px rgba(0,0,0,0.35) )',
     };
     return (
-      <main className={classes} style={container}>
-        <Slide style={slide}/>
-        <NotesLayer style={notesLayer} coords={(event)=>this.getCoords(event)}/>
+      <main className={classes} style={container}
+        ref={(whiteboard) => { this.whiteboard = whiteboard; }}
+      >
+        <Slide/>
+        <NotesLayer style={notesLayer}/>
     </main>
     );
   }

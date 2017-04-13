@@ -57,8 +57,19 @@ class NotesLayer extends Component {
     Layer.stopTaking(this.generateCoords(event));
   }
   render() {
-    const { notes, note_displaying, note_data, style } = this.props;
+    const { notes, note_displaying, note_data } = this.props;
+    const { slide_height, slide_width } = this.props;
     const notePreview = Layer.fetchNoteData();
+    const style = {
+      margin: 0,
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: slide_width, 
+      height: slide_height,
+      filter: 'drop-shadow(  1px 1px 2px rgba(0,0,0,0.35) )',
+    };
     return (
       <svg style={style} 
         onMouseDown={(event)=>this.handleStartTaking(event)}
@@ -89,6 +100,8 @@ NotesLayer.propTypes = {
     React.PropTypes.object,
     React.PropTypes.array,
   ]),
+  slide_height: PropTypes.number,
+  slide_width: PropTypes.number,
 };
 
 export default createContainer(() => {
@@ -104,5 +117,7 @@ export default createContainer(() => {
     note_color: AppState.get('note_color'),
     note_size: AppState.get('note_size'),
     note_data: AppState.get('note_data'),
+    slide_height: AppState.get('slide_height'),
+    slide_width: AppState.get('slide_width'),
   };
 }, NotesLayer);

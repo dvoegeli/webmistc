@@ -32,6 +32,8 @@ const State = new Mongo.Collection(null);
 const initialState = {
   /* WHITEBOARD */
   whiteboard_fullscreen: false,
+  whiteboard_height: undefined, /*[undefined|Integer]*/ 
+  whiteboard_width: undefined, /*[undefined|Integer]*/
   /* MICROPHONE */
 
   mic_muted: false,
@@ -93,6 +95,8 @@ const initialState = {
 
   /* SLIDES */
   slides_nav_open: false,
+  slide_height: undefined, /*[undefined|Integer]*/ 
+  slide_width: undefined, /*[undefined|Integer]*/
 
   /* WINDOW */
   window_height: undefined, /*[undefined|Integer]*/ 
