@@ -16,7 +16,6 @@ class NotesLayer extends Component {
     this.coords = { /*x: Number, y: Number*/ };
   }
   componentDidMount(){
-    //console.log(this.layer)
     this.coords = this.layer.createSVGPoint();
   }
   generateCoords(event){
@@ -39,7 +38,6 @@ class NotesLayer extends Component {
     Layer.startTaking(this.generateCoords(event));
   }
   handleTaking(event) {
-    //console.log(this.generateCoords(event))
     const { note_displaying, note_type, note_erasing } = this.props;
     if (note_erasing) return;
     // _.throttle needs event.persist() 
