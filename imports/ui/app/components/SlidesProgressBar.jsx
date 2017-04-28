@@ -34,6 +34,6 @@ export default createContainer(() => {
   return {
     slides_nav_open: AppState.get('slides_nav_open'),
     slides: Slides.find({}).count(),
-    active: Slides.findOne({active: true}) && Slides.findOne({active: true}).number,
+    active: Slides.activeSlide('number'),
   };
 }, SlidesProgressBar);

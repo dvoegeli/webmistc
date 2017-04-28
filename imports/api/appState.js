@@ -32,22 +32,28 @@ const State = new Mongo.Collection(null);
 const initialState = {
   /* WHITEBOARD */
   whiteboard_fullscreen: false,
+  whiteboard_height: undefined, /*[undefined|Integer]*/ 
+  whiteboard_width: undefined, /*[undefined|Integer]*/
   /* MICROPHONE */
 
   mic_muted: false,
 
-  // /* TOOL */ /* should this be notes? */
-  // tool_type: 'box',
-  // tool_color: 'red',
-  // tool_size: 'medium',
-
   /* NOTES */
   notes_menu_open: false,
-  note_type: 'draw',    /* [draw|text|line|arrow|circle|box|eraser] */
-  note_color: 'red',    /* [purple|blue|orange|green|red] */
-  note_size: 'medium',  /* [tiny|small|medium|large|huge] */
-  /* NOTES SERVER DATA*/
+  note_type: 'line',   /* [drawing|text|line|arrow|circle|box|eraser] */
+  note_color: 'blue',  /* [purple|blue|orange|green|red] */
+  note_size: 'small', /* [tiny|small|medium|large|huge] */
+  note_displaying: false,
+  note_erasing: false,
+  note_data: {/*
+    coords: {
+      x: Number,
+      y: Number,
+    },
+    text: String*/
+  },
   notes_sticky: true,
+  note_sticky_next: '',
 
   /* FEATURES */
   features_menu_open: false,
@@ -65,6 +71,9 @@ const initialState = {
 
   /* SIZES */
   sizes_menu_open: false,
+
+  /* ERASER */
+  erase_slide_menu_open: false,
 
   /* SOUND */
   sound_test: false,
@@ -86,10 +95,8 @@ const initialState = {
 
   /* SLIDES */
   slides_nav_open: false,
-  /* SLIDE SERVER DATA*/
-  /*slide_active: 'slide1',*/ /*[slide1|...|slideN]*/
-  /* this will be generated server side when uploading slides */
-  /*slides_labels: [ "slide1", "slide2", "slide3", "slide4", "slide5", "slide6", "slide7"],*/
+  slide_height: undefined, /*[undefined|Integer]*/ 
+  slide_width: undefined, /*[undefined|Integer]*/
 
   /* WINDOW */
   window_height: undefined, /*[undefined|Integer]*/ 

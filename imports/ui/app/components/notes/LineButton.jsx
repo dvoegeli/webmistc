@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
-import AppState from '../../../../api/appState.js';
+import AppState from '/imports/api/appState.js';
 
 // LineButton component - button for selecting the line note tool
 class LineButton extends Component {

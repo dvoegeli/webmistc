@@ -2,7 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
  
-import AppState from '../../../../api/appState.js';
+import AppState from '/imports/api/appState';
+//import { StickyNotes } from '/imports/api/stickyNotes';
  
 
 // StickyNotesButton component - button for toggling sticky notes
@@ -10,10 +11,14 @@ import AppState from '../../../../api/appState.js';
 // Off means the next note replaces the previous note on the whiteboard
 class StickyNotesButton extends Component {
   toggleStickyNotes(){
-    AppState.set('notes_sticky', !this.props.notes_sticky);
+    const {notes_sticky} = this.props
+    AppState.set('notes_sticky', !notes_sticky);
+    if(notes_sticky){
+      AppState.set('note_sticky_next', '');
+    }
   }
   render() {
-    const {notes_sticky} = this.props
+    const {notes_sticky} = this.props;
     const button = classNames(
       'fa fa-lg fa-fw', {
       'fa-toggle-on w3-text-green': notes_sticky,

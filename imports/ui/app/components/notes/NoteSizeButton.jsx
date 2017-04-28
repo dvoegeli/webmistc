@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import _ from 'lodash';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
-import AppState from '../../../../api/appState.js';
+import AppState from '/imports/api/appState.js';
 
 // NoteSizeButton component - button for opening the note size options menu
 class NoteSizeButton extends Component {

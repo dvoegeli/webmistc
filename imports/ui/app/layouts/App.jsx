@@ -19,6 +19,19 @@ import FeaturesMenu from '../components/FeaturesMenu.jsx';
 import SmartAlert from '../components/SmartAlert.jsx';
 
 export default class App extends Component {
+  componentWillMount() {
+    this.updateWindowDimensions();
+  }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.updateWindowDimensions);
+  }
+  updateWindowDimensions() {
+    AppState.set({
+      window_width: $(window).width(),
+      window_height: $(window).height(),
+    });
+  }
   render() {
     return (
       <div>
