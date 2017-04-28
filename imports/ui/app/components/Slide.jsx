@@ -56,6 +56,7 @@ class Slide extends Component {
       top: '50%',
       left: '50%',
       transform: 'translate(-50%, -50%)',
+      userSelect: 'none',
     };
     const {slide} = this.props;
     return (

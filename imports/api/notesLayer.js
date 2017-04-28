@@ -60,7 +60,7 @@ export default NotesLayer = {
     Meteor.call(insertNote, note, StickyNotes.handler);
   },
 };
-
+// remove function
 const generateCoords = (event) => {
   let coords = {
     x: (event.nativeEvent.offsetX || event.nativeEvent.touches[0].clientX),

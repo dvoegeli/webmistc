@@ -28,7 +28,8 @@ class Drawing extends Component {
     return (
       <path id={_id} d={truncatedLine}
       strokeWidth={size} stroke={color} fill='none'
-      onMouseOver={()=>this.handleErase()}/>
+      onMouseOver={()=>this.handleErase()}
+      strokeLinecap="round"/>
     );
   }
 }
