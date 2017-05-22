@@ -11,13 +11,9 @@ class MuteButton extends Component {
   }
   toggleMute(){
     AppState.set('mic_muted', !this.props.mic_muted);
-    if(!this.props.mic_muted){
-      console.log('muting mic');
-      AudioConference.mute();
-    } else {
-      console.log('unmuting mic');
-      AudioConference.unmute(this.props.sound_volume);
-    }
+    console.log('toggling mute')
+    this.props.mic_muted ? AudioConference.unmute() : AudioConference.mute();
+    
   }
 
   render() {

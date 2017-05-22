@@ -29,8 +29,12 @@ MicVisualizer.start = () => {
 }
 MicVisualizer.stop = () => {
   if (!micSource || !canvas) return;
-  micSource.disconnect(scriptNode);
-  scriptNode.disconnect(audioContext.destination);
+  try{
+    micSource.disconnect(scriptNode);
+    scriptNode.disconnect(audioContext.destination);
+  }catch(e){
+    // microphone was never connected
+  }
 }
 MicVisualizer.micSource = audioStream => {
   micSource = audioContext.createMediaStreamSource(audioStream)
