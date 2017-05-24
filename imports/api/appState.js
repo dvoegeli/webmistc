@@ -36,7 +36,7 @@ const initialState = {
   whiteboard_width: undefined, /*[undefined|Integer]*/
   /* MICROPHONE */
 
-  mic_muted: false,
+  mic_muted: true,
 
   /* NOTES */
   notes_menu_open: false,
@@ -76,7 +76,8 @@ const initialState = {
   erase_slide_menu_open: false,
 
   /* SOUND */
-  sound_test: false,
+  sound_volume: .5, /*range [0,1]*/
+  sound_audio_context: false,
 
   /* RECORD */
   record_start: false,

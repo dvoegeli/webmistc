@@ -35,7 +35,7 @@ class Whiteboard extends Component {
       whiteboard_height: $(whiteboard).height(),
     });
   }
-  generateToolCursor(color, type){   
+  generateNoteCursor(color, type){   
     return `url('data:image/svg+xml,<svg fill="${Colors.getHex(color)}" shape-rendering="auto" width="22" height="22" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">${this.types[type]}</svg>'), auto`;
   }
   render() {
@@ -45,7 +45,7 @@ class Whiteboard extends Component {
       'whiteboard--fullscreen': fullscreen,
     });
     const container = {
-      cursor: this.generateToolCursor(note_color, note_type),
+      cursor: this.generateNoteCursor(note_color, note_type),
       textAlign: 'center',
     };
     const notesLayer = {
@@ -61,7 +61,7 @@ class Whiteboard extends Component {
         ref={(whiteboard) => { this.whiteboard = whiteboard; }}
       >
         <Slide/>
-        <NotesLayer style={notesLayer}/>
+        <NotesLayer />
     </main>
     );
   }

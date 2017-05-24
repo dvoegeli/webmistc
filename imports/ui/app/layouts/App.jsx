@@ -17,6 +17,8 @@ import NotesMenu from '../components/NotesMenu.jsx';
 import FeaturesMenuButton from '../components/FeaturesMenuButton.jsx';
 import FeaturesMenu from '../components/FeaturesMenu.jsx';
 import SmartAlert from '../components/SmartAlert.jsx';
+import AudioConference from '/imports/api/audioConference.js';
+import ReactTooltip from 'react-tooltip';
 
 export default class App extends Component {
   componentWillMount() {
@@ -25,6 +27,7 @@ export default class App extends Component {
 
   componentDidMount() {
     window.addEventListener("resize", this.updateWindowDimensions);
+    AudioConference.connect();
   }
   updateWindowDimensions() {
     AppState.set({
@@ -48,6 +51,13 @@ export default class App extends Component {
         <BackgroundOverlay/>
         <Whiteboard/>
         <SmartAlert/>
+        <ReactTooltip 
+          place="right" 
+          class="tooltip" 
+          effect="solid" 
+          delayShow={1000} 
+          disable={ $(window).width() > 900 ? false : true }
+        />
       </div>
     );
   }

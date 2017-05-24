@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
 import AppState from '/imports/api/appState.js';
+import AudioConference from '/imports/api/audioConference.js';
 
 // MuteButton component - mutes the microphone
 class MuteButton extends Component {
@@ -9,7 +10,10 @@ class MuteButton extends Component {
     super(props);
   }
   toggleMute(){
-    AppState.set('mic_muted', !this.props.mic_muted,);
+    AppState.set('mic_muted', !this.props.mic_muted);
+    console.log('toggling mute')
+    this.props.mic_muted ? AudioConference.unmute() : AudioConference.mute();
+    
   }
 
   render() {
@@ -36,11 +40,13 @@ class MuteButton extends Component {
 MuteButton.propTypes = {
   whiteboard_fullscreen: PropTypes.bool.isRequired,
   mic_muted: PropTypes.bool.isRequired,
+  sound_volume: PropTypes.number.isRequired,
 };
  
 export default createContainer(() => {
   return {
     whiteboard_fullscreen: AppState.get('whiteboard_fullscreen'),
     mic_muted: AppState.get('mic_muted'),
+    sound_volume: AppState.get('sound_volume'),
   };
 }, MuteButton);

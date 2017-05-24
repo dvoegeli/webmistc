@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import _ from 'lodash';
 import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
-import ReactTooltip from 'react-tooltip';
  
 import AppState from '/imports/api/appState.js';
 
@@ -38,13 +37,6 @@ class NoteMenu extends Component {
     return (
       <nav className={noteMenu}>
         <div className="notes-menu w3-text-teal">
-          <ReactTooltip 
-            place="right" 
-            class="tooltip" 
-            effect="solid" 
-            delayShow={1000} 
-            disable={ window_width > 900 ? false : true }
-          />
           <StickyNotesButton/>
           <DrawingButton select={this.changeNote}/>
           <TextButton select={this.changeNote}/>
