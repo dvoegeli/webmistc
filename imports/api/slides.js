@@ -27,6 +27,9 @@ Meteor.methods({
     });
     Slides.insert(slide);
   },
+  'slides.reset'() {
+    Slides.remove({});
+  },
   'slides.move'(request) {
     check(request, Match.OneOf(Number, String));
 

@@ -3,7 +3,8 @@ import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
  
 import AppState from '/imports/api/appState.js';
-import SlidesImport from './SlidesImport.jsx'
+import SlidesImport from './Slides/SlidesImport.jsx';
+import SlidesReset from './Slides/SlidesReset.jsx';
  
 
 // Slides component - menu for slides features
@@ -22,7 +23,7 @@ class Slides extends Component {
         <header className="panel__header w3-container w3-teal">
           <a className="w3-teal w3-left-align" onClick={()=>this.closeMenu()}>
             <i className="fa-chevron-left fa fa-lg fa-fw w3-margin-right"/>
-            Import/Export
+            Slides
           </a>
         </header>
         <main className="panel__content w3-container">
@@ -35,6 +36,9 @@ class Slides extends Component {
                 <i className="fa-sign-out fa fa-lg fa-fw w3-margin-right"/>
                 Export Slides
               </a>
+            </li>
+            <li>
+              <SlidesReset/>
             </li>
             <li>
               <a className="flex-row w3-padding-0 w3-section w3-text-teal" href="#!">

@@ -53,7 +53,7 @@ class Presentation extends Component {
     }
     return (
       <div className={presentationControl}>
-        <header className="panel__header w3-container w3(-teal">
+        <header className="panel__header w3-container w3-teal">
                   <a className="w3-teal w3-left-align" onClick={()=>this.closeMenu()}>
             <i className="fa-chevron-left fa fa-lg fa-fw w3-margin-right"/>
             Presentation
