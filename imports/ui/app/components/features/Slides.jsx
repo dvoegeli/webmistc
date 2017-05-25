@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import AppState from '/imports/api/appState.js';
 import SlidesAppend from './Slides/SlidesAppend.jsx';
 import SlidesReset from './Slides/SlidesReset.jsx';
+import SlidesBlank from './Slides/SlidesBlank.jsx';
  
 
 // Slides component - menu for slides features
@@ -41,10 +42,7 @@ class Slides extends Component {
               <SlidesReset/>
             </li>
             <li>
-              <a className="flex-row w3-padding-0 w3-section w3-text-teal" href="#!">
-                <i className="fa-file-o fa fa-lg fa-fw w3-margin-right"/>
-                Insert New
-              </a>
+              <SlidesBlank/>
             </li>
           </ul>
         </main>

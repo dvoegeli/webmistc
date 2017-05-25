@@ -6,8 +6,8 @@ import classNames from 'classnames';
 import AppState from '/imports/api/appState.js';
 import { Slides } from '/imports/api/slides.js';
 
-// SlidesImport component - button to import slides to database
-class SlidesImport extends Component {
+// SlidesAppend component - button to append slides to last slide in database
+class SlidesAppend extends Component {
   constructor() {
     super()
     this.parseImport = this.parseImport.bind(this);
@@ -34,7 +34,6 @@ class SlidesImport extends Component {
         });
       });
     });
-
   }
   parsePdf(pdf) {
     const slides = [];
@@ -69,8 +68,8 @@ class SlidesImport extends Component {
     );
   }
 }
-SlidesImport.propTypes = {};
+SlidesAppend.propTypes = {};
 
 export default createContainer(() => {
   return {};
-}, SlidesImport);
+}, SlidesAppend);

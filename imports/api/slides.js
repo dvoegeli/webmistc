@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { check, Match } from 'meteor/check';
+import _ from 'lodash';
 
 export const Slides = new Mongo.Collection('slides');
 
@@ -25,13 +26,7 @@ Meteor.methods({
     slide = Object.assign(slide, {
       createdAt: new Date()
     });
-    // const slides = Slides.find({}, {
-    //   fields: { _id: true, number: true },
-    //   sort: { number: 1 }
-    // }).fetch();
     const count = Slides.find({}).count();
-    console.log(count);
-    console.log(Slides.activeSlide('number'));
     Slides.insert(slide);
 
   },
@@ -48,6 +43,34 @@ Meteor.methods({
       number: location + slide.number,
     });
     Slides.insert(slide);   
+  },
+  'slides.blank' (slide) {
+    check(slide, {
+      data: String
+    });
+
+    const activeSlide = Slides.activeSlide('number') || 0;
+
+    const slides = Slides.find({}, {
+      fields: { _id: true, number: true },
+      sort: { number: 1 }
+    }).fetch();
+    _.forEach(slides, (slide) => {
+      const number = (slide.number > activeSlide) ? slide.number + 1 : slide.number; 
+      Slides.update(slide._id, {
+        $set: { 
+          number,
+          active: false,
+        },
+      });
+    })
+    slide = Object.assign(slide, {
+      active: true,
+      number: activeSlide + 1,
+      createdAt: new Date()
+    });
+    Slides.insert(slide);
+
   },
   'slides.reset' () {
     Slides.remove({});
