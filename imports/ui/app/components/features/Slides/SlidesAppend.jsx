@@ -16,6 +16,8 @@ class SlidesImport extends Component {
     PDFJS.workerSrc = '/packages/pascoual_pdfjs/build/pdf.worker.js';
   }
   storePdfSlides(slides) {
+    // store all the slides after the last slide
+    const storageLocation = Slides.find({}).count();
     slides.forEach((slide, number) => {
       const canvas = document.createElement('canvas');
       const scale = 1.5;
@@ -25,9 +27,8 @@ class SlidesImport extends Component {
       canvas.width = viewport.width;
       const task = slide.render({ canvasContext: context, viewport: viewport });
       task.promise.then(function() {
-        // this is broken for importing more than 1 set of slides
-        Meteor.call('slides.insert', {
-          active: !number, /*first slide is active*/
+        Meteor.call('slides.append', storageLocation, {
+          active: Slides.activeSlide() ? false : !number, /*if no active slide, then first is active */
           number: number + 1, /*index should be 1, not 0*/
           data: canvas.toDataURL('image/png'),
         });
@@ -62,7 +63,7 @@ class SlidesImport extends Component {
             onChange={this.parseImport}
           />
           <i className="fa-sign-in fa fa-lg fa-fw w3-margin-right"/>
-          Import Slides
+          Append
         </label>
       </a>
     );
