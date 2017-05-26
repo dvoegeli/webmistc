@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import AppState from '/imports/api/appState.js';
 import { Slides } from '/imports/api/slides.js';
 
-// SlidesAppend component - button to append slides to last slide in database
+// SlidesAppend component - button to append slides to last slide
 class SlidesAppend extends Component {
   constructor() {
     super()
@@ -45,6 +45,7 @@ class SlidesAppend extends Component {
   }
   parseImport(event) {
     const slides = event.target.files[0];
+    if(!slides) return;
     // check if image or pdf, assume pdf for now
     const slidesUrl = URL.createObjectURL(slides);
     PDFJS.getDocument(slidesUrl).then(this.parsePdf.bind(this), (error) => console.log(error));

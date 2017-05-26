@@ -6,6 +6,7 @@ import AppState from '/imports/api/appState.js';
 import SlidesAppend from './Slides/SlidesAppend.jsx';
 import SlidesReset from './Slides/SlidesReset.jsx';
 import SlidesBlank from './Slides/SlidesBlank.jsx';
+import SlidesDelete from './Slides/SlidesDelete.jsx';
  
 
 // Slides component - menu for slides features
@@ -40,6 +41,9 @@ class Slides extends Component {
             </li>
             <li>
               <SlidesReset/>
+            </li>
+            <li>
+              <SlidesDelete/>
             </li>
             <li>
               <SlidesBlank/>

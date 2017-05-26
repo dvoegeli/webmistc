@@ -7,23 +7,24 @@ import { Slides } from '/imports/api/slides.js';
 
 import ConfirmationButtons from '../../ConfirmationButtons.jsx';
 
-// SlidesReset component - button to delete all slides
-class SlidesReset extends Component {
+// SlidesDelete component - button to delete current slide
+class SlidesDelete extends Component {
   constructor(props) {
     super(props);
     this.state = {
       confirming: false,
     };
     this.cancel = this.cancel.bind(this);
-    this.reset = this.reset.bind(this);
+    this.delete = this.delete.bind(this);
   }
   confirm(){
     this.setState({ 'confirming': true });
   }
-  reset(event){
+  delete(event){
+    console.log('deleteing active slide')
     event.stopPropagation();
-    Meteor.call('erase.presentation');
-    Meteor.call('slides.reset');
+    //Meteor.call('erase.slide');
+    Meteor.call('slides.delete');
     this.setState({ 'confirming': false });
   }
   cancel(event){
@@ -38,18 +39,18 @@ class SlidesReset extends Component {
         onClick={() => this.confirm()}
       >
         { confirming ? (
-          <ConfirmationButtons cancel={this.cancel} execute={this.reset} />
+          <ConfirmationButtons cancel={this.cancel} execute={this.delete} />
         ) : (
-          <i className="fa-bomb fa fa-lg fa-fw w3-margin-right"/>
+          <i className="fa-trash fa fa-lg fa-fw w3-margin-right"/>
         )}
-        {!confirming ? 'Reset' : ''}
+        {!confirming ? 'Delete' : ''}
         
       </a>
     );
   }
 }
-SlidesReset.propTypes = {};
+SlidesDelete.propTypes = {};
 
 export default createContainer(() => {
   return {};
-}, SlidesReset);
+}, SlidesDelete);

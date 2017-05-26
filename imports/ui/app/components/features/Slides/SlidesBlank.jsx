@@ -5,8 +5,6 @@ import classNames from 'classnames';
 import AppState from '/imports/api/appState.js';
 import { Slides } from '/imports/api/slides.js';
 
-import ConfirmationButtons from '../../ConfirmationButtons.jsx';
-
 // SlidesBlank component - button to insert a blank slide
 class SlidesBlank extends Component {
   constructor(props) {
