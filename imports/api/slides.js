@@ -23,26 +23,23 @@ Slides.numbers = () => {
 }
 
 Meteor.methods({
-  'slides.insert' (slide) {
+  'slides.insert' (location, offset, slide) {
+    check(location, Number);
+    check(offset, Number);
     check(slide, {
       active: Boolean,
       number: Number,
       data: String
     });
-    slide = Object.assign(slide, {
-      createdAt: new Date()
-    });
-    const count = Slides.find({}).count();
-    Slides.insert(slide);
-
+    // this is going to be complicated...
   },
   'slides.append' (location, slide) {
+    check(location, Number);
     check(slide, {
       active: Boolean,
       number: Number,
       data: String
     });
-    check(location, Number);
     const count = Slides.find({}).count();
     slide = Object.assign(slide, {
       createdAt: new Date(),
@@ -78,7 +75,7 @@ Meteor.methods({
   'slides.delete'() {
     let slides = Slides.numbers();
     if(!slides) return;
-    
+
     const activeSlide = Slides.activeSlide();
     
     if(_.isEqual(slides.length, 1)){
