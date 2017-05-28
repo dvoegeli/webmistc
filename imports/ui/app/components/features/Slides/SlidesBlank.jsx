@@ -18,6 +18,7 @@ class SlidesBlank extends Component {
     context.rect(0, 0, 1366, 768);
     context.fillStyle = 'white';
     context.fill();
+    Meteor.call('slides.offset', 1);
     Meteor.call('slides.blank', {
       data: canvas.toDataURL('image/png'),
     });

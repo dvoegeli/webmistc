@@ -15,7 +15,8 @@ Slides.activeSlide = (attr) => {
   const slide = Slides.findOne({ active: true });
   return slide ? (attr ? slide[attr] : slide) : undefined;
 }
-Slides.numbers = () => {
+// pared collection is filtered on slide.number and slide._id 
+Slides.paredCollection = () => {
   return Slides.find({}, {
     fields: { _id: true, number: true },
     sort: { number: 1 }
@@ -23,85 +24,77 @@ Slides.numbers = () => {
 }
 
 Meteor.methods({
-  'slides.insert' (location, offset, slide) {
+  'slides.insert' (location, slide) {
     check(location, Number);
-    check(offset, Number);
     check(slide, {
-      active: Boolean,
       number: Number,
       data: String
     });
-    // this is going to be complicated...
-  },
-  'slides.append' (location, slide) {
-    check(location, Number);
-    check(slide, {
-      active: Boolean,
-      number: Number,
-      data: String
-    });
-    const count = Slides.find({}).count();
+    const active = _.isEqual(slide.number, 1);
+    const number = slide.number + location;
     slide = Object.assign(slide, {
       createdAt: new Date(),
-      number: location + slide.number,
+      active,
+      number
     });
-    Slides.insert(slide);   
+    const hasSlides = !_.isEqual(location, 0);
+    if(hasSlides){
+      const activeSlide = Slides.activeSlide();
+      Slides.update({ _id: activeSlide._id }, {
+        $set: { 
+          active: false,
+        },
+      });
+    }
+    Slides.insert(slide);
+  },
+  'slides.offset' (amount) {
+    check(amount, Number);
+    const activeSlide = Slides.activeSlide();
+    const slides = Slides.paredCollection();
+    _.forEach(slides, (slide) => {
+      const canShiftSlides = slide.number > activeSlide.number;
+      const number = canShiftSlides ? (slide.number + amount) : slide.number;
+      Slides.update(slide._id, {
+        $set: { number },
+      });
+    });
   },
   'slides.blank' (slide) {
     check(slide, {
       data: String
     });
-
-    const activeSlide = Slides.activeSlide('number') || 0;
-
-    const slides = Slides.numbers();
-    _.forEach(slides, (slide) => {
-      const number = (slide.number > activeSlide) ? slide.number + 1 : slide.number; 
-      Slides.update(slide._id, {
+    const activeSlide = Slides.activeSlide(); 
+    const number = (activeSlide && activeSlide.number + 1) || 1;
+    slide = Object.assign(slide, {
+      createdAt: new Date(),
+      active: true,
+      number
+    });
+    if(activeSlide){
+      Slides.update(activeSlide._id, {
         $set: { 
-          number,
           active: false,
         },
       });
-    })
-    slide = Object.assign(slide, {
-      active: true,
-      number: activeSlide + 1,
-      createdAt: new Date()
-    });
+    }
     Slides.insert(slide);
 
   },
   'slides.delete'() {
-    let slides = Slides.numbers();
-    if(!slides) return;
-
     const activeSlide = Slides.activeSlide();
-    
-    if(_.isEqual(slides.length, 1)){
-      Slides.remove(activeSlide._id);
-      return;
-    }
-
-    if(_.isEqual(slides.length, 2)){
-      Slides.remove(activeSlide._id);
-      Slides.update({}, {
-        $set: { active: true, number: 1 },
-      });
-      return;
-    }
-
-    const isDeletingLast = _.isEqual(activeSlide.number, slides.length);
+    if(!activeSlide) return; 
+    const isLastSlide = Slides.find().count();
     Slides.remove(activeSlide._id);
-    slides = Slides.numbers();
-    _.forEach(slides, (slide) => {
-      const canShiftSlide = (slide.number > activeSlide.number);
-      const number = canShiftSlide? slide.number - 1 : slide.number;
-      const atBeforeActive = _.isEqual(slide.number, activeSlide.number - 1);
-      const atAfterActive = _.isEqual(slide.number, activeSlide.number + 1)
-      const active = (isDeletingLast && atBeforeActive) || atAfterActive;
-      Slides.update(slide._id, { $set: { number, active } });
-    })
+    if(!!isLastSlide){
+      const isDeletingLastSlide = _.isEqual(activeSlide.number, isLastSlide);
+      const number = activeSlide.number + (isDeletingLastSlide ? -1 : 0);
+      Slides.update({ number }, { 
+        $set: { 
+          active: true,
+        } 
+      });
+    }
   },
   'slides.reset' () {
     Slides.remove({});

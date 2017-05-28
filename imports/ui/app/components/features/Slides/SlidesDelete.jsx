@@ -21,9 +21,12 @@ class SlidesDelete extends Component {
     this.setState({ 'confirming': true });
   }
   delete(event){
-    console.log('deleteing active slide')
     event.stopPropagation();
-    //Meteor.call('erase.slide');
+    Meteor.call('erase.slide');
+    const isDeletingLast = _.isEqual(Slides.activeSlide('number'), Slides.find().count());
+    if(!isDeletingLast){
+      Meteor.call('slides.offset', -1);
+    }
     Meteor.call('slides.delete');
     this.setState({ 'confirming': false });
   }
@@ -31,7 +34,7 @@ class SlidesDelete extends Component {
     event.stopPropagation();
     this.setState({ 'confirming': false });
   }
-
+  /*stacked icon: times over stacked slides*/
   render() {
     const { confirming } = this.state;
     return (
@@ -41,6 +44,7 @@ class SlidesDelete extends Component {
         { confirming ? (
           <ConfirmationButtons cancel={this.cancel} execute={this.delete} />
         ) : (
+          
           <i className="fa-trash fa fa-lg fa-fw w3-margin-right"/>
         )}
         {!confirming ? 'Delete' : ''}

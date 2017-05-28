@@ -6,8 +6,8 @@ import classNames from 'classnames';
 import AppState from '/imports/api/appState.js';
 import { Slides } from '/imports/api/slides.js';
 
-// SlidesAppend component - button to append slides to last slide
-class SlidesAppend extends Component {
+// SlidesInsert component - button to append slides to last slide
+class SlidesInsert extends Component {
   constructor() {
     super()
     this.parseImport = this.parseImport.bind(this);
@@ -16,8 +16,10 @@ class SlidesAppend extends Component {
     PDFJS.workerSrc = '/packages/pascoual_pdfjs/build/pdf.worker.js';
   }
   storePdfSlides(slides) {
-    // store all the slides after the last slide
-    const storageLocation = Slides.find({}).count();
+    // store all the slides after the active slide
+    const location = Slides.activeSlide('number') || 0;
+    const offset = slides.length || 0;
+    Meteor.call('slides.offset', offset);
     slides.forEach((slide, number) => {
       const canvas = document.createElement('canvas');
       const scale = 1.5;
@@ -27,8 +29,7 @@ class SlidesAppend extends Component {
       canvas.width = viewport.width;
       const task = slide.render({ canvasContext: context, viewport: viewport });
       task.promise.then(function() {
-        Meteor.call('slides.append', storageLocation, {
-          active: Slides.activeSlide() ? false : !number, /*if no active slide, then first is active */
+        Meteor.call('slides.insert', location, {
           number: number + 1, /*index should be 1, not 0*/
           data: canvas.toDataURL('image/png'),
         });
@@ -62,16 +63,16 @@ class SlidesAppend extends Component {
             style={{display: "none"}}
             onChange={this.parseImport}
           />
-         {/*stacked icon: arrow right over stacked slides*/}
-          <i className="fa-arrow-right fa fa-lg fa-fw w3-margin-right"/>
-          Append
+         {/*stacked icon: arrow down over single slide*/}
+          <i className="fa-arrow-down fa fa-lg fa-fw w3-margin-right"/>
+          Insert
         </label>
       </a>
     );
   }
 }
-SlidesAppend.propTypes = {};
+SlidesInsert.propTypes = {};
 
 export default createContainer(() => {
   return {};
-}, SlidesAppend);
+}, SlidesInsert);

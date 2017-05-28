@@ -4,6 +4,7 @@ import classNames from 'classnames';
  
 import AppState from '/imports/api/appState.js';
 import SlidesAppend from './Slides/SlidesAppend.jsx';
+import SlidesInsert from './Slides/SlidesInsert.jsx';
 import SlidesReset from './Slides/SlidesReset.jsx';
 import SlidesBlank from './Slides/SlidesBlank.jsx';
 import SlidesDelete from './Slides/SlidesDelete.jsx';
@@ -34,10 +35,7 @@ class Slides extends Component {
               <SlidesAppend/>
             </li>
             <li>
-              <a className="flex-row w3-padding-0 w3-section w3-text-teal" href="#!">
-                <i className="fa-sign-out fa fa-lg fa-fw w3-margin-right"/>
-                Export
-              </a>
+              <SlidesInsert/>
             </li>
             <li>
               <SlidesReset/>

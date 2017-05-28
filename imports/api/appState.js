@@ -40,7 +40,7 @@ const initialState = {
 
   /* NOTES */
   notes_menu_open: false,
-  note_type: 'line',   /* [drawing|text|line|arrow|circle|box|eraser] */
+  note_type: 'drawing',   /* [drawing|text|line|arrow|circle|box|eraser] */
   note_color: 'blue',  /* [purple|blue|orange|green|red] */
   note_size: 'small', /* [tiny|small|medium|large|huge] */
   note_displaying: false,
@@ -57,7 +57,7 @@ const initialState = {
 
   /* FEATURES */
   features_menu_open: false,
-  features_show: 'none', 
+  features_show: 'slides', 
   /*[none|question|chat|message|role|sound|presentation|slides|vote]*/
 
   /* ROLES */
