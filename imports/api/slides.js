@@ -25,6 +25,8 @@ Slides.paredCollection = () => {
 
 Meteor.methods({
   'slides.insert' (location, slide) {
+    // broken is trying to append to end
+    // likely, it's because the shift is broken
     check(location, Number);
     check(slide, {
       number: Number,
@@ -39,8 +41,7 @@ Meteor.methods({
     });
     const hasSlides = !_.isEqual(location, 0);
     if(hasSlides){
-      const activeSlide = Slides.activeSlide();
-      Slides.update({ _id: activeSlide._id }, {
+      Slides.update({ number: location }, {
         $set: { 
           active: false,
         },
