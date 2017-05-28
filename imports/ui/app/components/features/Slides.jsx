@@ -3,7 +3,11 @@ import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
  
 import AppState from '/imports/api/appState.js';
-import SlidesImport from './SlidesImport.jsx'
+import SlidesAppend from './Slides/SlidesAppend.jsx';
+import SlidesInsert from './Slides/SlidesInsert.jsx';
+import SlidesReset from './Slides/SlidesReset.jsx';
+import SlidesBlank from './Slides/SlidesBlank.jsx';
+import SlidesDelete from './Slides/SlidesDelete.jsx';
  
 
 // Slides component - menu for slides features
@@ -22,25 +26,25 @@ class Slides extends Component {
         <header className="panel__header w3-container w3-teal">
           <a className="w3-teal w3-left-align" onClick={()=>this.closeMenu()}>
             <i className="fa-chevron-left fa fa-lg fa-fw w3-margin-right"/>
-            Import/Export
+            Slides
           </a>
         </header>
         <main className="panel__content w3-container">
           <ul className="w3-ul">
             <li>
-              <SlidesImport/>
+              <SlidesAppend/>
             </li>
             <li>
-              <a className="flex-row w3-padding-0 w3-section w3-text-teal" href="#!">
-                <i className="fa-sign-out fa fa-lg fa-fw w3-margin-right"/>
-                Export Slides
-              </a>
+              <SlidesInsert/>
             </li>
             <li>
-              <a className="flex-row w3-padding-0 w3-section w3-text-teal" href="#!">
-                <i className="fa-file-o fa fa-lg fa-fw w3-margin-right"/>
-                Insert Blank Slide
-              </a>
+              <SlidesReset/>
+            </li>
+            <li>
+              <SlidesDelete/>
+            </li>
+            <li>
+              <SlidesBlank/>
             </li>
           </ul>
         </main>

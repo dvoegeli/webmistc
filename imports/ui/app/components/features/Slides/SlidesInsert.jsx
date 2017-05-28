@@ -6,8 +6,8 @@ import classNames from 'classnames';
 import AppState from '/imports/api/appState.js';
 import { Slides } from '/imports/api/slides.js';
 
-// SlidesImport component - button to import slides to database
-class SlidesImport extends Component {
+// SlidesInsert component - button to append slides to last slide
+class SlidesInsert extends Component {
   constructor() {
     super()
     this.parseImport = this.parseImport.bind(this);
@@ -16,6 +16,10 @@ class SlidesImport extends Component {
     PDFJS.workerSrc = '/packages/pascoual_pdfjs/build/pdf.worker.js';
   }
   storePdfSlides(slides) {
+    // store all the slides after the active slide
+    const location = Slides.activeSlide('number') || 0;
+    const offset = slides.length || 0;
+    Meteor.call('slides.offset', offset);
     slides.forEach((slide, number) => {
       const canvas = document.createElement('canvas');
       const scale = 1.5;
@@ -25,15 +29,12 @@ class SlidesImport extends Component {
       canvas.width = viewport.width;
       const task = slide.render({ canvasContext: context, viewport: viewport });
       task.promise.then(function() {
-        // this is broken for importing more than 1 set of slides
-        Meteor.call('slides.insert', {
-          active: !number, /*first slide is active*/
+        Meteor.call('slides.insert', location, {
           number: number + 1, /*index should be 1, not 0*/
           data: canvas.toDataURL('image/png'),
         });
       });
     });
-
   }
   parsePdf(pdf) {
     const slides = [];
@@ -45,6 +46,7 @@ class SlidesImport extends Component {
   }
   parseImport(event) {
     const slides = event.target.files[0];
+    if(!slides) return;
     // check if image or pdf, assume pdf for now
     const slidesUrl = URL.createObjectURL(slides);
     PDFJS.getDocument(slidesUrl).then(this.parsePdf.bind(this), (error) => console.log(error));
@@ -61,15 +63,16 @@ class SlidesImport extends Component {
             style={{display: "none"}}
             onChange={this.parseImport}
           />
-          <i className="fa-sign-in fa fa-lg fa-fw w3-margin-right"/>
-          Import Slides
+         {/*stacked icon: arrow down over single slide*/}
+          <i className="fa-arrow-down fa fa-lg fa-fw w3-margin-right"/>
+          Insert
         </label>
       </a>
     );
   }
 }
-SlidesImport.propTypes = {};
+SlidesInsert.propTypes = {};
 
 export default createContainer(() => {
   return {};
-}, SlidesImport);
+}, SlidesInsert);

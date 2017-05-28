@@ -38,7 +38,6 @@ connection.mediaConstraints = {
 };
 
 connection.onstream = function(event) {
-  console.log('connection is now streaming')
   audioStream = {
     local: event.mediaElement,
     remote: event.stream.getAudioTracks(),
