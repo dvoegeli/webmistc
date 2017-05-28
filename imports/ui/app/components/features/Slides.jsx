@@ -3,7 +3,6 @@ import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
  
 import AppState from '/imports/api/appState.js';
-import SlidesAppend from './Slides/SlidesAppend.jsx';
 import SlidesInsert from './Slides/SlidesInsert.jsx';
 import SlidesReset from './Slides/SlidesReset.jsx';
 import SlidesBlank from './Slides/SlidesBlank.jsx';
@@ -32,19 +31,16 @@ class Slides extends Component {
         <main className="panel__content w3-container">
           <ul className="w3-ul">
             <li>
-              <SlidesAppend/>
-            </li>
-            <li>
               <SlidesInsert/>
             </li>
             <li>
-              <SlidesReset/>
+              <SlidesBlank/>
             </li>
             <li>
               <SlidesDelete/>
             </li>
             <li>
-              <SlidesBlank/>
+              <SlidesReset/>
             </li>
           </ul>
         </main>
