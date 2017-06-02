@@ -25,8 +25,6 @@ Slides.paredCollection = () => {
 
 Meteor.methods({
   'slides.insert' (location, slide) {
-    // broken is trying to append to end
-    // likely, it's because the shift is broken
     check(location, Number);
     check(slide, {
       number: Number,
@@ -103,7 +101,7 @@ Meteor.methods({
   'slides.move' (request) {
     check(request, Match.OneOf(Number, String));
 
-    const active = Slides.findOne({ active: true });
+    const active = Slides.activeSlide();
 
     if (Match.test(request, String)) {
       const firstSlide = 1;
@@ -129,7 +127,6 @@ Meteor.methods({
         });
       }
     }
-
     if (Match.test(request, Number)) {
       Slides.update(active._id, {
         $set: { active: false },
