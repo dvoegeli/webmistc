@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import { browserHistory } from 'react-router';
 import _ from 'lodash';
-import classNames from 'classnames';
 
 import AppState from '../../../api/appState.js';
 
@@ -22,6 +22,10 @@ import ReactTooltip from 'react-tooltip';
 
 export default class App extends Component {
   componentWillMount() {
+    if (!AppState.get('user_name')) {
+      browserHistory.push('/');
+      return;
+    };
     this.updateWindowDimensions();
   }
 

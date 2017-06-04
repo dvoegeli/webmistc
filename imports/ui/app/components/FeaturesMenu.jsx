@@ -19,8 +19,8 @@ class FeaturesMenu extends Component {
   render() {
     const menu = classNames(
       'menu menu--panels w3-sidenav w3-card-8 w3-white w3-animate-right', {
-        'w3-show': this.props.features_menu_open,
-      });
+      'w3-show': this.props.features_menu_open,
+    });
     return (
       <nav className={menu}>
         <div className="panels-menu w3-white">

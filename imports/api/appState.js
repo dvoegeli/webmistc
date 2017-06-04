@@ -65,6 +65,7 @@ const initialState = {
   roles_sort: 'attendee', /*[attendee|contributor|presenter|host]*/
   /* USER SERVER DATA*/
   user_role: 'host', /*[attendee|contributor|presenter|host]*/
+  user_name: undefined, /*[undefined|username]*/
 
   /* COLORS */
   colors_menu_open: false,
