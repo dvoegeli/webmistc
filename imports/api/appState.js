@@ -57,7 +57,7 @@ const initialState = {
 
   /* FEATURES */
   features_menu_open: false,
-  features_show: 'slides', 
+  features_show: 'none', 
   /*[none|question|chat|message|role|sound|presentation|slides|vote]*/
 
   /* ROLES */

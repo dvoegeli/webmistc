@@ -3,3 +3,4 @@
 import '/imports/api/notes';
 import '/imports/api/stickyNotes';
 import '/imports/api/slides';
+import '/imports/api/chats';
