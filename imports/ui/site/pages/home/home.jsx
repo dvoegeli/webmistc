@@ -57,23 +57,29 @@ export default class Home extends Component {
     });
     return (
       <div className='flex-absolute-center w3-light-gray' style={{height: '100vh'}}>
-      <form className='w3-container w3-card-4 w3-teal' style={{width: '50%'}}
-        onSubmit={event=>this.handleSubmit(event)}
-      >
-        <h1 className='w3-text-white'>WebMISTC</h1>
-        <p>Enter your username</p>
-        <p>      
-          <input className={inputElement} name='username' type='text'
-            ref={ input => this.input = input}
-            onChange={(event)=>this.handleChange(event)}
-          />
-          <span className={usernameLength}>{this.state.inputLength}</span>
-          <span className='w3-margin-left w3-text-pale-red w3-small'>{usernameInput}</span>
-        </p>
-        <p>      
-          <button className='w3-btn w3-cyan w3-text-white w3-ripple'>Login</button>
-        </p>
-      </form>
+      <span className='flex-column'>
+        <img src='/img/logo.svg' alt='Logo' 
+          className='w3-image w3-margin-bottom' style={{width: '50vw'}}
+        />
+        <form className='w3-container w3-card-4 w3-teal' style={{width: '50vw'}}
+          onSubmit={event=>this.handleSubmit(event)}
+        >
+          
+          <p>Enter your username</p>
+          <p>      
+            <input className={inputElement} name='username' type='text'
+              ref={ input => this.input = input}
+              onChange={(event)=>this.handleChange(event)}
+            />
+            <span className={usernameLength}>{this.state.inputLength}</span>
+            <span className='w3-margin-left w3-text-pale-red w3-small'>{usernameInput}</span>
+          </p>
+          <p>      
+            <button className='w3-btn w3-cyan w3-text-white w3-ripple'>Login</button>
+          </p>
+        </form>
+
+      </span>
       </div>
     );
   }

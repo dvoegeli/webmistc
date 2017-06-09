@@ -61,7 +61,18 @@ class Whiteboard extends Component {
         ref={(whiteboard) => { this.whiteboard = whiteboard; }}
       >
         <Slide/>
-        <NotesLayer />
+        <NotesLayer/>
+        <img src='/img/logo.svg' alt='Logo' 
+          className='w3-opacity' 
+          style={{
+            position: 'relative',
+            float: 'left',
+            left: 8,
+            top: 8,
+            width: 100,
+
+          }}
+        />
     </main>
     );
   }
