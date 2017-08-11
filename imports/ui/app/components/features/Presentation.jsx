@@ -3,6 +3,7 @@ import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
 
 import AppState from '/imports/api/appState.js';
+import api from '/imports/api/presentation.js';
  
 // Presentation component - menu for presentation features
 class Presentation extends Component {
@@ -87,7 +88,7 @@ class Presentation extends Component {
             </li>
             <li>
               <h4>Record</h4>
-              <a className="flex-row w3-text-teal" href="#!">
+              <a className="flex-row w3-text-teal" onClick={()=>api.save()}>
                 <i className="fa-save fa fa-lg w3-margin-right"/>
                 Save Presentation
               </a>

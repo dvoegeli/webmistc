@@ -15,10 +15,19 @@ Slides.activeSlide = (attr) => {
   const slide = Slides.findOne({ active: true });
   return slide ? (attr ? slide[attr] : slide) : undefined;
 }
+
 // pared collection is filtered on slide.number and slide._id 
 Slides.paredCollection = () => {
   return Slides.find({}, {
     fields: { _id: true, number: true },
+    sort: { number: 1 }
+  }).fetch();
+}
+
+// slides collection to save, excluding '_id' 
+Slides.saveCollection = () => {
+  return Slides.find({}, {
+    fields: { _id: false },
     sort: { number: 1 }
   }).fetch();
 }
@@ -32,20 +41,15 @@ Meteor.methods({
     });
     const active = _.isEqual(slide.number, 1);
     const number = slide.number + location;
-    slide = Object.assign(slide, {
-      createdAt: new Date(),
-      active,
+    slide.number = Object.assign(slide, {
       number
     });
     const hasSlides = !_.isEqual(location, 0);
     if(hasSlides){
-      Slides.update({ number: location }, {
-        $set: { 
-          active: false,
-        },
-      });
+      Meteor.call('slides.active', location, false);
     }
     Slides.insert(slide);
+    Meteor.call('slides.active', number, active);
   },
   'slides.offset' (amount) {
     check(amount, Number);
@@ -66,19 +70,13 @@ Meteor.methods({
     const activeSlide = Slides.activeSlide(); 
     const number = (activeSlide && activeSlide.number + 1) || 1;
     slide = Object.assign(slide, {
-      createdAt: new Date(),
-      active: true,
       number
     });
     if(activeSlide){
-      Slides.update(activeSlide._id, {
-        $set: { 
-          active: false,
-        },
-      });
+      Meteor.call('slides.active', activeSlide.number, false);
     }
     Slides.insert(slide);
-
+    Meteor.call('slides.active', number, true);
   },
   'slides.delete'() {
     const activeSlide = Slides.activeSlide();
@@ -88,11 +86,7 @@ Meteor.methods({
     if(!!isLastSlide){
       const isDeletingLastSlide = _.isEqual(activeSlide.number, isLastSlide);
       const number = activeSlide.number + (isDeletingLastSlide ? -1 : 0);
-      Slides.update({ number }, { 
-        $set: { 
-          active: true,
-        } 
-      });
+      Meteor.call('slides.active', number, true);
     }
   },
   'slides.reset' () {
@@ -115,26 +109,22 @@ Meteor.methods({
       const canMoveRight = (moveRight && (nextSlide <= lastSlide));
 
       if (canMoveLeft) {
-        Slides.update(active._id, { $set: { active: false } });
-        Slides.update({ number: active.number - 1 }, {
-          $set: { active: true },
-        });
+        Meteor.call('slides.active', active.number, false);
+        Meteor.call('slides.active', active.number - 1, true);
       }
       if (canMoveRight) {
-        Slides.update(active._id, { $set: { active: false } });
-        Slides.update({ number: active.number + 1 }, {
-          $set: { active: true },
-        });
+        Meteor.call('slides.active', active.number, false);
+        Meteor.call('slides.active', active.number + 1, true);
       }
     }
     if (Match.test(request, Number)) {
-      Slides.update(active._id, {
-        $set: { active: false },
-      });
-      Slides.update({ number: request }, {
-        $set: { active: true },
-      });
+      Meteor.call('slides.active', active.number, false);
+      Meteor.call('slides.active', request, true);
     }
-
+  },
+  'slides.active' (number, active) {
+    check(number, Number);
+    check(active, Boolean);
+    Slides.update({ number }, { $set: { active } });
   },
 });
