@@ -25,7 +25,7 @@ Slides.paredCollection = () => {
 }
 
 // slides collection to save, excluding '_id' 
-Slides.saveCollection = () => {
+Slides.collection = () => {
   return Slides.find({}, {
     fields: { _id: false },
     sort: { number: 1 }
@@ -79,6 +79,7 @@ Meteor.methods({
     Meteor.call('slides.active', number, true);
   },
   'slides.delete'() {
+    Meteor.call('recordings.insert', 'slides.delete', Array.from(arguments) );
     const activeSlide = Slides.activeSlide();
     if(!activeSlide) return; 
     const isLastSlide = Slides.find().count();
@@ -90,10 +91,12 @@ Meteor.methods({
     }
   },
   'slides.reset' () {
+    Meteor.call('recordings.insert', 'slides.reset', Array.from(arguments) );
     Slides.remove({});
   },
   'slides.move' (request) {
     check(request, Match.OneOf(Number, String));
+    Meteor.call('recordings.insert', 'slides.move', Array.from(arguments) );
 
     const active = Slides.activeSlide();
 
@@ -125,6 +128,7 @@ Meteor.methods({
   'slides.active' (number, active) {
     check(number, Number);
     check(active, Boolean);
+    Meteor.call('recordings.insert', 'slides.active', Array.from(arguments) );
     Slides.update({ number }, { $set: { active } });
   },
 });

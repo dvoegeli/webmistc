@@ -23,6 +23,7 @@ Meteor.methods({
       slide: Slides.activeSlide('_id'),
       createdAt: new Date()
     });
+    Meteor.call('recordings.insert', 'drawing.insert', Array.from(arguments) );
     return Notes.insert(drawing);
   },
 });

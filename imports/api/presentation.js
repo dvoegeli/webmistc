@@ -1,17 +1,26 @@
+import { Meteor } from 'meteor/meteor';
 import JSZip from 'jszip';
-import { saveAs } from "file-saver";
+import { saveAs } from 'file-saver';
+
+import { Slides } from './slides.js';
+import { AudioConference } from './audioConference.js';
 
 export default Presentation = {};
 
 // Returns a promise
 // Use .then(()=>{...}) to use the promise
 Presentation.save = () => {
-  const zip = new JSZip();
-  // compile recording here, i.e., state updates and audio
-  zip.file("state.json", JSON.stringify({ buzz: 'ding' }));
-  zip.generateAsync({ type: "blob" }).then(function(blob) {
-    saveAs(blob, "presentation.mstc");
+  Meteor.call('recordings.fetch', (error, recordings) => {
+    if (error) {}
+    const zip = new JSZip();
+    zip.file('state.json', JSON.stringify(recordings));
+    zip.file('slides.json', JSON.stringify(Slides.collection()));
+    // zip.file('audio.opus', AudioConference.audio());
+    zip.generateAsync({ type: 'blob' }).then(function(blob) {
+      saveAs(blob, 'presentation.mstc');
+    });
   });
+
 }
 Presentation.load = () => {
   // implement me

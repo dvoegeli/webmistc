@@ -11,7 +11,12 @@ class Presentation extends Component {
     AppState.set('features_show', 'none');
   }
   toggleRecord(){
-    AppState.set('record_start', !this.props.record_start);
+    const isRecording = !this.props.record_start;
+    AppState.set('record_start', isRecording);
+    Meteor.call('recordings.record', isRecording);
+    if(isRecording){
+      Meteor.call('recordings.reset');
+    }
   }
 
   togglePlayback(){

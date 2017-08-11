@@ -25,6 +25,7 @@ Notes.getNotes = () => {
 
 Meteor.methods({
   'notes.remove'(id) {
+    Meteor.call('recordings.insert', 'notes.remove', Array.from(arguments) );
     Notes.remove(id);
   },
 });
