@@ -19,9 +19,11 @@ Meteor.methods({
     message = Object.assign(message, {
       createdAt: new Date(),
     });
+    Meteor.call('recordings.insert', 'chats.insert', Array.from(arguments) );
     Chats.insert(message);
   },
   'chats.reset' () {
+    Meteor.call('recordings.insert', 'chats.reset', Array.from(arguments) );
     Chats.remove({});
   },
 });

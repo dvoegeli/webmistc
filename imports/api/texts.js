@@ -19,6 +19,7 @@ Meteor.methods({
       color: String,
       size: String,
     });
+    Meteor.call('recordings.insert', 'text.insert', Array.from(arguments) );
     text = Object.assign(text, {
       slide: Slides.activeSlide('_id'),
       createdAt: new Date()
@@ -39,6 +40,7 @@ Meteor.methods({
       color: String,
       size: String,
     });
+    Meteor.call('recordings.insert', 'text.update', Array.from(arguments) );
     text = Object.assign(text, {
       slide: Slides.activeSlide('_id'),
       createdAt: new Date()
