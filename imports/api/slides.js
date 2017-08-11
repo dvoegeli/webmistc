@@ -41,7 +41,7 @@ Meteor.methods({
     });
     const active = _.isEqual(slide.number, 1);
     const number = slide.number + location;
-    slide.number = Object.assign(slide, {
+    slide = Object.assign(slide, {
       number
     });
     const hasSlides = !_.isEqual(location, 0);
