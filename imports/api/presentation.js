@@ -20,8 +20,11 @@ Presentation.save = () => {
       saveAs(blob, 'presentation.mstc');
     });
   });
-
 }
 Presentation.load = () => {
-  // implement me
+  // require("fs").readFile("hello.zip", function (err, data) {
+  //   if (err) throw err;
+  //   var zip = new JSZip();
+  //   zip.loadAsync(data);
+  // }
 }
