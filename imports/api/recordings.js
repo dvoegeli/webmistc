@@ -9,6 +9,9 @@ export const Recordings = new Mongo.Collection('recordings');
 
 let isRecording = false;
 
+// TODO: need to enter a NOP recording at the beginning to set start time
+// otherwise, the slides will not sync up with the audio
+
 Meteor.methods({
   'recordings.reset' () {
     Recordings.remove({});

@@ -5,6 +5,9 @@ import _ from 'lodash';
 
 export const Slides = new Mongo.Collection('slides');
 
+// TODO: slides should be a part of the recording process
+// otherwise, adding blank slides break playback
+
 if (Meteor.isServer) {
   Meteor.publish('slides', function slidesPublication() {
     return Slides.find();
