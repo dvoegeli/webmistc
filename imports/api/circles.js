@@ -18,10 +18,10 @@ Meteor.methods({
       },
       color: String,
       size: String,
+      slide: Match.Maybe(String)
     });
     circle = Object.assign(circle, {
       slide: Slides.activeSlide('_id'),
-      createdAt: new Date()
     });
     Meteor.call('recordings.insert', 'circle.insert', Array.from(arguments) );
     return Notes.insert(circle);

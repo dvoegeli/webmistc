@@ -14,7 +14,8 @@ Meteor.methods({
   'chats.insert' (message) {
     check(message, {
       username: String,
-      text: String
+      text: String,
+      createdAt: Match.Maybe(Object)
     });
     message = Object.assign(message, {
       createdAt: new Date(),

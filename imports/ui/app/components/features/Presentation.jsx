@@ -18,9 +18,12 @@ class Presentation extends Component {
       Meteor.call('recordings.reset');
     }
   }
-
   togglePlayback(){
     AppState.set('playback_start', !this.props.playback_start);
+  }
+  handleLoadPresentation(event){
+    api.load(event.target.files[0]);
+    // reset the html so the user can reselect the same file
   }
 
   render() {
@@ -71,7 +74,9 @@ class Presentation extends Component {
               <h4>Playback</h4>
               <a className="flex-row">
                 <label>
-                  <input type="file" style={{display: "none"}}/>
+                  <input type="file" style={{display: "none"}} accept=".mstc"
+                    onChange={(event)=>this.handleLoadPresentation(event)}
+                  />
                   <i className="fa-folder-open-o fa fa-lg fa-fw w3-margin-right"/>Open Presentation
                 </label>
               </a>

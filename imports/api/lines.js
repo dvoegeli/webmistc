@@ -18,10 +18,10 @@ Meteor.methods({
       },
       color: String,
       size: String,
+      slide: Match.Maybe(String)
     });
     line = Object.assign(line, {
-      slide: Slides.activeSlide('_id'),
-      createdAt: new Date()
+      slide: Slides.activeSlide('_id')
     });
     Meteor.call('recordings.insert', 'line.insert', Array.from(arguments) );
     return Notes.insert(line);

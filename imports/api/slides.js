@@ -24,15 +24,32 @@ Slides.paredCollection = () => {
   }).fetch();
 }
 
-// slides collection to save, excluding '_id' 
+// slides collection to save
 Slides.collection = () => {
   return Slides.find({}, {
-    fields: { _id: false },
     sort: { number: 1 }
   }).fetch();
 }
 
+Slides.loadCollection = (collection, finishedLoading) => {
+  // guarantee sort order
+  _.sortBy(collection, ['number']);
+  _.forEach(collection, (slide)=>{
+    Meteor.call('slides.load', slide);
+  });
+  finishedLoading();
+}
+
 Meteor.methods({
+  'slides.load' (slide) {
+    check(slide, {
+      number: Number,
+      data: String,
+      active: Boolean,
+      _id: String
+    });
+    Slides.insert(slide);
+  },
   'slides.insert' (location, slide) {
     check(location, Number);
     check(slide, {

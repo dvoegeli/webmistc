@@ -18,11 +18,11 @@ Meteor.methods({
       },
       color: String,
       size: String,
+      slide: Match.Maybe(String)
     });
     Meteor.call('recordings.insert', 'text.insert', Array.from(arguments) );
     text = Object.assign(text, {
-      slide: Slides.activeSlide('_id'),
-      createdAt: new Date()
+      slide: Slides.activeSlide('_id')
     });
     return Notes.insert(text);
   },
@@ -39,11 +39,11 @@ Meteor.methods({
       },
       color: String,
       size: String,
+      slide: Match.Maybe(String)
     });
     Meteor.call('recordings.insert', 'text.update', Array.from(arguments) );
     text = Object.assign(text, {
-      slide: Slides.activeSlide('_id'),
-      createdAt: new Date()
+      slide: Slides.activeSlide('_id')
     });
     return Notes.update(text._id, text);
   },
