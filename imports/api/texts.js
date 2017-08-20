@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { check, Match } from 'meteor/check';
+import { Random } from 'meteor/random';
 import { Notes } from './notes';
 import { Slides } from './slides';
 
@@ -18,12 +19,14 @@ Meteor.methods({
       },
       color: String,
       size: String,
+      slide: Match.Maybe(String),
+      _id: Match.Maybe(String)
+    });
+    text = Object.assign(text, {
+      slide: text.slide || Slides.activeSlide('_id'),
+      _id: text._id || Random.id(),
     });
     Meteor.call('recordings.insert', 'text.insert', Array.from(arguments) );
-    text = Object.assign(text, {
-      slide: Slides.activeSlide('_id'),
-      createdAt: new Date()
-    });
     return Notes.insert(text);
   },
   'text.update'(text) {
@@ -39,12 +42,14 @@ Meteor.methods({
       },
       color: String,
       size: String,
+      slide: Match.Maybe(String),
+      _id: Match.Maybe(String)
+    });
+    text = Object.assign(text, {
+      slide: text.slide || Slides.activeSlide('_id'),
+      _id: text._id || Random.id(),
     });
     Meteor.call('recordings.insert', 'text.update', Array.from(arguments) );
-    text = Object.assign(text, {
-      slide: Slides.activeSlide('_id'),
-      createdAt: new Date()
-    });
     return Notes.update(text._id, text);
   },
 });

@@ -3,10 +3,14 @@ import { Mongo } from 'meteor/mongo';
 import { check, Match } from 'meteor/check';
 
 import AppState from './appState';
+import { Slides } from './slides';
 
 export const Recordings = new Mongo.Collection('recordings');
 
 let isRecording = false;
+
+// TODO: need to enter a NOP recording at the beginning to set start time
+// otherwise, the slides will not sync up with the audio
 
 Meteor.methods({
   'recordings.reset' () {
@@ -32,5 +36,7 @@ Meteor.methods({
   },
   'recordings.record' (state) {
     isRecording = state;
+    const active = Slides.activeSlide();
+    //Meteor.call('recordings.insert', 'slides.active', [active.number, true] );
   }
 });

@@ -11,7 +11,7 @@ import StickyNotes from '/imports/api/stickyNotes';
 // TODO: soft returns, tabs, and reposition
 // BUG: accidental select when placing notes
 // BUG: incorrect preview when dragging during initial placement
-// BUG: sticky notes should remove last note after text is entered
+// BUG: sticky notes should not remove last note until after text is submitted
 
 // Text component - text for the notes layer
 class Text extends Component {
@@ -65,6 +65,14 @@ class Text extends Component {
     if (hasDefaultText) {
       $(this.textInput).focus();
       document.execCommand('selectAll', false, null);
+    }
+  }
+  componentDidUpdate(){
+    const text = $(this.textInput).text();
+    const hasText = !_.isEqual(text, this.defaultText);
+    if (hasText) {
+      document.getSelection().removeAllRanges();
+      $(this.textInput).blur();
     }
   }
   render() {
