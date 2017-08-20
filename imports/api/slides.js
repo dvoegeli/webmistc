@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { check, Match } from 'meteor/check';
+import { Random } from 'meteor/random';
 import _ from 'lodash';
 
 export const Slides = new Mongo.Collection('slides');
@@ -27,42 +28,22 @@ Slides.paredCollection = () => {
   }).fetch();
 }
 
-// slides collection to save
-Slides.collection = () => {
-  return Slides.find({}, {
-    sort: { number: 1 }
-  }).fetch();
-}
-
-Slides.loadCollection = (collection, finishedLoading) => {
-  // guarantee sort order
-  _.sortBy(collection, ['number']);
-  _.forEach(collection, (slide)=>{
-    Meteor.call('slides.load', slide);
-  });
-  finishedLoading();
-}
-
 Meteor.methods({
-  'slides.load' (slide) {
-    check(slide, {
-      number: Number,
-      data: String,
-      active: Boolean,
-      _id: String
-    });
-    Slides.insert(slide);
-  },
   'slides.insert' (location, slide) {
     check(location, Number);
     check(slide, {
       number: Number,
-      data: String
+      data: String,
+      _id: Match.Maybe(String),
     });
     const active = _.isEqual(slide.number, 1);
     const number = slide.number + location;
     slide = Object.assign(slide, {
-      number
+      _id: slide._id || Random.id(),
+    });
+    Meteor.call('recordings.insert', 'slides.insert', Array.from(arguments) );
+    slide = Object.assign(slide, {
+      number,
     });
     const hasSlides = !_.isEqual(location, 0);
     if(hasSlides){
@@ -75,6 +56,7 @@ Meteor.methods({
     check(amount, Number);
     const activeSlide = Slides.activeSlide();
     const slides = Slides.paredCollection();
+    Meteor.call('recordings.insert', 'slides.offset', Array.from(arguments) );
     _.forEach(slides, (slide) => {
       const canShiftSlides = slide.number > activeSlide.number;
       const number = canShiftSlides ? (slide.number + amount) : slide.number;
@@ -85,13 +67,17 @@ Meteor.methods({
   },
   'slides.blank' (slide) {
     check(slide, {
-      data: String
+      data: String,
+      number: Match.Maybe(Number),
+      _id: Match.Maybe(String),
     });
     const activeSlide = Slides.activeSlide(); 
     const number = (activeSlide && activeSlide.number + 1) || 1;
     slide = Object.assign(slide, {
-      number
+      number,
+      _id: slide._id || Random.id(),
     });
+    Meteor.call('recordings.insert', 'slides.blank', Array.from(arguments) );
     if(activeSlide){
       Meteor.call('slides.active', activeSlide.number, false);
     }
@@ -99,10 +85,10 @@ Meteor.methods({
     Meteor.call('slides.active', number, true);
   },
   'slides.delete'() {
-    Meteor.call('recordings.insert', 'slides.delete', Array.from(arguments) );
     const activeSlide = Slides.activeSlide();
     if(!activeSlide) return; 
     const isLastSlide = Slides.find().count();
+    Meteor.call('recordings.insert', 'slides.delete', Array.from(arguments) );
     Slides.remove(activeSlide._id);
     if(!!isLastSlide){
       const isDeletingLastSlide = _.isEqual(activeSlide.number, isLastSlide);
@@ -116,10 +102,8 @@ Meteor.methods({
   },
   'slides.move' (request) {
     check(request, Match.OneOf(Number, String));
-    Meteor.call('recordings.insert', 'slides.move', Array.from(arguments) );
-
     const active = Slides.activeSlide();
-
+    Meteor.call('recordings.insert', 'slides.move', Array.from(arguments) );
     if (Match.test(request, String)) {
       const firstSlide = 1;
       const lastSlide = Slides.find().count();

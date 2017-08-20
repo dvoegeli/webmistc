@@ -37,6 +37,6 @@ Meteor.methods({
   'recordings.record' (state) {
     isRecording = state;
     const active = Slides.activeSlide();
-    Meteor.call('recordings.insert', 'slides.active', [active.number, true] );
+    //Meteor.call('recordings.insert', 'slides.active', [active.number, true] );
   }
 });
