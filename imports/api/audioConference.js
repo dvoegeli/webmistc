@@ -15,12 +15,14 @@ if (!Response.prototype.setEncoding) {
 import _ from 'lodash';
 import AppState from '/imports/api/appState.js';
 import MicVisualizer from '/imports/api/micVisualizer.js';
-
+import { saveAs } from 'file-saver';
 
 const connection = new RTCMultiConnection();
 const audioContext = new AudioContext();
 const scriptNode = audioContext.createScriptProcessor(1024, 1, 1);
-let audioStream;
+let audioData;
+let audioRecorder;
+const recordingOptions = {mimeType: 'audio/webm;codecs=opus'};
 
 // use prototype STUN server until we host our own server
 connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
@@ -37,35 +39,74 @@ connection.mediaConstraints = {
   video: false
 };
 
-connection.onstream = function(event) {
-  audioStream = {
+connection.onstream = (event) => {
+  audioData = {
     local: event.mediaElement,
     remote: event.stream.getAudioTracks(),
   }
-  MicVisualizer.micSource(event.stream);
-  AudioConference.mute();
-  AudioConference.volume(0.5);
+  audioStream = event.stream;
+  const isLocalStream = _.isEqual(event.type, 'local');
+  if(isLocalStream){
+    MicVisualizer.micSource(audioStream);
+    AudioConference.mute();
+    AudioConference.volume(0.5);
+  }
+  // TODO: method to add this stream's tracks to other stream's tracks
+}
+
+function handleStopRecording(event) {
+  console.log('playing audio...')
+  //saveAs(event.data, 'audio.webm');
+  var url = URL.createObjectURL( event.data );
+  var audio = new Audio();
+  audio.src = url;
+  audio.play();
+}
+
+function extractStreams(streamEvents, type){
+  if(!_.includes(['local', 'remote'],type.toLowerCase())) return;
+  return _.filter(streamEvents,
+    (stream) => _.isEqual(stream.type, type)
+  );
+}
+
+function isTrackAvailable(){
+  const tracks = audioStream.getAudioTracks();
+  const isAvailable = _.some(tracks, track => track.enabled);
+  return isAvailable;
 }
 
 export default AudioConference = {};
 
-function extractLocalStreams(streamEvents){
-  return _.filter(streamEvents,
-    (stream) => _.isEqual(stream.type, 'local')
-  );
-}
 AudioConference.connect = () => connection.openOrJoin('1f4b7ad5-5822-487a-bf02-3cb94cb961f3');
+
 AudioConference.mute = () => {
-  if (!audioStream) return;
+  if (!audioData) return;
   const events = connection.streamEvents;
-  extractLocalStreams(events).forEach(event => event.stream.mute());
+  extractStreams(events, 'local').forEach(event => event.stream.mute());
 }
+
 AudioConference.unmute = (volume) => {
-  if (!audioStream) return;
+  if (!audioData) return;
   const events = connection.streamEvents;
-  extractLocalStreams(events).forEach(event => event.stream.unmute());
+  extractStreams(events, 'local').forEach(event => event.stream.unmute());
 }
+
 AudioConference.volume = (volume) => {
-  if (!audioStream.local) return;
-  audioStream.local.volume = volume;
+  if (!audioData.local) return;
+  audioData.local.volume = volume;
 }
+
+AudioConference.startRecording = () => {
+  audioRecorder = new MediaRecorder(audioStream, recordingOptions);
+  audioRecorder.ondataavailable = handleStopRecording;
+  if(!isTrackAvailable()) return;
+  audioRecorder.start();
+}
+AudioConference.stopRecording = () => {
+  const isRecordingInactive = _.isEqual(audioRecorder.state, 'inactive');
+  if(isRecordingInactive) return;
+  audioRecorder.stop();
+}
+
+// TODO: pause recording
