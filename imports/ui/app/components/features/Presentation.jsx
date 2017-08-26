@@ -3,6 +3,7 @@ import { createContainer } from 'meteor/react-meteor-data';
 import classNames from 'classnames';
 
 import AppState from '/imports/api/appState.js';
+import AudioConference from '/imports/api/audioConference.js';
 import api from '/imports/api/presentation.js';
  
 // Presentation component - menu for presentation features
@@ -14,16 +15,14 @@ class Presentation extends Component {
     const isRecording = !this.props.record_start;
     AppState.set('record_start', isRecording);
     Meteor.call('recordings.record', isRecording);
-    if(isRecording){
-      Meteor.call('recordings.reset');
-    }
+    isRecording ? AudioConference.startRecording() : AudioConference.stopRecording();
   }
   togglePlayback(){
     AppState.set('playback_start', !this.props.playback_start);
   }
   handleLoadPresentation(event){
     api.load(event.target.files[0]);
-    // reset the html so the user can reselect the same file
+    // TODO: reset the html so the user can reselect the same file
   }
 
   render() {

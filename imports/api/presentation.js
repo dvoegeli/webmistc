@@ -3,25 +3,32 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import _ from 'lodash';
 
-import { Slides } from './slides.js';
-import { AudioConference } from './audioConference.js';
+import { Slides } from '/imports/api/slides';
+import AudioConference from '/imports/api/audioConference';
 
 export default Presentation = {};
 
-function playback(state, stateChanges) {
+function playbackStateChanges(state, stateChanges) {
   const currentState = stateChanges[state];
   const isEnd = _.isEqual(state + 1, stateChanges.length);
   if (!isEnd) {
     const nextState = stateChanges[state + 1];
     const timeout = parseInt(nextState.time) - parseInt(currentState.time);
     Meteor.setTimeout(() => {
-      playback(state + 1, stateChanges);
+      playbackStateChanges(state + 1, stateChanges);
     }, timeout);
   }
   Meteor.apply(currentState.action, currentState.params);
 }
 
-function playPresentation(stateChanges) {
+function playbackAudio(audioData) {
+  var audioUrl = URL.createObjectURL( audioData );
+  var audio = new Audio();
+  audio.src = audioUrl;
+  audio.play();
+}
+
+function playPresentation(stateChanges, audio) {
   const FIRST_STATE = 0
   const currentState = stateChanges[FIRST_STATE];
   const hasNoStateChanges = _.isEqual(stateChanges.length, 0);
@@ -33,8 +40,8 @@ function playPresentation(stateChanges) {
     Meteor.apply(currentState.action, currentState.params);
     return;
   }
-
-  playback(FIRST_STATE, stateChanges);
+  playbackAudio(audio)
+  playbackStateChanges(FIRST_STATE, stateChanges);
 }
 
 function unzipSuccess(unzipped) {
@@ -50,12 +57,13 @@ function unzipSuccess(unzipped) {
       files[STATE_CHANGES] = file.async('string');
     }
     if(isAudio){
-      // files[1] = file.async('???whatever audio.opus is???');
+      files[AUDIO] = file.async('blob');
     }
   });
   Promise.all(files).then(files => { 
     const stateChanges = JSON.parse(files[STATE_CHANGES])
-    playPresentation(stateChanges);
+    const audio = files[AUDIO];
+    playPresentation(stateChanges, audio);
   }).catch(reason => {
     // TODO: UX: place errors in UI, not alert
     alert('Error loading presentation. ' + reason)
@@ -72,7 +80,7 @@ Presentation.save = () => {
     if (error) {}
     const zip = new JSZip();
     zip.file('state.json', JSON.stringify(recordings));
-    // zip.file('audio.opus', AudioConference.audio());
+    zip.file('audio.opus', AudioConference.getRecording());
     zip.generateAsync({ type: 'blob' }).then((blob) => {
       saveAs(blob, 'presentation.mstc');
     });

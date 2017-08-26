@@ -17,16 +17,15 @@ Meteor.methods({
     Recordings.remove({});
   },
   'recordings.insert' (action, params) {
-    if (isRecording) {
-      check(action, String);
-      check(params, Array);
-      const interaction = {
-        action,
-        params,
-        time: Date.now()
-      }
-      Recordings.insert(interaction);
+    if (!isRecording) return;
+    check(action, String);
+    check(params, Array);
+    const interaction = {
+      action,
+      params,
+      time: Date.now()
     }
+    Recordings.insert(interaction);
   },
   'recordings.fetch' () {
     return Recordings.find({}, {
@@ -34,9 +33,21 @@ Meteor.methods({
       sort: { date: 1 }
     }).fetch();
   },
+  'recordings.start' () {
+    if (!isRecording) return;
+    // a NOP recording entry at the beginning to set start time
+    // otherwise, the slides will not sync up with the audio
+    const interaction = {
+      action: 'recordings.start',
+      params: [],
+      time: Date.now()
+    }
+    Recordings.insert(interaction);
+  },
   'recordings.record' (state) {
     isRecording = state;
-    const active = Slides.activeSlide();
-    //Meteor.call('recordings.insert', 'slides.active', [active.number, true] );
+    if (!isRecording) return;
+    Meteor.call('recordings.reset');
+    Meteor.call('recordings.start');
   }
 });
