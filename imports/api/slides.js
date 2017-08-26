@@ -99,6 +99,7 @@ Meteor.methods({
   'slides.reset' () {
     Meteor.call('recordings.insert', 'slides.reset', Array.from(arguments) );
     Slides.remove({});
+    Meteor.call('erase.presentation');
   },
   'slides.move' (request) {
     check(request, Match.OneOf(Number, String));

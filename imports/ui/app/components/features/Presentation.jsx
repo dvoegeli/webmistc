@@ -15,19 +15,14 @@ class Presentation extends Component {
     const isRecording = !this.props.record_start;
     AppState.set('record_start', isRecording);
     Meteor.call('recordings.record', isRecording);
-    if(isRecording){
-      AudioConference.startRecording();
-      Meteor.call('recordings.reset');
-    } else {
-      AudioConference.stopRecording();
-    }
+    isRecording ? AudioConference.startRecording() : AudioConference.stopRecording();
   }
   togglePlayback(){
     AppState.set('playback_start', !this.props.playback_start);
   }
   handleLoadPresentation(event){
     api.load(event.target.files[0]);
-    // reset the html so the user can reselect the same file
+    // TODO: reset the html so the user can reselect the same file
   }
 
   render() {
