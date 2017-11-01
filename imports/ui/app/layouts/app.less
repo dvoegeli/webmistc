@@ -258,6 +258,20 @@
   }
 }
 
+.slide-nav-prev--fullscreen, .slide-nav-next--fullscreen {
+  position: fixed!important;
+  top: ~"calc( ( 100vh - 4em ) / 2)";
+  z-index: (@z-slide-controls + @z-fullscreen);
+}
+
+.slide-nav-prev--fullscreen {
+  left: 25px!important;
+}
+
+.slide-nav-next--fullscreen {
+  right: 25px!important;
+}
+
 .slide-nav {
   width: 100%;
   overflow: hidden;
