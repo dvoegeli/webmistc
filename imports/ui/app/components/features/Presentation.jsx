@@ -11,19 +11,16 @@ class Presentation extends Component {
   closeMenu(){
     AppState.set('features_show', 'none');
   }
+  togglePause(){
+    const isRecording = !this.props.record_start;
+    if(!isRecording)
+    this.toggleRecord();
+  }
   toggleRecord(){
     const isRecording = !this.props.record_start;
     AppState.set('record_start', isRecording);
     Meteor.call('recordings.record', isRecording);
     isRecording ? AudioConference.startRecording() : AudioConference.stopRecording();
-  }
-  pause(){
-    const isRecording = !this.props.record_start
-    if(!isRecording){
-      AppState.set('record_start', isRecording);
-      Meteor.call('recordings.record', isRecording);
-      AudioConference.startRecording();
-    }
   }
   togglePlayback(){
     AppState.set('playback_start', !this.props.playback_start);
@@ -113,7 +110,7 @@ class Presentation extends Component {
                 <button className={record.recordingButton} onClick={()=>this.toggleRecord()}>
                   <i className={record.recordingButtonIcon}/>
                 </button>
-                <button className={record.pauseResumeButton} onClick={()=>this.pause()}>
+                <button className={record.pauseResumeButton} onClick={()=>this.togglePause()}>
                   <i className={record.pauseResumeButtonIcon}/>
                 </button>
               </div>
@@ -125,7 +122,6 @@ class Presentation extends Component {
     );
   }
 }
-
 
 Presentation.propTypes = {
   features_show: PropTypes.string.isRequired,
