@@ -17,6 +17,8 @@ class SlidesButton extends Component {
       'clickable w3-text-teal w3-opacity-max', {
       'slide-nav-prev': _.isEqual(direction, 'prev'),
       'slide-nav-next': _.isEqual(direction, 'next'),
+      'slide-nav-prev--fullscreen': _.isEqual(direction, 'prev') && this.props.whiteboard_fullscreen,
+      'slide-nav-next--fullscreen': _.isEqual(direction, 'next') && this.props.whiteboard_fullscreen,
     });
     const icon = classNames(
       'fa fa-4x', {
@@ -32,9 +34,12 @@ class SlidesButton extends Component {
 }
  
 SlidesButton.propTypes = {
+  whiteboard_fullscreen: PropTypes.bool.isRequired,
   direction: PropTypes.string.isRequired,
 };
  
 export default createContainer(() => {
-  return {};
+  return {
+    whiteboard_fullscreen: AppState.get('whiteboard_fullscreen'),
+  };
 }, SlidesButton);
