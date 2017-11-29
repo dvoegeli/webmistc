@@ -5,11 +5,16 @@ import classNames from 'classnames';
 import AppState from '/imports/api/appState.js';
 import AudioConference from '/imports/api/audioConference.js';
 import api from '/imports/api/presentation.js';
- 
+
 // Presentation component - menu for presentation features
 class Presentation extends Component {
   closeMenu(){
     AppState.set('features_show', 'none');
+  }
+  togglePause(){
+    const isRecording = !this.props.record_start;
+    if(!isRecording)
+    this.toggleRecord();
   }
   toggleRecord(){
     const isRecording = !this.props.record_start;
@@ -105,7 +110,7 @@ class Presentation extends Component {
                 <button className={record.recordingButton} onClick={()=>this.toggleRecord()}>
                   <i className={record.recordingButtonIcon}/>
                 </button>
-                <button className={record.pauseResumeButton} onClick={()=>this.toggleRecord()}>
+                <button className={record.pauseResumeButton} onClick={()=>this.togglePause()}>
                   <i className={record.pauseResumeButtonIcon}/>
                 </button>
               </div>
@@ -117,15 +122,14 @@ class Presentation extends Component {
     );
   }
 }
- 
- 
+
 Presentation.propTypes = {
   features_show: PropTypes.string.isRequired,
   record_start: PropTypes.bool.isRequired,
   playback_start: PropTypes.bool.isRequired,
 
 };
- 
+
 export default createContainer(() => {
   return {
     features_show: AppState.get('features_show'),
