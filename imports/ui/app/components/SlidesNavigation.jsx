@@ -15,8 +15,8 @@ class SlidesNavigation extends Component {
     });
     return (
       <nav className={slideNav}>
-        <section className="slide-nav w3-border-left w3-border-right ">
-          <Draggable axis="x" bounds={{top: 0, left: -1250, right: 0, bottom: 0}}>
+        <section className="slide-nav w3-border-left w3-border-right">
+          <Draggable axis="x" bounds={{right:0}}>
             <div>
               <span className="slide-nav__slides flex-row">
                 {this.props.slides.map((slide) => {

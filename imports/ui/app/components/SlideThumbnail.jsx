@@ -13,13 +13,13 @@ class SlideThumbnail extends Component {
   render() {
     const {slide, active} = this.props;
     const thumbnail = classNames(
-      'slide-nav__slide clickable w3-margin flex-absolute-center', {
-      'w3-white w3-text-grey w3-card-2': !active,
-      'slide-nav__active w3-teal w3-card-4 w3-padding': active,
+      'clickable w3-margin flex-absolute-center', {
+      'w3-white w3-card-2': !active,
+      'w3-teal w3-card-4 w3-padding': active,
     })
     return (
       <a className={thumbnail} onClick={()=>this.changeSlide()}>
-        <img width='auto' height='95%' src={slide}/>
+        <img witdth='auto' height='175vw' src={slide}/>
       </a>
     );
   }
