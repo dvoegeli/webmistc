@@ -23,6 +23,7 @@ class Whiteboard extends Component {
       eraser: '<path fill="lightcoral" d="M832 1408l336-384h-768l-336 384h768zm1013-1077q15 34 9.5 71.5t-30.5 65.5l-896 1024q-38 44-96 44h-768q-38 0-69.5-20.5t-47.5-54.5q-15-34-9.5-71.5t30.5-65.5l896-1024q38-44 96-44h768q38 0 69.5 20.5t47.5 54.5z"/>',
     };
     this.whiteboard; // reference to the whiteboard ReactDOM element
+    this.isCtrlDown = false;
   }  
   componentDidMount() {
     this.updateDimensions();
@@ -37,6 +38,19 @@ class Whiteboard extends Component {
   }
   generateNoteCursor(color, type){   
     return `url('data:image/svg+xml,<svg fill="${Colors.getHex(color)}" shape-rendering="auto" width="22" height="22" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">${this.types[type]}</svg>'), auto`;
+  }
+  keepNotes(event){
+    console.log(event)
+    const ctrlKey = 17;
+    const zKey = 90;
+
+    if (event.keyCode == 17 || event.keyCode == 91) {
+      this.isCtrlDown = true;
+    }
+    if (this.isCtrlDown && event.keyCode == zKey) {
+      event.preventDefault();
+      return false;
+    }
   }
   render() {
     const {note_color, note_type, fullscreen} = this.props;
@@ -57,8 +71,9 @@ class Whiteboard extends Component {
       filter: 'drop-shadow(  1px 1px 2px rgba(0,0,0,0.35) )',
     };
     return (
-      <main className={classes} style={container}
-        ref={(whiteboard) => { this.whiteboard = whiteboard; }}
+      <main className={classes} style={container} onKeyDown={(event)=>this.keepNotes(event)}
+        ref={(whiteboard) => { this.whiteboard = whiteboard; }  
+      }
       >
         <Slide/>
         <NotesLayer/>
@@ -77,7 +92,7 @@ class Whiteboard extends Component {
     );
   }
 }
- 
+
  
 Whiteboard.propTypes = {
   fullscreen: PropTypes.bool.isRequired,
@@ -91,4 +106,4 @@ export default createContainer(() => {
     note_color: AppState.get('note_color'),
     note_type: AppState.get('note_type'),
   };
-}, Whiteboard);
+},Whiteboard);
