@@ -120,7 +120,7 @@ class Vote extends Component {
                 </div>
 
                 <div className="flex-row w3-row w3-section">
-                  <a>
+                  <a className="w3-clickable">
                     <i className="fa-plus fa fa-lg fa-fw w3-margin-right"/>
                     Add Answer
                   </a>
